@@ -57,3 +57,12 @@ tasks.register<Exec>("assembleReleaseExecutableMacos") {
     group = "Build"
     description = "Builds universal macOS binary"
 }
+
+tasks.register<Exec>("archiveReleaseExecutableMacOs") {
+    dependsOn("assembleReleaseExecutableMacos")
+    val buildNumber = findProperty("buildNumber")?.toString() ?: "dev"
+    commandLine("zip", "kdoctor_$version+$buildNumber.zip", "kdoctor")
+    workingDir = buildDir
+    group = "Build"
+    description = "Builds and archives universal macOS binary"
+}
