@@ -2,6 +2,8 @@ plugins {
     kotlin("multiplatform")
 }
 
+version = "1.0.0"
+
 kotlin {
     listOf(macosX64(), macosArm64()).forEach {
         it.binaries {
