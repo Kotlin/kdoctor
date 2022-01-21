@@ -24,7 +24,7 @@ object System {
 
     fun getHardwareInfo(): String? =
         System.execute("system_profiler", "SPHardwareDataType").output?.lines()
-            ?.firstOrNull { it.contains("Processor Name") }
+            ?.firstOrNull { it.contains("Processor Name") || it.contains("Chip") }
             ?.split(":")?.lastOrNull()?.let { "CPU: $it" }
 
     fun findAppPaths(appId: String): List<String> =
