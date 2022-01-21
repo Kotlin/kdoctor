@@ -8,8 +8,8 @@ class SystemDiagnostic : Diagnostic("System") {
         Message(
             if (System.type == SystemType.MacOS) Result.Success else Result.Failure,
             """
-                ${System.type} (${System.getVersion()})
-                ${System.getHardwareInfo()}
+                ${System.type} (${System.getVersion() ?: "N/A"})
+                ${System.getHardwareInfo() ?: ""}
             """.trimIndent()
         )
     )
