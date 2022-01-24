@@ -116,7 +116,7 @@ fun System.parsePlist(path: String): Map<String, Any>? {
     }
 }
 
-actual fun System.findAppsPathsInDirectory(prefix: String, directory: String) : List<String> {
+actual fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean) : List<String> {
     val paths = mutableListOf<String>()
     val dp = opendir(directory) ?: return paths
     do {
@@ -126,6 +126,8 @@ actual fun System.findAppsPathsInDirectory(prefix: String, directory: String) : 
             val type = result.pointed.d_type.toInt()
             if (type == DT_DIR && name.startsWith(prefix) && name.endsWith(".app")) {
                 paths.add("$directory/$name")
+            } else if (recursively && type == DT_DIR && name.trim('.').isNotEmpty()){
+                paths.addAll(findAppsPathsInDirectory(prefix, "$directory/$name", recursively))
             }
         }
     } while (result != null)

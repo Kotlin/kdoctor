@@ -23,6 +23,7 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
         if (paths.isEmpty()) {
             paths.addAll(System.findAppsPathsInDirectory("Android Studio", "/Applications"))
             paths.addAll(System.findAppsPathsInDirectory("Android Studio", "${System.homeDir}/Applications"))
+            paths.addAll(System.findAppsPathsInDirectory("Android Studio", "${System.homeDir}/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio", true))
         }
         if (paths.isEmpty()) {
             messages.addFailure(
