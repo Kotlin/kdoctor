@@ -12,7 +12,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
 
         val rubyVersion = System.execute("ruby", "-v").output
         val rubyLocation = System.execute("which", "ruby").output
-        if (rubyLocation == null || rubyVersion == null || rubyVersion.contains("not found")) {
+        if (rubyLocation == null || rubyVersion == null) {
             messages.addFailure(
                 "ruby not found",
                 "Get ruby from https://www.ruby-lang.org/en/documentation/installation/"
@@ -42,7 +42,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         }
 
         val rubyGemsVersion = System.execute("gem", "-v").output
-        if (rubyGemsVersion == null || rubyGemsVersion.contains("not found")) {
+        if (rubyGemsVersion == null) {
             messages.addFailure(
                 "ruby gems not found",
                 "Get ruby gems from https://rubygems.org/pages/download"

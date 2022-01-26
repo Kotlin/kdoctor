@@ -23,8 +23,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                     else -> javaLocation
                 }
         }
-        if (javaLocation.isNullOrBlank() || javaLocation.contains("not found", ignoreCase = true) ||
-            javaVersion.isNullOrBlank() || javaVersion.contains("unable to locate", ignoreCase = true)
+        if (javaLocation.isNullOrBlank() || javaVersion.isNullOrBlank()
         ) {
             messages.addFailure(
                 "Java not found",
