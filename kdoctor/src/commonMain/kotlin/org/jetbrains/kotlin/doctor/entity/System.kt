@@ -13,7 +13,7 @@ enum class Shell(val path: String, val profile: String) {
     Zsh("/bin/zsh", "~/.zprofile")
 }
 
-data class ProcessResult(val code: Int, val output: String?)
+data class ProcessResult(val code: Int, val output: String?, val error: String?)
 
 object System {
     val type: SystemType = getCurrentSystemType()
@@ -33,10 +33,8 @@ object System {
             ?.filter { it.isNotBlank() }
             .orEmpty()
 
-    fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
-        val output = System.execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
-        return if (output?.contains("filename not matched") == true) null else output
-    }
+    fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
+        System.execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
 
     fun getShell(): Shell? {
         val shellPath = getEnvVar("SHELL")
@@ -50,4 +48,4 @@ expect fun System.getEnvVar(name: String): String?
 expect fun System.fileExists(path: String): Boolean
 expect fun System.readFile(path: String): String?
 expect fun System.execute(command: String, vararg args: String): ProcessResult
-expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false) : List<String>
+expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
