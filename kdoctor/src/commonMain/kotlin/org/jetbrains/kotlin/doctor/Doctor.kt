@@ -30,8 +30,11 @@ object Doctor {
 
 fun main() {
     runBlocking {
-        print("Diagnosing Kotlin Multiplatform Mobile environment...")
+        val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
+        print(progressMsg)
         val kmmDiagnostic = Doctor.diagnoseKmmEnvironment(true)
-        print("\r$kmmDiagnostic")
+        print("\r")
+        print(" ".repeat(progressMsg.length))
+        println("\r$kmmDiagnostic")
     }
 }
