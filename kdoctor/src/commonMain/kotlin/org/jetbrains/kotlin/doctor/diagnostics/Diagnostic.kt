@@ -25,10 +25,14 @@ abstract class Diagnostic(val name: String) {
 
     fun diagnose(verbose: Boolean): String {
         val messages = runChecks()
-        val (result, text) =  Message(
-            messages.sortedWith { a, b -> getResultIndex(a.result) - getResultIndex(b.result) }.first().result,
-            messages.joinToString("\n\n") { it.text }
-        )
+        val (result, text) = if (messages.isEmpty()) {
+            Message(Result.Failure, "Diagnostic returned no result")
+        } else {
+            Message(
+                messages.sortedWith { a, b -> getResultIndex(a.result) - getResultIndex(b.result) }.first().result,
+                messages.joinToString("\n\n") { it.text }
+            )
+        }
         return Paragraph(
             "[${result.symbol}] $name",
             if (verbose) text else ""
