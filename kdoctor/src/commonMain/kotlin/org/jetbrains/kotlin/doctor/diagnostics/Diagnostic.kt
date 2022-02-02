@@ -1,53 +1,53 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 abstract class Diagnostic(val name: String) {
-    enum class Result(val symbol: Char) {
+    enum class ResultType(val symbol: Char) {
         Success('v'),
         Info('i'),
         Warning('!'),
         Failure('x')
     }
 
-    data class Message(val result: Result, val text: String)
+    data class Message(val resultType: ResultType, val text: String)
+
+    inner class Result(private val title: String, messages: List<Message>) {
+
+        private val messages: List<Message> = messages.ifEmpty {
+            listOf(Message(ResultType.Failure, "Diagnostic returned no result"))
+        }
+
+        val resultType = this.messages.minByOrNull { getResultTypeSeverity(it.resultType) }?.resultType ?: ResultType.Failure
+
+        val text = buildString {
+            appendLine("[${resultType.symbol}] $title")
+            appendLine(messages.joinToString("\n\n") { it.text.prependIndent() })
+        }
+    }
 
     private class Paragraph(val title: String, vararg val text: String) {
         fun print() = (title + "\n" + text.joinToString("\n").prependIndent()).trim()
     }
 
-    protected open fun getResultIndex(result: Result) = when (result) {
-        Result.Failure -> 0
-        Result.Warning -> 1
-        Result.Success -> 2
-        Result.Info -> 3
+    protected open fun getResultTypeSeverity(resultType: ResultType) = when (resultType) {
+        ResultType.Failure -> 0
+        ResultType.Warning -> 1
+        ResultType.Success -> 2
+        ResultType.Info -> 3
     }
 
     protected abstract fun runChecks(): List<Message>
 
-    fun diagnose(verbose: Boolean): String {
-        val messages = runChecks()
-        val (result, text) = if (messages.isEmpty()) {
-            Message(Result.Failure, "Diagnostic returned no result")
-        } else {
-            Message(
-                messages.sortedWith { a, b -> getResultIndex(a.result) - getResultIndex(b.result) }.first().result,
-                messages.joinToString("\n\n") { it.text }
-            )
-        }
-        return Paragraph(
-            "[${result.symbol}] $name",
-            if (verbose) text else ""
-        ).print()
-    }
+    fun diagnose(verbose: Boolean) = Result(name, runChecks())
 
     fun MutableCollection<Message>.addSuccess(title: String, vararg text: String) =
-        add(Message(Result.Success, Paragraph(title, *text).print()))
+        add(Message(ResultType.Success, Paragraph(title, *text).print()))
 
     fun MutableCollection<Message>.addInfo(title: String, vararg text: String) =
-        add(Message(Result.Info, Paragraph(title, *text).print()))
+        add(Message(ResultType.Info, Paragraph(title, *text).print()))
 
     fun MutableCollection<Message>.addWarning(title: String, vararg text: String) =
-        add(Message(Result.Warning, Paragraph(title, *text).print()))
+        add(Message(ResultType.Warning, Paragraph(title, *text).print()))
 
     fun MutableCollection<Message>.addFailure(title: String, vararg text: String) =
-        add(Message(Result.Failure, Paragraph(title, *text).print()))
+        add(Message(ResultType.Failure, Paragraph(title, *text).print()))
 }
