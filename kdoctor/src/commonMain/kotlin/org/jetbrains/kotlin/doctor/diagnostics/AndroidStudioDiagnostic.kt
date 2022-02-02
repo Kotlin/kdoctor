@@ -9,11 +9,11 @@ import org.jetbrains.kotlin.doctor.entity.getKotlinPlugin
 import org.jetbrains.kotlin.doctor.entity.findAppsPathsInDirectory
 
 class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
-    override fun getResultIndex(result: Result) = when (result) {
-        Result.Success -> 0
-        Result.Failure -> 1
-        Result.Warning -> 2
-        Result.Info -> 3
+    override fun getResultTypeSeverity(resultType: ResultType) = when (resultType) {
+        ResultType.Success -> 0
+        ResultType.Failure -> 1
+        ResultType.Warning -> 2
+        ResultType.Info -> 3
     }
 
     override fun runChecks(): List<Message> {
@@ -23,7 +23,13 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
         if (paths.isEmpty()) {
             paths.addAll(System.findAppsPathsInDirectory("Android Studio", "/Applications"))
             paths.addAll(System.findAppsPathsInDirectory("Android Studio", "${System.homeDir}/Applications"))
-            paths.addAll(System.findAppsPathsInDirectory("Android Studio", "${System.homeDir}/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio", true))
+            paths.addAll(
+                System.findAppsPathsInDirectory(
+                    "Android Studio",
+                    "${System.homeDir}/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio",
+                    true
+                )
+            )
         }
         if (paths.isEmpty()) {
             messages.addFailure(

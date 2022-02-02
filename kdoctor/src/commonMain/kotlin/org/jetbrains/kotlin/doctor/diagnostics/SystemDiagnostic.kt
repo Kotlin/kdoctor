@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.doctor.entity.SystemType
 class SystemDiagnostic : Diagnostic("System") {
     override fun runChecks() = listOf(
         Message(
-            if (System.type == SystemType.MacOS) Result.Success else Result.Failure,
+            if (System.type == SystemType.MacOS) ResultType.Success else ResultType.Failure,
             """
                 ${System.type} (${System.getVersion() ?: "N/A"})
                 ${System.getHardwareInfo() ?: ""}
