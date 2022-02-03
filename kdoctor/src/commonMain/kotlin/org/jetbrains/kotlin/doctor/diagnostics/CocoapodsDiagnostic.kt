@@ -37,7 +37,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         if (ruby.location == "/usr/bin/ruby") {
             messages.addInfo(
                 "System ruby is currently used",
-                "Consider installing ruby via brew, rvm or other package manager in case of issues with cocoapods installation"
+                "Consider installing ruby via Homebrew, rvm or other package manager in case of issues with cocoapods installation"
             )
         }
 

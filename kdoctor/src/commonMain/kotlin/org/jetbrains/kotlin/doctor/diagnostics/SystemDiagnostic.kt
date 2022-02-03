@@ -10,6 +10,7 @@ class SystemDiagnostic : Diagnostic("System") {
             """
                 ${System.type} (${System.getVersion() ?: "N/A"})
                 ${System.getHardwareInfo() ?: ""}
+                
             """.trimIndent()
         )
     )

@@ -68,10 +68,8 @@ class JavaDiagnostic : Diagnostic("Java") {
                 }
 
                 messages.addInfo(
-                    """
-                        Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.
-                        Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section
-                    """.trimIndent()
+                    "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+                    "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
                 )
             }
         }

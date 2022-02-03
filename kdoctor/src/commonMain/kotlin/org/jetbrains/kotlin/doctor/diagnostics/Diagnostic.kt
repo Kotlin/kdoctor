@@ -20,12 +20,19 @@ abstract class Diagnostic(val name: String) {
 
         val text = buildString {
             appendLine("[${resultType.symbol}] $title")
-            appendLine(messages.joinToString("\n\n") { it.text.prependIndent() })
+            append(messages.joinToString("\n") { it.text.prependIndent() })
         }
     }
 
     private class Paragraph(val title: String, vararg val text: String) {
-        fun print() = (title + "\n" + text.joinToString("\n").prependIndent()).trim()
+        fun print(prefix: String = "") = buildString {
+            appendLine(
+                title.lines()
+                    .mapIndexed { i: Int, s: String -> if (i == 0) s.prependIndent(prefix) else s.prependIndent(" ".repeat(prefix.length)) }
+                    .joinToString("\n")
+            )
+            if (text.isEmpty().not()) appendLine(text.joinToString("\n") { it.prependIndent().prependIndent(" ".repeat(prefix.length)) })
+        }
     }
 
     protected open fun getResultTypeSeverity(resultType: ResultType) = when (resultType) {
@@ -39,15 +46,17 @@ abstract class Diagnostic(val name: String) {
 
     fun diagnose(verbose: Boolean) = Result(name, runChecks())
 
+    private val attentionPrefix = "* "
+
     fun MutableCollection<Message>.addSuccess(title: String, vararg text: String) =
         add(Message(ResultType.Success, Paragraph(title, *text).print()))
 
     fun MutableCollection<Message>.addInfo(title: String, vararg text: String) =
-        add(Message(ResultType.Info, Paragraph(title, *text).print()))
+        add(Message(ResultType.Info, Paragraph(title, *text).print(attentionPrefix)))
 
     fun MutableCollection<Message>.addWarning(title: String, vararg text: String) =
-        add(Message(ResultType.Warning, Paragraph(title, *text).print()))
+        add(Message(ResultType.Warning, Paragraph(title, *text).print(attentionPrefix)))
 
     fun MutableCollection<Message>.addFailure(title: String, vararg text: String) =
-        add(Message(ResultType.Failure, Paragraph(title, *text).print()))
+        add(Message(ResultType.Failure, Paragraph(title, *text).print(attentionPrefix)))
 }
