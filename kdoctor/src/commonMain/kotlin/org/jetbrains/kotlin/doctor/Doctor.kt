@@ -1,5 +1,7 @@
 package org.jetbrains.kotlin.doctor
 
+import kotlinx.cli.ArgParser
+import kotlinx.cli.ArgType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -45,7 +47,17 @@ object Doctor {
     }
 }
 
-fun main() {
+fun main(args: Array<String>) {
+    val parser = ArgParser("kdoctor")
+    val versionFlag by parser.option(ArgType.Boolean, shortName = "v", fullName = "version", description = "print KDoctor version")
+    parser.parse(args)
+    when (versionFlag) {
+        true -> println(DoctorVersion.VERSION)
+        else -> run()
+    }
+}
+
+private fun run() {
     runBlocking {
         val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
         print(progressMsg)

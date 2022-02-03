@@ -2,8 +2,6 @@ plugins {
     kotlin("multiplatform")
 }
 
-version = "1.0.0"
-
 kotlin {
     listOf(macosX64(), macosArm64()).forEach {
         it.binaries {
@@ -18,6 +16,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
+                implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
             }
         }
         val macosX64Main by getting
@@ -56,13 +55,4 @@ tasks.register<Exec>("assembleReleaseExecutableMacos") {
     workingDir = buildDir
     group = "Build"
     description = "Builds universal macOS binary"
-}
-
-tasks.register<Exec>("archiveReleaseExecutableMacOs") {
-    dependsOn("assembleReleaseExecutableMacos")
-    val buildNumber = findProperty("buildNumber")?.toString() ?: "dev"
-    commandLine("zip", "kdoctor_$version+$buildNumber.zip", "kdoctor")
-    workingDir = buildDir
-    group = "Build"
-    description = "Builds and archives universal macOS binary"
 }
