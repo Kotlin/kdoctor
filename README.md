@@ -53,7 +53,9 @@ Diagnosing Kotlin Multiplatform Mobile environment...
 
 Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for Kotlin Multiplatform Mobile development:
 
-`Your system is ready for Kotlin Multiplatform Mobile Development!`
+```bash
+Your system is ready for Kotlin Multiplatform Mobile Development!
+```
 
 If KDoctor notifies that there are problems, please review the report:
 
@@ -63,22 +65,24 @@ Please check the output for problem description and possible solutions.
 ```
 
 Check the results of each diagnostic. There are 3 possible statuses:
-* \[v] - Success
-* \[x] - Failure
-* \[!] - Warning
+* `[v]` - Success
+* `[x]` - Failure
+* `[!]` - Warning
 
-Pay the most attention to the failed diagnostics ([x]) and look for messages that start with * for problem description and potential solution. 
+Pay the most attention to the failed diagnostics (`[x]`) and look for messages that start with * for problem description and potential solution. 
 
-It is also worth checking diagnostics with warnings ([!]) and even successful messages as they may contain useful notes and tips.
+It is also worth checking diagnostics with warnings (`[!]`) and even successful messages as they may contain useful notes and tips.
 
 Execute KDoctor with a `-v` option to print the tool's version
-```
+
+```bash
 kdoctor -v
 0.0.1
 ```
-##Sample output
 
-```
+## Sample output
+
+```bash
 [v] System                                           
     macOS (11.6.2)
     CPU:  Dual-Core Intel Core i5
