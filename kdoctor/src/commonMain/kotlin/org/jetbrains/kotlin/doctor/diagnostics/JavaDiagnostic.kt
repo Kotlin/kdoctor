@@ -11,7 +11,8 @@ class JavaDiagnostic : Diagnostic("Java") {
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
         var javaLocation = System.execute("which", "java").output
-        val javaVersion = System.execute("java", "--version").output?.lineSequence()?.firstOrNull()
+        val javaVersionCmd = System.execute("java", "-version")
+        val javaVersion = if (javaVersionCmd.code == 0) javaVersionCmd.error?.lineSequence()?.firstOrNull() else null
         //java_home requires empty argument, returns empty response otherwise
         val systemJavaHome = System.execute("/usr/libexec/java_home", "").output
         val javaHome = System.getEnvVar("JAVA_HOME")
