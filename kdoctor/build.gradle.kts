@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 kotlin {
@@ -17,14 +18,14 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
                 implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
             }
         }
         val macosX64Main by getting
         val macosArm64Main by getting
         val macosMain by creating {
-            dependencies {
-                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-            }
+
         }
 
         /* Main hierarchy */
