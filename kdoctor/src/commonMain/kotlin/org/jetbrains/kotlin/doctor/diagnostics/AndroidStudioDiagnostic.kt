@@ -1,12 +1,8 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
-import org.jetbrains.kotlin.doctor.entity.System
-import org.jetbrains.kotlin.doctor.entity.Version
-import org.jetbrains.kotlin.doctor.entity.appFromPath
-import org.jetbrains.kotlin.doctor.entity.getEmbeddedJavaVersion
-import org.jetbrains.kotlin.doctor.entity.getKmmPlugin
-import org.jetbrains.kotlin.doctor.entity.getKotlinPlugin
-import org.jetbrains.kotlin.doctor.entity.findAppsPathsInDirectory
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import org.jetbrains.kotlin.doctor.entity.*
 
 class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
     override fun getResultTypeSeverity(resultType: ResultType) = when (resultType) {
@@ -39,7 +35,25 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             return messages
         }
 
-        val studioInstallations = paths.mapNotNull { appFromPath(it) }
+        val studioInstallations = paths.mapNotNull { appFromPath(it) }.filter { app -> //filter Toolbox backup versions
+            if (app.location != null && app.location.contains("Toolbox", ignoreCase = true)) {
+                val channelPath = app.location.substringBeforeLast('/').substringBeforeLast('/')
+                val historyFile = "$channelPath/.history.json"
+                val historyJson = System.readFile(historyFile)
+                val jsonFormatter = Json { ignoreUnknownKeys = true }
+                val history = historyJson?.let {
+                    try {
+                        jsonFormatter.decodeFromString<ToolboxHistory>(it)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }?.history
+                val currentBuild = history?.maxByOrNull { it.timestamp }?.item?.build
+                currentBuild?.let { app.location.contains(currentBuild) } ?: true
+            } else {
+                true
+            }
+        }
 
         if (studioInstallations.count() > 1) {
             messages.addInfo("Multiple Android Studio installations found")
