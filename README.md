@@ -1,3 +1,8 @@
+# Work in progress
+
+KDoctor is under development and has not been released yet.  
+Feel free to evaluate the latest pre-release version and share your feedback. 
+
 # KDoctor
 
 KDoctor is a command-line tool that helps to set up the environment for [Kotlin Multiplatform Mobile](https://kotlinlang.org/lp/mobile/) app development.
