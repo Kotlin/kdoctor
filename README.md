@@ -37,7 +37,7 @@ brew install kdoctor
 
 To build from source use:
 ```bash
-git clone https://github.com/Kotlin/kotlin-interactive-shell
+git clone https://github.com/Kotlin/kdoctor
 cd kdoctor
 ./gradlew assembleReleaseExecutableMacOs
 ```
