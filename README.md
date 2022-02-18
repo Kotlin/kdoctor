@@ -30,14 +30,14 @@ You can download an archive from GitHub:
 1. Go to [Releases](https://github.com/Kotlin/kdoctor/releases) page
 2. Download the latest available version there
 3. Unpack it to preferred place
-<!--- uncomment once available on Homebrew
+
 ### Homebrew
 
 Install via [Homebrew](https://brew.sh/) with the following command:
 ```bash
 brew install kdoctor
 ```
--->
+
 ### Build From Source
 
 To build from source use:
@@ -51,14 +51,14 @@ cd kdoctor
 
 Call KDoctor in the console and wait till it completes the diagnostics 
 
-```bash
+```
 kdoctor
 Diagnosing Kotlin Multiplatform Mobile environment...
 ```
 
 Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for Kotlin Multiplatform Mobile development:
 
-```bash
+```
 Your system is ready for Kotlin Multiplatform Mobile Development!
 ```
 
@@ -80,14 +80,14 @@ It is also worth checking diagnostics with warnings (`[!]`) and even successful 
 
 Execute KDoctor with a `-v` option to print the tool's version
 
-```bash
+```
 kdoctor -v
-0.0.1
+0.0.2
 ```
 
 ## Sample output
 
-```bash
+```
 [v] System                                           
     macOS (11.6.2)
     CPU:  Dual-Core Intel Core i5
