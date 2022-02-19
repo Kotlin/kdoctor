@@ -8,8 +8,9 @@ class SystemDiagnostic : Diagnostic("System") {
         Message(
             if (System.type == SystemType.MacOS) ResultType.Success else ResultType.Failure,
             """
-                ${System.type} (${System.getVersion() ?: "N/A"})
+                OS: ${System.type} (${System.getVersion() ?: "N/A"})
                 ${System.getHardwareInfo() ?: ""}
+                Using Rosetta 2: ${if (System.isUsingRosetta) "Yes" else "No"}
                 
             """.trimIndent()
         )
