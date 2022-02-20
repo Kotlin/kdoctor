@@ -21,7 +21,7 @@ actual fun System.readFile(path: String): String? = memScoped {
     readFd(fd)
 }
 
-actual fun System.execute(command: String, vararg args: String): ProcessResult = memScoped {
+actual fun System.execute(command: String, vararg args: String, verbose: Boolean): ProcessResult = memScoped {
     val readEnd = 0
     val writeEnd = 1
 
@@ -58,8 +58,8 @@ actual fun System.execute(command: String, vararg args: String): ProcessResult =
         close(errorPipe[writeEnd])
 
         //execute command
-        val newArgs = listOf(command) + args
-        val result = execvp(command, newArgs.map { it.cstr.ptr }.toCValues())
+        val newArgs = listOf(command) + args + null
+        val result = execvp(command, newArgs.map { it?.cstr?.ptr }.toCValues())
         exit(result)
     }
 
@@ -81,6 +81,26 @@ actual fun System.execute(command: String, vararg args: String): ProcessResult =
     } else {
         kill(timerPid, SIGKILL)
         retCode.value
+    }
+
+    if (verbose) {
+        val commandWithArgs = "$command ${args.joinToString(separator = " ")}"
+        val returnCodeShifted = (returnCode shr 8)
+        println("-----> Command \"$commandWithArgs\" returned with code $returnCodeShifted")
+
+        val outputLines = output?.lines()
+        if (outputLines != null && outputLines.size > 1) {
+            println("<----- output:")
+            outputLines.forEach {
+                println(it)
+            }
+        } else {
+            println("<----- output: $output")
+        }
+
+        error?.let {
+            println("<----- error: $it")
+        }
     }
 
     ProcessResult(returnCode, output, error)
