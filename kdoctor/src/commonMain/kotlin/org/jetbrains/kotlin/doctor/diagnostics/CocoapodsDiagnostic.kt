@@ -4,11 +4,30 @@ import org.jetbrains.kotlin.doctor.entity.Application
 import org.jetbrains.kotlin.doctor.entity.System
 import org.jetbrains.kotlin.doctor.entity.Version
 import org.jetbrains.kotlin.doctor.entity.execute
-import org.jetbrains.kotlin.doctor.entity.getEnvVar
 
 class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
+
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
+
+        val (code, output, error) = System.execute("brew", "list", "cocoapods")
+
+        val cocoapodsFormulae = System.execute("brew", "list", "", "cocoapods", "").output
+            ?.lines()
+
+        val cocoapodsFromHomebrew = cocoapodsFormulae?.let { lines ->
+            lines.find { it.contains("cocoapods:") }
+                ?.split("/")
+                ?.find { it.matches(Regex(COCOAPODS_VERSION_PATTERN)) }
+                ?.substringAfter("_")
+                ?.let { version ->
+                    Application(name = "cocoapods", version = Version(version))
+                }
+        }
+
+        if (cocoapodsFromHomebrew != null) {
+            messages.addSuccess("Found cocoapods in Homebrew: ${cocoapodsFromHomebrew.name} (${cocoapodsFromHomebrew.version})")
+        }
 
         val rubyVersion = System.execute("ruby", "-v").output
         val rubyLocation = System.execute("which", "ruby").output
@@ -62,8 +81,13 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             Application(name, version)
         }
 
-        val cocoapods = cocoapodsGems?.firstOrNull { it.name == "cocoapods" }
-        if (cocoapods == null) {
+        val cocoapodsFromGem = cocoapodsGems?.firstOrNull { it.name == "cocoapods" }
+
+        if (cocoapodsFromGem != null) {
+            messages.addSuccess("Found cocoapods in Gem: ${cocoapodsFromGem.name} (${cocoapodsFromGem.version})")
+        }
+
+        if (cocoapodsFromGem == null && cocoapodsFromHomebrew == null) {
             messages.addFailure(
                 "cocoapods not found",
                 "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
@@ -71,7 +95,9 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             return messages
         }
 
-        messages.addSuccess("${cocoapods.name} (${cocoapods.version})")
+        if (cocoapodsFromGem == null) {
+            return messages
+        }
 
         val cocoapodsGenerate = cocoapodsGems.firstOrNull { it.name == "cocoapods-generate" }
         if (cocoapodsGenerate == null) {
@@ -97,7 +123,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
             export LC_ALL=en_US.UTF-8
         """.trimIndent()
-            if (cocoapods.version > Version(1, 10, 2)) {
+            if (cocoapodsFromGem.version > Version(1, 10, 2)) {
                 messages.addFailure("CocoaPods requires your terminal to be using UTF-8 encoding.", hint)
             } else {
                 messages.addWarning("CocoaPods requires your terminal to be using UTF-8 encoding.", hint)
@@ -105,5 +131,9 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         }
 
         return messages
+    }
+
+    companion object {
+        private const val COCOAPODS_VERSION_PATTERN = "^\\d\\.\\d{1,2}.\\d{1,2}\$"
     }
 }
