@@ -1,11 +1,11 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 abstract class Diagnostic(val name: String) {
-    enum class ResultType(val symbol: Char) {
-        Success('v'),
-        Info('i'),
-        Warning('!'),
-        Failure('x')
+    enum class ResultType(val symbol: String) {
+        Success("✅"),
+        Info("ℹ️"),
+        Warning("⚠️"),
+        Failure("❌")
     }
 
     data class Message(val resultType: ResultType, val text: String)
@@ -19,7 +19,7 @@ abstract class Diagnostic(val name: String) {
         val resultType = this.messages.minByOrNull { getResultTypeSeverity(it.resultType) }?.resultType ?: ResultType.Failure
 
         val text = buildString {
-            appendLine("[${resultType.symbol}] $title")
+            appendLine("${resultType.symbol} $title")
             append(messages.joinToString("\n") { it.text.prependIndent() })
         }
     }
@@ -46,7 +46,7 @@ abstract class Diagnostic(val name: String) {
 
     fun diagnose(verbose: Boolean) = Result(name, runChecks())
 
-    private val attentionPrefix = "* "
+    private val attentionPrefix = "ℹ️ "
 
     fun MutableCollection<Message>.addSuccess(title: String, vararg text: String) =
         add(Message(ResultType.Success, Paragraph(title, *text).print()))
