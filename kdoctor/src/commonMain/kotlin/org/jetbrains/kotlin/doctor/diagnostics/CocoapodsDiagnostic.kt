@@ -10,16 +10,14 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
 
-        val (code, output, error) = System.execute("brew", "list", "cocoapods")
-
-        val cocoapodsFormulae = System.execute("brew", "list", "", "cocoapods", "").output
+        val cocoapodsFormulae = System.execute("brew", "list", "cocoapods").output
             ?.lines()
 
         val cocoapodsFromHomebrew = cocoapodsFormulae?.let { lines ->
-            lines.find { it.contains("cocoapods:") }
+            lines.find { it.contains("/bin/pod") }
                 ?.split("/")
                 ?.find { it.matches(Regex(COCOAPODS_VERSION_PATTERN)) }
-                ?.substringAfter("_")
+                ?.substringBefore("_")
                 ?.let { version ->
                     Application(name = "cocoapods", version = Version(version))
                 }
@@ -29,7 +27,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             messages.addSuccess("Found cocoapods in Homebrew: ${cocoapodsFromHomebrew.name} (${cocoapodsFromHomebrew.version})")
         }
 
-        val rubyVersion = System.execute("ruby", "-v").output
+        val rubyVersion = System.execute("ruby", "-v", verbose = true).output
         val rubyLocation = System.execute("which", "ruby").output
         if (rubyLocation == null || rubyVersion == null) {
             messages.addFailure(
@@ -134,6 +132,6 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
     }
 
     companion object {
-        private const val COCOAPODS_VERSION_PATTERN = "^\\d\\.\\d{1,2}.\\d{1,2}\$"
+        private const val COCOAPODS_VERSION_PATTERN = "^\\d\\.\\d{1,2}.\\d{1,2}(_\\d)?$"
     }
 }
