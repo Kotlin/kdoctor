@@ -27,7 +27,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             messages.addSuccess("Found cocoapods in Homebrew: ${cocoapodsFromHomebrew.name} (${cocoapodsFromHomebrew.version})")
         }
 
-        val rubyVersion = System.execute("ruby", "-v", verbose = true).output
+        val rubyVersion = System.execute("ruby", "-v").output
         val rubyLocation = System.execute("which", "ruby").output
         if (rubyLocation == null || rubyVersion == null) {
             messages.addFailure(
