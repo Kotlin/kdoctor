@@ -58,5 +58,5 @@ expect fun System.getHomeDir(): String
 expect fun System.getEnvVar(name: String): String?
 expect fun System.fileExists(path: String): Boolean
 expect fun System.readFile(path: String): String?
-expect fun System.execute(command: String, vararg args: String): ProcessResult
+expect fun System.execute(command: String, vararg args: String, verbose: Boolean = false): ProcessResult
 expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
