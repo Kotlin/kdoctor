@@ -13,8 +13,7 @@ class JavaDiagnostic : Diagnostic("Java") {
         var javaLocation = System.execute("which", "java").output
         val javaVersionCmd = System.execute("java", "-version")
         val javaVersion = if (javaVersionCmd.code == 0) javaVersionCmd.error?.lineSequence()?.firstOrNull() else null
-        //java_home requires empty argument, returns empty response otherwise
-        val systemJavaHome = System.execute("/usr/libexec/java_home", "").output
+        val systemJavaHome = System.execute("/usr/libexec/java_home").output
         val javaHome = System.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
             javaLocation =

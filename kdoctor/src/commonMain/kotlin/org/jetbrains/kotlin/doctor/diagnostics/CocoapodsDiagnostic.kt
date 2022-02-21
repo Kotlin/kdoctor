@@ -91,7 +91,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
 
         messages.addSuccess("${cocoapodsGenerate.name} (${cocoapodsGenerate.version})")
 
-        val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE", "") //trailing empty arg is required
+        val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE")
         if (locale.output == null || !locale.output.contains("UTF-8")) {
             val hint = """
             Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
