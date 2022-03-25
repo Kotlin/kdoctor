@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.doctor.entity.Application
 import org.jetbrains.kotlin.doctor.entity.System
 import org.jetbrains.kotlin.doctor.entity.Version
 import org.jetbrains.kotlin.doctor.entity.execute
-import org.jetbrains.kotlin.doctor.entity.getEnvVar
 
 class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
     override fun runChecks(): List<Message> {
@@ -53,27 +52,47 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         val gems = Application("ruby gems", Version(rubyGemsVersion))
         messages.addSuccess("${gems.name} (${gems.version})")
 
-        val gemList = System.execute("gem", "list", "--local", "cocoapods").output
-        val cocoapodsGems = gemList?.split("\n")?.mapNotNull {
-            val nameAndVersion = it.split(" ", limit = 2)
-            val name = nameAndVersion.firstOrNull() ?: return@mapNotNull null
-            val versionString = nameAndVersion.lastOrNull()?.trim('(', ')')
-            val version = if (versionString != null) Version(versionString) else Version.unknown
-            Application(name, version)
+        var cocoapods: Application? = null
+        val cocoapodsVersionOutput = System.execute("pod", "--version").output
+        if (cocoapodsVersionOutput != null) {
+            val cocoapodsVersion = Version(cocoapodsVersionOutput)
+            cocoapods = Application("cocoapods", cocoapodsVersion)
         }
-
-        val cocoapods = cocoapodsGems?.firstOrNull { it.name == "cocoapods" }
         if (cocoapods == null) {
+            //check if installed via brew but not linked to /usr/bin
+            val cocoapodsBrewInstallation = System.execute("brew", "list", "cocoapods", "--versions").output
+            if (cocoapodsBrewInstallation?.isNotBlank() == true) {
+                messages.addFailure(
+                    "Cocoapods are installed via Homebrew but not linked to /usr/local/bin",
+                    "Execute 'brew link --overwrite cocoapods'"
+                )
+            } else {
+                messages.addFailure(
+                    "cocoapods not found",
+                    "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
+                )
+            }
+            return messages
+        } else if (cocoapods.version < Version(1, 8, 0)) {
             messages.addFailure(
-                "cocoapods not found",
-                "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
+                "cocoapods version ${cocoapods.version.version} is outdated",
+                "Update your cocoapods installation to the latest available version"
             )
             return messages
         }
-
         messages.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
-        val cocoapodsGenerate = cocoapodsGems.firstOrNull { it.name == "cocoapods-generate" }
+        var cocoapodsGenerate: Application? = null
+        val cocoapodsGenerateName = "cocoapods-generate"
+        val plugins = System.execute("pod", "plugins", "installed", "--no-ansi").output
+        val cocoaPodsGenerateEntry = plugins?.lines()?.find { it.contains(cocoapodsGenerateName) }
+        if (cocoaPodsGenerateEntry != null) {
+            val version = cocoaPodsGenerateEntry.split(":").lastOrNull()?.let { Version(it.trim()) }
+            if (version != null) {
+                cocoapodsGenerate = Application(cocoapodsGenerateName, version)
+            }
+        }
+
         if (cocoapodsGenerate == null) {
             messages.addFailure(
                 "cocoapods-generate plugin not found",
@@ -81,6 +100,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             )
             return messages
         }
+
         if (cocoapodsGenerate.version < Version(2, 2, 2)) {
             messages.addFailure(
                 "Cocoapods-generate version ${cocoapodsGenerate.version} is not supported",
