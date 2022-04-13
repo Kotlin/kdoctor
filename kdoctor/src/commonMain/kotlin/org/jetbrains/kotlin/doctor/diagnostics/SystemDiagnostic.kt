@@ -11,7 +11,7 @@ class SystemDiagnostic : Diagnostic("System") {
                 resultType = if (System.type == SystemType.MacOS) ResultType.Success else ResultType.Failure,
                 text = """
                     OS: ${System.type} (${System.getVersion() ?: "N/A"})
-                    ${System.getHardwareInfo() ?: ""}
+                    ${System.getCPUInfo() ?: ""}
                 """.trimIndent()
             )
         )
