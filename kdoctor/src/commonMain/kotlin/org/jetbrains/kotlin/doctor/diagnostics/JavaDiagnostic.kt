@@ -1,11 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
-import org.jetbrains.kotlin.doctor.entity.Application
-import org.jetbrains.kotlin.doctor.entity.System
-import org.jetbrains.kotlin.doctor.entity.Version
-import org.jetbrains.kotlin.doctor.entity.execute
-import org.jetbrains.kotlin.doctor.entity.fileExists
-import org.jetbrains.kotlin.doctor.entity.getEnvVar
+import org.jetbrains.kotlin.doctor.entity.*
 
 class JavaDiagnostic : Diagnostic("Java") {
     override fun runChecks(): List<Message> {
@@ -56,15 +51,39 @@ class JavaDiagnostic : Diagnostic("Java") {
                     )
                 }
                 if (javaHome != systemJavaHome) {
-                    messages.addInfo(
-                        """
+                    val xcodeJavaHome =
+                        System.execute(
+                            "defaults",
+                            "read",
+                            "com.apple.dt.Xcode",
+                            "IDEApplicationwideBuildSettings"
+                        ).output?.lines()?.lastOrNull { it.contains("\"JAVA_HOME\"") }?.split("=")?.lastOrNull()
+                            ?.trim(' ', '"', ';')
+                    if (xcodeJavaHome == null) {
+                        messages.addInfo(
+                            """
                             Note that, by default, Xcode uses Java environment returned by /usr/libexec/java_home:
                             $systemJavaHome
                             It does not match current JAVA_HOME environment variable:
                             $javaHome
                         """.trimIndent(),
-                        javaHomeHint(systemJavaHome)
-                    )
+                            """
+                            Set JAVA_HOME in XCode -> Preferences -> Locations -> Custom Paths to
+                            $javaHome
+                        """.trimIndent()
+                        )
+                    } else if (javaHome != xcodeJavaHome) {
+                        messages.addInfo(
+                            """
+                            Xcode JAVA_HOME is set to
+                            $xcodeJavaHome
+                            It does not match current JAVA_HOME environment variable:
+                            $javaHome 
+                            """.trimIndent(),
+                            "Set JAVA_HOME in XCode -> Preferences -> Locations -> Custom Paths to $javaHome"
+                        )
+                    }
+
                 }
 
                 messages.addInfo(
