@@ -34,10 +34,19 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         messages.addSuccess("${ruby.name} (${ruby.version})")
 
         if (ruby.location == "/usr/bin/ruby") {
-            messages.addInfo(
-                "System ruby is currently used",
-                "Consider installing ruby via Homebrew, rvm or other package manager in case of issues with cocoapods installation"
-            )
+            var title = "System ruby is currently used"
+            if (System.isUsingM1) {
+                messages.addFailure(
+                    title,
+                    "CocoaPods is not compatible with system ruby installation on Apple M1 computers.",
+                    "Please install ruby 2.7 via Homebrew, rvm, rbenv or other tool and make it default"
+                )
+            } else {
+                messages.addInfo(
+                    title,
+                    "Consider installing ruby 2.7 via Homebrew, rvm or other package manager in case of issues with CocoaPods installation"
+                )
+            }
         }
 
         val rubyGemsVersion = System.execute("gem", "-v").output

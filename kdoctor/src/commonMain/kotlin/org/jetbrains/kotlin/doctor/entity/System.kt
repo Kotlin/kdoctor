@@ -21,18 +21,13 @@ object System {
 
     val isUsingRosetta by lazy { isUsingRosetta() }
 
+    val isUsingM1 by lazy { isUsingM1() }
+
     fun getVersion() =
         System.execute("sw_vers", "-productVersion").output?.let { Version(it) }
 
-    fun getHardwareInfo(): String? = if (isUsingRosetta) {
-        System.execute("sysctl", "-n", "machdep.cpu.brand_string", "").output
-            ?.let { "CPU: $it" }
-    } else {
-        System.execute("system_profiler", "SPHardwareDataType").output?.lines()
-            ?.firstOrNull { it.contains("Processor Name") || it.contains("Chip") }
-            ?.split(":")?.lastOrNull()
-            ?.let { "CPU: $it" }
-    }
+    fun getCPUInfo(): String? = System.execute("sysctl", "-n", "machdep.cpu.brand_string", "").output
+        ?.let { "CPU: $it" }
 
     fun findAppPaths(appId: String): List<String> =
         System.execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
@@ -51,6 +46,8 @@ object System {
     private fun isUsingRosetta(): Boolean = System.execute("sysctl", "sysctl.proc_translated").output
         ?.substringAfter("sysctl.proc_translated: ")
         ?.toIntOrNull() == 1
+
+    private fun isUsingM1(): Boolean = getCPUInfo()?.contains("Apple") == true
 }
 
 expect fun System.getCurrentSystemType(): SystemType
