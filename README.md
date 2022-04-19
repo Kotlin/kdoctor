@@ -1,9 +1,7 @@
-# Work in progress
-
-KDoctor is under development and has not been released yet.  
-Feel free to evaluate the latest pre-release version and share your feedback. 
-
 # KDoctor
+[![JetBrains incubator project](https://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Homebrew](https://badgen.net/homebrew/v/kdoctor)](https://formulae.brew.sh/formula/kdoctor)
 
 KDoctor is a command-line tool that helps to set up the environment for [Kotlin Multiplatform Mobile](https://kotlinlang.org/lp/mobile/) app development.
 
