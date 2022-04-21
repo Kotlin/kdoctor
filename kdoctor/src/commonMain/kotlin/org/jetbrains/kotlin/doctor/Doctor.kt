@@ -36,12 +36,12 @@ object Doctor {
             if (failures > 0)
                 appendLine(
                     """
-                    |KDoctor has diagnosed one or more problems while checking your environment.
+                    |${Diagnostic.ResultType.Failure.symbol} KDoctor has diagnosed one or more problems while checking your environment.
                     |Please check the output for problem description and possible solutions.
                     """.trimMargin()
                 )
             else
-                appendLine("Your system is ready for Kotlin Multiplatform Mobile Development!")
+                appendLine("${Diagnostic.ResultType.Success.symbol} Your system is ready for Kotlin Multiplatform Mobile Development!")
         }
         return results.joinToString("\n") { it.text }.plus("\n$conclusion")
     }
