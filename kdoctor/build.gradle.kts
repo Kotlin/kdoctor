@@ -1,6 +1,11 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
+}
+
+repositories {
+    google()
+    mavenCentral()
 }
 
 kotlin {
@@ -16,9 +21,9 @@ kotlin {
         /* Main source sets */
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
-                implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
-                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
             }
         }
