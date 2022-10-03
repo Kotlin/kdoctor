@@ -1,5 +1,8 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 abstract class Diagnostic(val name: String) {
     enum class ResultType(val symbol: Char) {
         Success('v'),
@@ -44,7 +47,9 @@ abstract class Diagnostic(val name: String) {
 
     protected abstract fun runChecks(): List<Message>
 
-    fun diagnose(verbose: Boolean) = Result(name, runChecks())
+    suspend fun diagnose(verbose: Boolean): Result = suspendCoroutine {
+        it.resume(Result(name, runChecks()))
+    }
 
     private val attentionPrefix = "* "
 
