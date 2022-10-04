@@ -2,11 +2,7 @@ package org.jetbrains.kotlin.doctor
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.jetbrains.kotlin.doctor.diagnostics.*
 
 object Doctor {
@@ -47,10 +43,14 @@ object Doctor {
     }
 }
 
+internal var isDebug = false
 fun main(args: Array<String>) {
     val parser = ArgParser("kdoctor")
     val versionFlag by parser.option(ArgType.Boolean, shortName = "v", fullName = "version", description = "print KDoctor version")
+    val debugFlag by parser.option(ArgType.Boolean, fullName = "debug", description = "debug mode")
     parser.parse(args)
+
+    debugFlag?.let { isDebug = it }
     when (versionFlag) {
         true -> println(DoctorVersion.VERSION)
         else -> run()

@@ -5,6 +5,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import org.jetbrains.kotlin.doctor.Log
 import platform.Foundation.NSHomeDirectory
 import platform.posix.*
 
@@ -77,29 +78,31 @@ actual fun System.execute(command: String, vararg args: String, verbose: Boolean
     val endedPid = wait(retCode.ptr)
     returnCode = if (endedPid == timerPid || endedPid == -1) {
         kill(execPid, SIGKILL)
+        Log.e { "$command SIGKILL" }
         EXIT_FAILURE
     } else {
         kill(timerPid, SIGKILL)
         retCode.value
     }
 
-    if (verbose) {
+    Log.d {
         val commandWithArgs = "$command ${args.joinToString(separator = " ")}"
-        val returnCodeShifted = (returnCode shr 8)
-        println("-----> Command \"$commandWithArgs\" returned with code $returnCodeShifted")
+        "-----> Command \"$commandWithArgs\" returned with code $returnCode"
+    }
 
+    if (verbose) {
         val outputLines = output?.lines()
         if (outputLines != null && outputLines.size > 1) {
-            println("<----- output:")
+            Log.d { "<----- output:" }
             outputLines.forEach {
-                println(it)
+                Log.d { it }
             }
         } else {
-            println("<----- output: $output")
+            Log.d { "<----- output: $output" }
         }
 
         error?.let {
-            println("<----- error: $it")
+            Log.e { "<----- error: $it" }
         }
     }
 
