@@ -68,7 +68,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                             $javaHome
                         """.trimIndent(),
                             """
-                            Set JAVA_HOME in XCode -> Preferences -> Locations -> Custom Paths to
+                            Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to
                             $javaHome
                         """.trimIndent()
                         )
@@ -80,7 +80,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                             It does not match current JAVA_HOME environment variable:
                             $javaHome 
                             """.trimIndent(),
-                            "Set JAVA_HOME in XCode -> Preferences -> Locations -> Custom Paths to $javaHome"
+                            "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
                         )
                     }
 
