@@ -12,23 +12,30 @@ actual fun Application.getPlugin(name: String): Plugin? {
     if (dataDirectoryName != null) {
         dataDirs.add("${System.homeDir}/Library/Application Support/Google/$dataDirectoryName")
     }
-    dataDirs.add("$location/Contents")
+    dataDirs.add("$location")
 
 
     return dataDirs.firstNotNullOfOrNull { findPlugin(it, name) }
 }
 
 private fun findPlugin(dataDir: String, pluginName: String): Plugin? {
-    val jars = System.execute(
-        "find",
-        "$dataDir/plugins/$pluginName/lib", "-name", "*.jar"
-    ).output?.split("\n") ?: return null
+    val jars = pluginJars(dataDir, pluginName) ?: return null
     val pluginXml = jars.firstNotNullOfOrNull { System.readArchivedFile(it, "META-INF/plugin.xml") } ?: return null
     val version = Regex("<version>(.+?)</version>").find(pluginXml)?.groups?.get(1)?.value ?: return null
     val id = Regex("<id>(.+?)</id>").find(pluginXml)?.groups?.get(1)?.value ?: return null
     val disabledPlugins = System.readFile("$dataDir/disabled_plugins.txt")
     val isEnabled = disabledPlugins == null || !disabledPlugins.contains(id)
     return Plugin(pluginName, id, Version(version), isEnabled)
+}
+
+private fun pluginJars(dataDir: String, pluginName: String): List<String>? {
+    return System.execute(
+        "find",
+        "$dataDir/Contents/plugins/$pluginName/lib", "-name", "*.jar"
+    ).output?.split("\n") ?: System.execute(
+        "find",
+        "$dataDir.plugins/$pluginName/lib", "-name", "*.jar"
+    ).output?.split("\n")
 }
 
 actual fun appFromPath(path: String): Application? {
