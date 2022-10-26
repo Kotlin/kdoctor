@@ -14,7 +14,6 @@ actual fun Application.getPlugin(name: String): Plugin? {
     }
     dataDirs.add("$location")
 
-
     return dataDirs.firstNotNullOfOrNull { findPlugin(it, name) }
 }
 
@@ -28,15 +27,18 @@ private fun findPlugin(dataDir: String, pluginName: String): Plugin? {
     return Plugin(pluginName, id, Version(version), isEnabled)
 }
 
-private fun pluginJars(dataDir: String, pluginName: String): List<String>? {
-    return System.execute(
-        "find",
-        "$dataDir/Contents/plugins/$pluginName/lib", "-name", "*.jar"
-    ).output?.split("\n") ?: System.execute(
-        "find",
-        "$dataDir.plugins/$pluginName/lib", "-name", "*.jar"
-    ).output?.split("\n")
-}
+private fun pluginJars(dataDir: String, pluginName: String): List<String>? =
+    listOf(
+        "$dataDir/Contents/plugins/$pluginName/lib",
+        "$dataDir/plugins/$pluginName/lib"
+    ).firstNotNullOfOrNull { path ->
+        System.execute(
+            command = "find",
+            path,
+            "-name",
+            "*.jar"
+        ).output?.split("\n")
+    }
 
 actual fun appFromPath(path: String): Application? {
     val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
