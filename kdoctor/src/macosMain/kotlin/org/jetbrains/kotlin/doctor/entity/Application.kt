@@ -30,7 +30,8 @@ private fun findPlugin(dataDir: String, pluginName: String): Plugin? {
 private fun pluginJars(dataDir: String, pluginName: String): List<String>? =
     listOf(
         "$dataDir/Contents/plugins/$pluginName/lib",
-        "$dataDir/plugins/$pluginName/lib"
+        "$dataDir/plugins/$pluginName/lib",
+        "$dataDir.plugins/$pluginName/lib"
     ).firstNotNullOfOrNull { path ->
         System.execute(
             command = "find",
