@@ -91,34 +91,6 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         }
         messages.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
-        var cocoapodsGenerate: Application? = null
-        val cocoapodsGenerateName = "cocoapods-generate"
-        val plugins = System.execute("pod", "plugins", "installed", "--no-ansi").output
-        val cocoaPodsGenerateEntry = plugins?.lines()?.find { it.contains(cocoapodsGenerateName) }
-        if (cocoaPodsGenerateEntry != null) {
-            val version = cocoaPodsGenerateEntry.split(":").lastOrNull()?.let { Version(it.trim()) }
-            if (version != null) {
-                cocoapodsGenerate = Application(cocoapodsGenerateName, version)
-            }
-        }
-
-        if (cocoapodsGenerate == null) {
-            messages.addInfo(
-                "cocoapods-generate plugin not found",
-                "Before Kotlin 1.7.0 you have to use cocoapods-generate plugin",
-                "Get cocoapods-generate from https://github.com/square/cocoapods-generate#installation"
-            )
-        } else {
-            if (cocoapodsGenerate.version < Version(2, 2, 2)) {
-                messages.addFailure(
-                    "Cocoapods-generate version ${cocoapodsGenerate.version} is not supported",
-                    "Get the latest version of cocoapods-generate plugin from https://github.com/square/cocoapods-generate#installation"
-                )
-            } else {
-                messages.addSuccess("${cocoapodsGenerate.name} (${cocoapodsGenerate.version})")
-            }
-        }
-
         val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE").output
         if (locale == null || !locale.contains("UTF-8")) {
             val hint = """
