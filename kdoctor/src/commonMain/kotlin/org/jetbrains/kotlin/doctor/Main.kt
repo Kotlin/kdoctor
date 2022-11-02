@@ -7,7 +7,7 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
 
-internal const val KDOCTOR_VERSION = "0.0.4"
+private const val KDOCTOR_VERSION = "0.0.5"
 
 fun main(args: Array<String>) {
     val parser = ArgParser("kdoctor")
