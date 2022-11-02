@@ -32,7 +32,7 @@ class JavaDiagnostic : Diagnostic("Java") {
             messages.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))
         } else {
             val javaHomeCanonical = javaHome.removeSuffix("/")
-            val javaCmdLocations = listOf("$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
+            val javaCmdLocations = listOf(javaHomeCanonical, "$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
             if (javaCmdLocations.none { System.fileExists(it) }) {
                 messages.addFailure(
                     "JAVA_HOME is set to an invalid directory: $javaHome",
