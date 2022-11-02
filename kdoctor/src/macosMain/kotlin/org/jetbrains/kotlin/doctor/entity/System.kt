@@ -1,19 +1,16 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import co.touchlab.kermit.Logger
 import kotlinx.cinterop.*
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import org.jetbrains.kotlin.doctor.Log
 import platform.Foundation.NSHomeDirectory
 import platform.posix.*
 
-actual fun System.getCurrentSystemType(): SystemType = SystemType.MacOS
-actual fun System.getHomeDir(): String = NSHomeDirectory()
+actual val System.currentOS: OS get() = OS.MacOS
+actual val System.homeDir: String get() = NSHomeDirectory()
 actual fun System.getEnvVar(name: String): String? = getenv(name)?.toKString()
 actual fun System.fileExists(path: String): Boolean = access(path, F_OK) == 0
 actual fun System.readFile(path: String): String? = memScoped {
+    Logger.d("readFile($path)")
     val fd = open(path, O_RDONLY)
     if (fd == -1) return null
     val fs: stat = alloc()
@@ -22,16 +19,18 @@ actual fun System.readFile(path: String): String? = memScoped {
     readFd(fd)
 }
 
-actual fun System.execute(command: String, vararg args: String, verbose: Boolean): String? = memScoped {
-    val cmd = mutableListOf<String?>().apply {
+actual fun System.execute(command: String, vararg args: String): ProcessResult = memScoped {
+    val cmd = mutableListOf<String>().apply {
         add(command)
         addAll(args)
-    }.joinToString(separator = " ")
-    Log.d { "Execute '$cmd'" }
+    }.joinToString(separator = " ") { it.replace(" ", "\\ ") }
+    Logger.d("Execute '$cmd'")
 
     val buffer = ByteArray(128)
+    val exitCode: Int
     var result = ""
-    val pipe = popen("$cmd 2>&1", "r") ?: error("popen('$cmd 2>&1', 'r') error")
+    val pipe = popen("$cmd 2>&1", "r") //more info https://stackoverflow.com/a/44680326
+        ?: error("popen('$cmd 2>&1', 'r') error")
 
     try {
         while (true) {
@@ -39,22 +38,11 @@ actual fun System.execute(command: String, vararg args: String, verbose: Boolean
             result += input.toKString()
         }
     } finally {
-        pclose(pipe)
+        exitCode = pclose(pipe) / 256 //more info https://stackoverflow.com/a/808995
+        Logger.d("Exit code '$cmd' = $exitCode")
     }
 
-    result.trim().takeIf { it.isNotBlank() }
-}
-
-fun System.parsePlist(path: String): Map<String, Any>? {
-    if (!fileExists(path)) return null
-    return try {
-        val output = execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path)
-        output?.let { Json.decodeFromString<JsonObject>(it) }
-    } catch (e: SerializationException) {
-        null
-    } catch (e: IllegalStateException) {
-        null
-    }
+    ProcessResult(exitCode, result.trim().takeIf { it.isNotBlank() })
 }
 
 actual fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> {

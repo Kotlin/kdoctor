@@ -1,16 +1,17 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import org.jetbrains.kotlin.doctor.entity.OS
 import org.jetbrains.kotlin.doctor.entity.System
-import org.jetbrains.kotlin.doctor.entity.SystemType
+import org.jetbrains.kotlin.doctor.entity.currentOS
 
 class SystemDiagnostic : Diagnostic("System") {
 
     override fun runChecks() = buildList {
         add(
             Message(
-                resultType = if (System.type == SystemType.MacOS) ResultType.Success else ResultType.Failure,
+                resultType = if (System.currentOS == OS.MacOS) ResultType.Success else ResultType.Failure,
                 text = """
-                    OS: ${System.type} (${System.getVersion() ?: "N/A"})
+                    OS: ${System.currentOS} (${System.getVersion() ?: "N/A"})
                     ${System.getCPUInfo() ?: ""}
                 """.trimIndent()
             )

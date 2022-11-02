@@ -5,9 +5,9 @@ import org.jetbrains.kotlin.doctor.entity.*
 class JavaDiagnostic : Diagnostic("Java") {
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
-        var javaLocation = System.execute("which", "java")
-        val javaVersion = System.execute("java", "-version")?.lineSequence()?.firstOrNull()
-        val systemJavaHome = System.execute("/usr/libexec/java_home")
+        var javaLocation = System.execute("which", "java").output
+        val javaVersion = System.execute("java", "-version").output?.lineSequence()?.firstOrNull()
+        val systemJavaHome = System.execute("/usr/libexec/java_home").output
         val javaHome = System.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
             javaLocation =
@@ -17,8 +17,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                     else -> javaLocation
                 }
         }
-        if (javaLocation.isNullOrBlank() || javaVersion.isNullOrBlank()
-        ) {
+        if (javaLocation.isNullOrBlank() || javaVersion.isNullOrBlank()) {
             messages.addFailure(
                 "Java not found",
                 "Get JDK from https://www.oracle.com/java/technologies/javase-downloads.html"
@@ -51,12 +50,11 @@ class JavaDiagnostic : Diagnostic("Java") {
                 }
                 if (javaHome != systemJavaHome) {
                     val xcodeJavaHome =
-                        System.execute(
-                            "defaults",
-                            "read",
-                            "com.apple.dt.Xcode",
-                            "IDEApplicationwideBuildSettings"
-                        )?.lines()?.lastOrNull { it.contains("\"JAVA_HOME\"") }?.split("=")?.lastOrNull()
+                        System.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
+                            ?.lines()
+                            ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
+                            ?.split("=")
+                            ?.lastOrNull()
                             ?.trim(' ', '"', ';')
                     if (xcodeJavaHome == null) {
                         messages.addInfo(

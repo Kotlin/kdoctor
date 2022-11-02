@@ -35,7 +35,7 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             return messages
         }
 
-        val studioInstallations = paths.mapNotNull { appFromPath(it) }.filter { app -> //filter Toolbox backup versions
+        val studioInstallations = paths.mapNotNull { AppManager.findApp(it) }.filter { app -> //filter Toolbox backup versions
             if (app.location != null && app.location.contains("Toolbox", ignoreCase = true)) {
                 val channelPath = app.location.substringBeforeLast('/').substringBeforeLast('/')
                 val historyFile = "$channelPath/.history.json"
@@ -59,14 +59,15 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             messages.addInfo("Multiple Android Studio installations found")
         }
 
-        studioInstallations.forEach { androidStudio ->
-            val kotlinPlugin = androidStudio.getKotlinPlugin()
-            val kmmPlugin = androidStudio.getKmmPlugin()
+        studioInstallations.forEach { app ->
+            val androidStudio = AppManager(app)
+            val kotlinPlugin = androidStudio.getPlugin(AppManager.KOTLIN_PLUGIN)
+            val kmmPlugin = androidStudio.getPlugin(AppManager.KMM_PLUGIN)
             val embeddedJavaVersion = androidStudio.getEmbeddedJavaVersion()
 
             val message = """
-                $name (${androidStudio.version})
-                Location: ${androidStudio.location}
+                $name (${app.version})
+                Location: ${app.location}
                 Bundled Java: ${embeddedJavaVersion ?: "not found"}
                 Kotlin Plugin: ${kotlinPlugin?.version ?: "not installed"}
                 Kotlin Multiplatform Mobile Plugin: ${kmmPlugin?.version ?: "not installed"}

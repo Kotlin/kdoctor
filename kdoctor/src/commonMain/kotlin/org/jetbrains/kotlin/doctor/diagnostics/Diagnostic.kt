@@ -14,7 +14,6 @@ abstract class Diagnostic(val name: String) {
     data class Message(val resultType: ResultType, val text: String)
 
     inner class Result(private val title: String, messages: List<Message>) {
-
         private val messages: List<Message> = messages.ifEmpty {
             listOf(Message(ResultType.Failure, "Diagnostic returned no result"))
         }
@@ -47,7 +46,7 @@ abstract class Diagnostic(val name: String) {
 
     protected abstract fun runChecks(): List<Message>
 
-    suspend fun diagnose(verbose: Boolean): Result = suspendCoroutine {
+    suspend fun diagnose(): Result = suspendCoroutine {
         it.resume(Result(name, runChecks()))
     }
 
