@@ -103,29 +103,28 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         }
 
         if (cocoapodsGenerate == null) {
-            messages.addFailure(
+            messages.addInfo(
                 "cocoapods-generate plugin not found",
+                "Before Kotlin 1.7.0 you have to use cocoapods-generate plugin",
                 "Get cocoapods-generate from https://github.com/square/cocoapods-generate#installation"
             )
-            return messages
+        } else {
+            if (cocoapodsGenerate.version < Version(2, 2, 2)) {
+                messages.addFailure(
+                    "Cocoapods-generate version ${cocoapodsGenerate.version} is not supported",
+                    "Get the latest version of cocoapods-generate plugin from https://github.com/square/cocoapods-generate#installation"
+                )
+            } else {
+                messages.addSuccess("${cocoapodsGenerate.name} (${cocoapodsGenerate.version})")
+            }
         }
-
-        if (cocoapodsGenerate.version < Version(2, 2, 2)) {
-            messages.addFailure(
-                "Cocoapods-generate version ${cocoapodsGenerate.version} is not supported",
-                "Get the latest version of cocoapods-generate plugin from https://github.com/square/cocoapods-generate#installation"
-            )
-            return messages
-        }
-
-        messages.addSuccess("${cocoapodsGenerate.name} (${cocoapodsGenerate.version})")
 
         val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE").output
         if (locale == null || !locale.contains("UTF-8")) {
             val hint = """
-            Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
-            export LC_ALL=en_US.UTF-8
-        """.trimIndent()
+                Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
+                export LC_ALL=en_US.UTF-8
+            """.trimIndent()
             if (cocoapods.version > Version(1, 10, 2)) {
                 messages.addFailure("CocoaPods requires your terminal to be using UTF-8 encoding.", hint)
             } else {
