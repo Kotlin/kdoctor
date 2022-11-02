@@ -24,26 +24,26 @@ object System {
     val isUsingM1 by lazy { isUsingM1() }
 
     fun getVersion() =
-        System.execute("sw_vers", "-productVersion").output?.let { Version(it) }
+        System.execute("sw_vers", "-productVersion")?.let { Version(it) }
 
-    fun getCPUInfo(): String? = System.execute("sysctl", "-n", "machdep.cpu.brand_string", "").output
+    fun getCPUInfo(): String? = System.execute("sysctl", "-n", "machdep.cpu.brand_string", "")
         ?.let { "CPU: $it" }
 
     fun findAppPaths(appId: String): List<String> =
-        System.execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
+        System.execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"")
             ?.split("\n")
             ?.filter { it.isNotBlank() }
             .orEmpty()
 
     fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
-        System.execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
+        System.execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile)
 
     fun getShell(): Shell? {
         val shellPath = getEnvVar("SHELL")
         return Shell.values().singleOrNull { it.path == shellPath }
     }
 
-    private fun isUsingRosetta(): Boolean = System.execute("sysctl", "sysctl.proc_translated").output
+    private fun isUsingRosetta(): Boolean = System.execute("sysctl", "sysctl.proc_translated")
         ?.substringAfter("sysctl.proc_translated: ")
         ?.toIntOrNull() == 1
 
@@ -55,5 +55,5 @@ expect fun System.getHomeDir(): String
 expect fun System.getEnvVar(name: String): String?
 expect fun System.fileExists(path: String): Boolean
 expect fun System.readFile(path: String): String?
-expect fun System.execute(command: String, vararg args: String, verbose: Boolean = false): ProcessResult
+expect fun System.execute(command: String, vararg args: String, verbose: Boolean = false): String?
 expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>

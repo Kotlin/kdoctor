@@ -22,7 +22,7 @@ private fun findPlugin(dataDir: String, pluginName: String): Plugin? {
     val jars = System.execute(
         "find",
         "$dataDir/plugins/$pluginName/lib", "-name", "*.jar"
-    ).output?.split("\n") ?: return null
+    )?.split("\n") ?: return null
     val pluginXml = jars.firstNotNullOfOrNull { System.readArchivedFile(it, "META-INF/plugin.xml") } ?: return null
     val version = Regex("<version>(.+?)</version>").find(pluginXml)?.groups?.get(1)?.value ?: return null
     val id = Regex("<id>(.+?)</id>").find(pluginXml)?.groups?.get(1)?.value ?: return null
@@ -45,7 +45,7 @@ actual fun Application.getEmbeddedJavaVersion(): Version? =
         "jre",
         "jbr/Contents/Home"
     ).firstNotNullOfOrNull { path ->
-        System.execute("$location/Contents/$path/bin/java", "--version").output
+        System.execute("$location/Contents/$path/bin/java", "--version")
             ?.lineSequence()
             ?.firstOrNull()
             ?.let { Version(it) }

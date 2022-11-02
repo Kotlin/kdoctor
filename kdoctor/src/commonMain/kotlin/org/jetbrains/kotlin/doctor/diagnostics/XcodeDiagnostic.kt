@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.doctor.entity.System
 import org.jetbrains.kotlin.doctor.entity.appFromPath
 import org.jetbrains.kotlin.doctor.entity.execute
 import org.jetbrains.kotlin.doctor.entity.findAppsPathsInDirectory
-import platform.posix.EXIT_SUCCESS
 
 class XcodeDiagnostic : Diagnostic("Xcode") {
     override fun runChecks(): List<Message> {
@@ -36,13 +35,13 @@ class XcodeDiagnostic : Diagnostic("Xcode") {
         }
 
         if (xcodeInstallations.count() > 1) {
-            val tools = System.execute("xcode-select", "-p").output
+            val tools = System.execute("xcode-select", "-p")
             if (tools != null) {
                 messages.addSuccess("Current command line tools: $tools")
             }
         }
 
-        val xcrun = System.execute("xcrun", "cc").output
+        val xcrun = System.execute("xcrun", "cc")
         if (xcrun?.contains("license") == true) {
             messages.addFailure(
                 "Xcode license is not accepted",
@@ -51,8 +50,9 @@ class XcodeDiagnostic : Diagnostic("Xcode") {
         }
 
         if (xcodeInstallations.isNotEmpty()) {
-            val firstLaunchStatus = System.execute("xcodebuild", "-checkFirstLaunchStatus")
-            if (firstLaunchStatus.code != EXIT_SUCCESS) {
+            try {
+                System.execute("xcodebuild", "-checkFirstLaunchStatus")
+            } catch (e : IllegalStateException) {
                 messages.addFailure(
                     "Xcode requires to perform the First Launch tasks",
                     "Launch Xcode or execute 'xcodebuild -runFirstLaunch' in terminal"

@@ -9,8 +9,8 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
 
-        val rubyVersion = System.execute("ruby", "-v").output
-        val rubyLocation = System.execute("which", "ruby").output
+        val rubyVersion = System.execute("ruby", "-v")
+        val rubyLocation = System.execute("which", "ruby")
         if (rubyLocation == null || rubyVersion == null) {
             messages.addFailure(
                 "ruby not found",
@@ -49,7 +49,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
             }
         }
 
-        val rubyGemsVersion = System.execute("gem", "-v").output
+        val rubyGemsVersion = System.execute("gem", "-v")
         if (rubyGemsVersion == null) {
             messages.addFailure(
                 "ruby gems not found",
@@ -62,14 +62,14 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         messages.addSuccess("${gems.name} (${gems.version})")
 
         var cocoapods: Application? = null
-        val cocoapodsVersionOutput = System.execute("pod", "--version").output
+        val cocoapodsVersionOutput = System.execute("pod", "--version")
         if (cocoapodsVersionOutput != null) {
             val cocoapodsVersion = Version(cocoapodsVersionOutput)
             cocoapods = Application("cocoapods", cocoapodsVersion)
         }
         if (cocoapods == null) {
             //check if installed via brew but not linked to /usr/bin
-            val cocoapodsBrewInstallation = System.execute("brew", "list", "cocoapods", "--versions").output
+            val cocoapodsBrewInstallation = System.execute("brew", "list", "cocoapods", "--versions")
             if (cocoapodsBrewInstallation?.isNotBlank() == true) {
                 messages.addFailure(
                     "Cocoapods are installed via Homebrew but not linked to /usr/local/bin",
@@ -93,7 +93,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
 
         var cocoapodsGenerate: Application? = null
         val cocoapodsGenerateName = "cocoapods-generate"
-        val plugins = System.execute("pod", "plugins", "installed", "--no-ansi").output
+        val plugins = System.execute("pod", "plugins", "installed", "--no-ansi")
         val cocoaPodsGenerateEntry = plugins?.lines()?.find { it.contains(cocoapodsGenerateName) }
         if (cocoaPodsGenerateEntry != null) {
             val version = cocoaPodsGenerateEntry.split(":").lastOrNull()?.let { Version(it.trim()) }
@@ -121,7 +121,7 @@ class CocoapodsDiagnostic : Diagnostic("Cocoapods") {
         messages.addSuccess("${cocoapodsGenerate.name} (${cocoapodsGenerate.version})")
 
         val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE")
-        if (locale.output == null || !locale.output.contains("UTF-8")) {
+        if (locale == null || !locale.contains("UTF-8")) {
             val hint = """
             Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
             export LC_ALL=en_US.UTF-8

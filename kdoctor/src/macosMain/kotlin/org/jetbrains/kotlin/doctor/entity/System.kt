@@ -22,99 +22,37 @@ actual fun System.readFile(path: String): String? = memScoped {
     readFd(fd)
 }
 
-actual fun System.execute(command: String, vararg args: String, verbose: Boolean): ProcessResult = memScoped {
-    val readEnd = 0
-    val writeEnd = 1
+actual fun System.execute(command: String, vararg args: String, verbose: Boolean): String? = memScoped {
+    val cmd = mutableListOf<String?>().apply {
+        add(command)
+        addAll(args)
+    }.joinToString(separator = " ")
+    Log.d { "Execute '$cmd'" }
 
-    //setup timer process
-    val timerPid = fork()
-    if (timerPid == 0) {
-        sleep(5000)
-        exit(EXIT_SUCCESS)
-    }
+    val buffer = ByteArray(128)
+    var result = ""
+    val pipe = popen("$cmd 2>&1", "r") ?: error("popen('$cmd 2>&1', 'r') error")
 
-    //setup pipes to read stdout and stderr of the child process
-    val outputPipe = allocArray<IntVar>(2)
-    val errorPipe = allocArray<IntVar>(2)
-    if (pipe(outputPipe) == -1) {
-        return ProcessResult(EXIT_FAILURE, null, null)
-    }
-    pipe(errorPipe)
-
-    //spawn a child process to execute command
-    val execPid = fork()
-    if (execPid == -1) {
-        return ProcessResult(EXIT_FAILURE, null, null)
-    }
-
-    //execute command in the child process
-    if (execPid == 0) {
-        //redirect stdout and stderr to the respective pipes
-        dup2(outputPipe[writeEnd], STDOUT_FILENO)
-        dup2(errorPipe[writeEnd], STDERR_FILENO)
-
-        close(outputPipe[readEnd])
-        close(errorPipe[readEnd])
-        close(outputPipe[writeEnd])
-        close(errorPipe[writeEnd])
-
-        //execute command
-        val newArgs = listOf(command) + args + null
-        val result = execvp(command, newArgs.map { it?.cstr?.ptr }.toCValues())
-        exit(result)
-    }
-
-    close(outputPipe[writeEnd])
-    close(errorPipe[writeEnd])
-
-    val output = readFd(outputPipe[readEnd])
-    close(outputPipe[readEnd])
-    val error = readFd(errorPipe[readEnd])
-    close(errorPipe[readEnd])
-
-    //kill command execution process if timer process has ended first
-    val returnCode: Int
-    val retCode = alloc<IntVar>()
-    val endedPid = wait(retCode.ptr)
-    returnCode = if (endedPid == timerPid || endedPid == -1) {
-        kill(execPid, SIGKILL)
-        Log.e { "$command SIGKILL" }
-        EXIT_FAILURE
-    } else {
-        kill(timerPid, SIGKILL)
-        retCode.value
-    }
-
-    Log.d {
-        val commandWithArgs = "$command ${args.joinToString(separator = " ")}"
-        "-----> Command \"$commandWithArgs\" returned with code $returnCode"
-    }
-
-    if (verbose) {
-        val outputLines = output?.lines()
-        if (outputLines != null && outputLines.size > 1) {
-            Log.d { "<----- output:" }
-            outputLines.forEach {
-                Log.d { it }
-            }
-        } else {
-            Log.d { "<----- output: $output" }
+    try {
+        while (true) {
+            val input = fgets(buffer.refTo(0), buffer.size, pipe) ?: break
+            result += input.toKString()
         }
-
-        error?.let {
-            Log.e { "<----- error: $it" }
-        }
+    } finally {
+        pclose(pipe)
     }
 
-    ProcessResult(returnCode, output, error)
+    result.trim().takeIf { it.isNotBlank() }
 }
 
 fun System.parsePlist(path: String): Map<String, Any>? {
     if (!fileExists(path)) return null
-    val output = execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path).output
     return try {
+        val output = execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path)
         output?.let { Json.decodeFromString<JsonObject>(it) }
     } catch (e: SerializationException) {
+        null
+    } catch (e: IllegalStateException) {
         null
     }
 }

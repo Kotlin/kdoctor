@@ -5,10 +5,9 @@ import org.jetbrains.kotlin.doctor.entity.*
 class JavaDiagnostic : Diagnostic("Java") {
     override fun runChecks(): List<Message> {
         val messages = mutableListOf<Message>()
-        var javaLocation = System.execute("which", "java").output
-        val javaVersionCmd = System.execute("java", "-version")
-        val javaVersion = if (javaVersionCmd.code == 0) javaVersionCmd.error?.lineSequence()?.firstOrNull() else null
-        val systemJavaHome = System.execute("/usr/libexec/java_home").output
+        var javaLocation = System.execute("which", "java")
+        val javaVersion = System.execute("java", "-version")?.lineSequence()?.firstOrNull()
+        val systemJavaHome = System.execute("/usr/libexec/java_home")
         val javaHome = System.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
             javaLocation =
@@ -57,7 +56,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                             "read",
                             "com.apple.dt.Xcode",
                             "IDEApplicationwideBuildSettings"
-                        ).output?.lines()?.lastOrNull { it.contains("\"JAVA_HOME\"") }?.split("=")?.lastOrNull()
+                        )?.lines()?.lastOrNull { it.contains("\"JAVA_HOME\"") }?.split("=")?.lastOrNull()
                             ?.trim(' ', '"', ';')
                     if (xcodeJavaHome == null) {
                         messages.addInfo(
