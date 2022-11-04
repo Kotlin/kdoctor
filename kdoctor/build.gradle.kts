@@ -9,6 +9,7 @@ repositories {
 }
 
 kotlin {
+    jvm() //for unit tests
     listOf(macosX64(), macosArm64()).forEach {
         it.binaries {
             executable {
@@ -25,13 +26,15 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
                 implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation ("co.touchlab:kermit:1.1.3")
-
+                implementation("io.ktor:ktor-client-core:2.1.3")
             }
         }
         val macosX64Main by getting
         val macosArm64Main by getting
         val macosMain by creating {
-
+            dependencies {
+                implementation("io.ktor:ktor-client-curl:2.1.3")
+            }
         }
 
         /* Main hierarchy */

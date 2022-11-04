@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import io.ktor.client.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -66,6 +67,7 @@ object System {
 
 expect val System.currentOS: OS
 expect val System.homeDir: String
+expect val System.httpClient: HttpClient
 expect fun System.getEnvVar(name: String): String?
 expect fun System.fileExists(path: String): Boolean
 expect fun System.readFile(path: String): String?

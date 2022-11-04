@@ -1,12 +1,15 @@
 package org.jetbrains.kotlin.doctor.entity
 
 import co.touchlab.kermit.Logger
+import io.ktor.client.*
+import io.ktor.client.engine.curl.*
 import kotlinx.cinterop.*
 import platform.Foundation.NSHomeDirectory
 import platform.posix.*
 
 actual val System.currentOS: OS get() = OS.MacOS
 actual val System.homeDir: String get() = NSHomeDirectory()
+actual val System.httpClient: HttpClient get() = HttpClient(Curl)
 actual fun System.getEnvVar(name: String): String? = getenv(name)?.toKString()
 actual fun System.fileExists(path: String): Boolean = access(path, F_OK) == 0
 actual fun System.readFile(path: String): String? = memScoped {

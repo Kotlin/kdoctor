@@ -1,0 +1,25 @@
+{
+  "problems": [
+    {
+      "trackerId": "KTIJ-20362",
+      "title": "'No tests were found' when executing MPP android tests",
+      "priority": "warning",
+      "matrix": {
+        "androidStudio": {
+          "from": "2021.3",
+          "to": "2021.3*"
+        }
+      }
+    },
+    {
+      "trackerId": "KTIJ-22073",
+      "title": "Run gutter in AndroidTest source-set suggests all targets of a project as an execution target",
+      "priority": "warning",
+      "matrix": {
+        "androidStudio": {
+          "from": "2022.1"
+        }
+      }
+    }
+  ]
+}
