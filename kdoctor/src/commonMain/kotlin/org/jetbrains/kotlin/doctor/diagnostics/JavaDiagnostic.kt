@@ -2,9 +2,10 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
 
-class JavaDiagnostic : Diagnostic("Java") {
-    override fun runChecks(): List<Message> {
-        val messages = mutableListOf<Message>()
+class JavaDiagnostic : Diagnostic() {
+    override fun diagnose(): Diagnosis {
+        val result = Diagnosis.Builder("Java")
+
         var javaLocation = System.execute("which", "java").output
         val javaVersion = System.execute("java", "-version").output?.lineSequence()?.firstOrNull()
         val systemJavaHome = System.execute("/usr/libexec/java_home").output
@@ -18,30 +19,30 @@ class JavaDiagnostic : Diagnostic("Java") {
                 }
         }
         if (javaLocation.isNullOrBlank() || javaVersion.isNullOrBlank()) {
-            messages.addFailure(
+            result.addFailure(
                 "Java not found",
                 "Get JDK from https://www.oracle.com/java/technologies/javase-downloads.html"
             )
-            return messages
+            return result.build()
         }
 
         val java = Application("Java", Version(javaVersion), javaLocation)
-        messages.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
+        result.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
 
         if (javaHome.isNullOrBlank()) {
-            messages.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))
+            result.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))
         } else {
             val javaHomeCanonical = javaHome.removeSuffix("/")
             val javaCmdLocations = listOf(javaHomeCanonical, "$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
             if (javaCmdLocations.none { System.fileExists(it) }) {
-                messages.addFailure(
+                result.addFailure(
                     "JAVA_HOME is set to an invalid directory: $javaHome",
                     javaHomeHint(javaLocation)
                 )
             } else {
-                messages.addSuccess("JAVA_HOME=$javaHome")
+                result.addSuccess("JAVA_HOME=$javaHome")
                 if (javaCmdLocations.none { it == javaLocation }) {
-                    messages.addInfo(
+                    result.addInfo(
                         """
                             JAVA_HOME does not match Java binary location found in PATH: $javaLocation
                             Note that, by default, Gradle will use Java environment provided by JAVA_HOME 
@@ -57,7 +58,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                             ?.lastOrNull()
                             ?.trim(' ', '"', ';')
                     if (xcodeJavaHome == null) {
-                        messages.addInfo(
+                        result.addInfo(
                             """
                             Note that, by default, Xcode uses Java environment returned by /usr/libexec/java_home:
                             $systemJavaHome
@@ -70,7 +71,7 @@ class JavaDiagnostic : Diagnostic("Java") {
                         """.trimIndent()
                         )
                     } else if (javaHome != xcodeJavaHome) {
-                        messages.addInfo(
+                        result.addInfo(
                             """
                             Xcode JAVA_HOME is set to
                             $xcodeJavaHome
@@ -83,14 +84,14 @@ class JavaDiagnostic : Diagnostic("Java") {
 
                 }
 
-                messages.addInfo(
+                result.addInfo(
                     "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
                     "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
                 )
             }
         }
 
-        return messages
+        return result.build()
     }
 
     private fun javaHomeHint(javaLocation: String?) = """

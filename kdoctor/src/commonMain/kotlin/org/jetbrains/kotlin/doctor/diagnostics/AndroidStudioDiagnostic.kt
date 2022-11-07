@@ -4,16 +4,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
 
-class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
-    override fun getResultTypeSeverity(resultType: ResultType) = when (resultType) {
-        ResultType.Success -> 0
-        ResultType.Failure -> 1
-        ResultType.Warning -> 2
-        ResultType.Info -> 3
-    }
+class AndroidStudioDiagnostic : Diagnostic() {
+    override fun diagnose(): Diagnosis {
+        val result = Diagnosis.Builder("Android Studio")
 
-    override fun runChecks(): List<Message> {
-        val messages = mutableListOf<Message>()
         val paths = mutableSetOf<String>()
         paths.addAll(System.findAppPaths("com.google.android.studio*"))
         if (paths.isEmpty()) {
@@ -28,11 +22,11 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             )
         }
         if (paths.isEmpty()) {
-            messages.addFailure(
+            result.addFailure(
                 "No Android Studio installation found",
                 "Get Android Studio from https://developer.android.com/studio"
             )
-            return messages
+            return result.build()
         }
 
         val studioInstallations = paths.mapNotNull { AppManager.findApp(it) }.filter { app -> //filter Toolbox backup versions
@@ -56,7 +50,7 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
         }
 
         if (studioInstallations.count() > 1) {
-            messages.addInfo("Multiple Android Studio installations found")
+            result.addInfo("Multiple Android Studio installations found")
         }
 
         studioInstallations.forEach { app ->
@@ -66,7 +60,7 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             val embeddedJavaVersion = androidStudio.getEmbeddedJavaVersion()
 
             val message = """
-                $name (${app.version})
+                Android Studio (${app.version})
                 Location: ${app.location}
                 Bundled Java: ${embeddedJavaVersion ?: "not found"}
                 Kotlin Plugin: ${kotlinPlugin?.version ?: "not installed"}
@@ -82,7 +76,7 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
                 if (kmmPlugin == null) {
                     hints.add("Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile")
                 }
-                messages.addFailure(message, *hints.toTypedArray())
+                result.addFailure(message, *hints.toTypedArray())
                 return@forEach
             }
 
@@ -103,12 +97,13 @@ class AndroidStudioDiagnostic : Diagnostic("Android Studio") {
             }
 
             if (hints.isNotEmpty()) {
-                messages.addFailure(message, *hints.toTypedArray())
+                result.addFailure(message, *hints.toTypedArray())
             } else {
-                messages.addSuccess(message)
+                result.addSuccess(message)
+                result.setConclusion(DiagnosisResult.Success) //at least one AS is fine
             }
         }
 
-        return messages
+        return result.build()
     }
 }
