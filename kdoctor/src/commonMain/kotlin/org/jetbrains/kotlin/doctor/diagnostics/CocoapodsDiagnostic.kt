@@ -81,7 +81,7 @@ class CocoapodsDiagnostic : Diagnostic() {
             return result.build()
         } else if (cocoapods.version < Version(1, 8, 0)) {
             result.addFailure(
-                "cocoapods version ${cocoapods.version.version} is outdated",
+                "cocoapods version ${cocoapods.version.rawString} is outdated",
                 "Update your cocoapods installation to the latest available version"
             )
             return result.build()
@@ -101,6 +101,11 @@ class CocoapodsDiagnostic : Diagnostic() {
             }
         }
 
+        result.addEnvironment(mapOf(
+            EnvironmentPiece.Ruby to ruby.version,
+            EnvironmentPiece.RubyGems to gems.version,
+            EnvironmentPiece.Cocoapods to cocoapods.version
+        ))
         return result.build()
     }
 }

@@ -79,8 +79,13 @@ class AndroidStudioDiagnostic : Diagnostic() {
                 result.addFailure(message, *hints.toTypedArray())
                 return@forEach
             }
+            result.addEnvironment(mapOf(
+                EnvironmentPiece.AndroidStudio to app.version,
+                EnvironmentPiece.KotlinPlugin to kotlinPlugin.version,
+                EnvironmentPiece.KmmPlugin to kmmPlugin.version
+            ))
 
-            val kmmKotlinVersion = Version(kmmPlugin.version.version.substringAfter("(").substringBefore(")"))
+            val kmmKotlinVersion = Version(kmmPlugin.version.rawString.substringAfter("(").substringBefore(")"))
             val minKotlinVersion = kmmKotlinVersion.prevMinorVersion
             val maxKmmKotlinVersion = kotlinPlugin.version.nextMinorVersion
 

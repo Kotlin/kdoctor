@@ -1,8 +1,10 @@
 {
+  "latestKdoctor": "0.0.6",
   "problems": [
     {
       "issueUrl": "https://youtrack.jetbrains.com/issue/KTIJ-20362",
       "title": "'No tests were found' when executing MPP android tests",
+      "hint": "Update your AS",
       "priority": "warning",
       "matrix": {
         "androidStudio": {

@@ -12,6 +12,7 @@ data class DiagnosisEntry(val result: DiagnosisResult, val text: String)
 data class Diagnosis(
     val title: String,
     val entries: List<DiagnosisEntry>,
+    val checkedEnvironments: List<Map<EnvironmentPiece, Version>>, //there maybe e.g. several AS with installed plugins
     val conclusion: DiagnosisResult
 ) {
 
@@ -24,6 +25,7 @@ data class Diagnosis(
         private val attentionPrefix = "* "
         private val entries = mutableListOf<DiagnosisEntry>()
         private var conclusion: DiagnosisResult? = null
+        private val checkedEnvironments: MutableList<Map<EnvironmentPiece, Version>> = mutableListOf()
 
         private fun paragraph(
             prefix: String,
@@ -66,17 +68,18 @@ data class Diagnosis(
             addEntry(DiagnosisResult.Failure, attentionPrefix, title, *text)
         }
 
-        fun addPlainMessage(result: DiagnosisResult, text: String) {
-            entries.add(DiagnosisEntry(result, text))
-        }
-
         fun setConclusion(conclusion: DiagnosisResult) {
             this.conclusion = conclusion
+        }
+
+        fun addEnvironment(environment: Map<EnvironmentPiece, Version>) {
+            checkedEnvironments.add(environment)
         }
 
         fun build() = Diagnosis(
             title,
             entries,
+            checkedEnvironments,
             conclusion ?: entries.minByOrNull { it.result }?.result ?: DiagnosisResult.Failure
         )
     }

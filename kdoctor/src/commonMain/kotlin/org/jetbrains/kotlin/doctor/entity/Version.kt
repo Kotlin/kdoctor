@@ -3,7 +3,7 @@ package org.jetbrains.kotlin.doctor.entity
 import kotlin.math.max
 
 class Version : Comparable<Version> {
-    val version: String
+    val rawString: String
     private val major: Int?
     private val minor: Int?
     private val patch: Int?
@@ -20,12 +20,12 @@ class Version : Comparable<Version> {
         version += if (patch != null) ".$patch" else ""
         version += if (prerelease != null) "-$prerelease" else ""
         version += if (meta != null) "+$meta" else ""
-        this.version = version
+        rawString = version
     }
 
     constructor(version: String) {
-        this.version = version
-        val match = regex.find(this.version)
+        rawString = version
+        val match = regex.find(this.rawString)
         major = match?.groups?.get(1)?.value?.toIntOrNull()
         minor = match?.groups?.get(2)?.value?.toIntOrNull()
         patch = match?.groups?.get(3)?.value?.toIntOrNull()
@@ -69,14 +69,14 @@ class Version : Comparable<Version> {
 
     override fun equals(other: Any?): Boolean {
         if (other is Version) {
-            return version == other.version
+            return rawString == other.rawString
         }
         return false
     }
 
-    override fun hashCode(): Int = version.hashCode()
+    override fun hashCode(): Int = rawString.hashCode()
 
-    override fun toString(): String = version
+    override fun toString(): String = rawString
 
     val semVersionShort: String?
         get() {
