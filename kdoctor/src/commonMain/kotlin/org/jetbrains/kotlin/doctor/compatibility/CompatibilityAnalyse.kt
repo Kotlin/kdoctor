@@ -29,7 +29,7 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
             userProblems.addAll(problems)
         }
         userProblems.forEach { problem ->
-            report.add("${problem.text}\nMore info: ${problem.url}")
+            report.add("${problem.text}\nMore details: ${problem.url}")
         }
 
         return report.joinToString("\n\n")

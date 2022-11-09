@@ -55,9 +55,18 @@ object Doctor {
             }
         }
 
-        results.joinToString("\n") { it.text }
-            .plus("\n$compatibilityReport")
-            .plus("\n$diagnosticConclusion")
+        buildString {
+            appendLine(results.joinToString(separator = "\n", transform =  { it.text }).trim())
+            if (compatibilityReport.isNotBlank()) {
+                appendLine()
+                appendLine("Check following recommendations:")
+                appendLine(compatibilityReport.prependIndent("    "))
+            }
+
+            appendLine()
+            appendLine("Conclusion:")
+            appendLine(diagnosticConclusion.prependIndent("    "))
+        }
     }
 
     //input: [[@], [a, b], [1, 2], [#]]

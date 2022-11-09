@@ -31,5 +31,5 @@ private fun run(): Unit = runBlocking {
     val kmmDiagnostic = Doctor.diagnoseKmmEnvironment()
     print("\r")
     print(" ".repeat(progressMsg.length))
-    println("\r$kmmDiagnostic")
+    println("\r${kmmDiagnostic.trim()}")
 }
