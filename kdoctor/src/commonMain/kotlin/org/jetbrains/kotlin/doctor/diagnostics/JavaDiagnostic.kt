@@ -60,29 +60,29 @@ class JavaDiagnostic : Diagnostic() {
                 ?.split("=")
                 ?.lastOrNull()
                 ?.trim(' ', '"', ';')
-        if (xcodeJavaHome == null && (javaHome != systemJavaHome)) {
-            result.addInfo(
-                """
-                    Note that, by default, Xcode uses Java environment returned by /usr/libexec/java_home:
-                    $systemJavaHome
-                    It does not match current JAVA_HOME environment variable:
-                    $javaHome
-                """.trimIndent(),
-                """
-                    Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to
-                    $javaHome
-                """.trimIndent()
-            )
-        } else if (xcodeJavaHome != javaHome) {
-            result.addInfo(
-                """
+                ?: systemJavaHome
+
+        if (xcodeJavaHome != javaHome) {
+            if (javaHome != null) {
+                result.addInfo(
+                    """
                     Xcode JAVA_HOME is set to
                     $xcodeJavaHome
                     It does not match current JAVA_HOME environment variable:
                     $javaHome 
                 """.trimIndent(),
-                "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
-            )
+                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
+                )
+            } else {
+                result.addInfo(
+                    """
+                    Xcode JAVA_HOME is set to
+                    $xcodeJavaHome
+                    It does not match current JAVA_HOME environment variable
+                """.trimIndent(),
+                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+                )
+            }
         }
 
         result.addInfo(

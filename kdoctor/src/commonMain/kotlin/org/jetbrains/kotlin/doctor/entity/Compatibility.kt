@@ -33,7 +33,7 @@ enum class CompatibilityPriority {
 @Serializable
 data class CompatibilityRange(
     @SerialName("from") val from: String? = null,
-    @SerialName("to") val to: String? = null
+    @SerialName("fixedIn") val fixedIn: String? = null
 )
 
 @Serializable

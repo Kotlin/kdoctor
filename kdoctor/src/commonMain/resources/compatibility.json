@@ -8,7 +8,7 @@
       "matrix": {
         "androidStudio": {
           "from": "2021.3",
-          "to": "2022.1"
+          "fixedIn": "2022.1"
         }
       }
     },

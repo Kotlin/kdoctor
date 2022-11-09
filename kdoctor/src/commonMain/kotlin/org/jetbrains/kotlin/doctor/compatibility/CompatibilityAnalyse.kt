@@ -21,9 +21,9 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
             val problems = compatibility.problems.filter { problem ->
                 problem.matrix.entries.all { (problemApp, problemAppRange) ->
                     val userAppVersion = environment[problemApp] ?: return@all false
-                    val less = problemAppRange.from?.let { userAppVersion < Version(it) } ?: false
-                    val more = problemAppRange.to?.let { userAppVersion >= Version(it) } ?: false
-                    return@all less || more
+                    val beforeProblem = problemAppRange.from?.let { userAppVersion < Version(it) } ?: false
+                    val fixedAlready = problemAppRange.fixedIn?.let { userAppVersion >= Version(it) } ?: false
+                    return@all beforeProblem || fixedAlready
                 }
             }
             userProblems.addAll(problems)
