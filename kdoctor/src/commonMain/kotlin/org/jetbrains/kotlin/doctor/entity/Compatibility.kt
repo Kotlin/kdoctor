@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.doctor.KDOCTOR_VERSION
 
 @Serializable
 enum class EnvironmentPiece {
-    @SerialName("kdoctor") Kdoctor,
     @SerialName("macos") Macos,
     @SerialName("jdk") Jdk,
     @SerialName("androidStudio") AndroidStudio,
@@ -24,13 +23,6 @@ enum class EnvironmentPiece {
 }
 
 @Serializable
-enum class CompatibilityPriority {
-    @SerialName("error") Error,
-    @SerialName("warning") Warning,
-    @SerialName("info") Info
-}
-
-@Serializable
 data class CompatibilityRange(
     @SerialName("from") val from: String? = null,
     @SerialName("fixedIn") val fixedIn: String? = null
@@ -40,7 +32,6 @@ data class CompatibilityRange(
 data class CompatibilityProblem(
     @SerialName("url") val url: String,
     @SerialName("text") val text: String,
-    @SerialName("priority") val priority: CompatibilityPriority,
     @SerialName("matrix") val matrix: Map<EnvironmentPiece, CompatibilityRange>
 )
 
