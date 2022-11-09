@@ -85,15 +85,6 @@ class AndroidStudioDiagnostic : Diagnostic() {
                 EnvironmentPiece.KmmPlugin to kmmPlugin.version
             ))
 
-            val kmmKotlinVersion = Version(kmmPlugin.version.rawString.substringAfter("(").substringBefore(")"))
-            val minKotlinVersion = kmmKotlinVersion.prevMinorVersion
-            val maxKmmKotlinVersion = kotlinPlugin.version.nextMinorVersion
-
-            if (kotlinPlugin.version < minKotlinVersion) {
-                hints.add("Update Kotlin plugin. Current version of Kotlin Multiplatform Mobile plugin requires $minKotlinVersion")
-            } else if (kotlinPlugin.version >= maxKmmKotlinVersion) {
-                hints.add("Update Kotlin Multiplatform Mobile plugin")
-            }
             if (!kotlinPlugin.isEnabled) {
                 hints.add("Kotlin plugin is disabled. Enable Kotlin in Android Studio settings.")
             }

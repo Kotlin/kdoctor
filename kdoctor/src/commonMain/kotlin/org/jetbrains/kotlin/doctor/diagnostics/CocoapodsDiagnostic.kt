@@ -17,17 +17,6 @@ class CocoapodsDiagnostic : Diagnostic() {
         }
 
         val ruby = Application("ruby", Version(rubyVersion), rubyLocation)
-
-        if (ruby.version >= Version(3, 0, 0)) {
-            result.addFailure(
-                """
-                ruby version ${ruby.version} is not compatible with cocoapods-generate
-                More details: https://github.com/rubygems/rubygems/issues/4338
-            """.trimIndent(),
-                "Downgrade ruby to version < 3.0.0"
-            )
-        }
-
         result.addSuccess("${ruby.name} (${ruby.version})")
 
         if (ruby.location == "/usr/bin/ruby") {
@@ -36,12 +25,12 @@ class CocoapodsDiagnostic : Diagnostic() {
                 result.addFailure(
                     title,
                     "CocoaPods is not compatible with system ruby installation on Apple M1 computers.",
-                    "Please install ruby 2.7 via Homebrew, rvm, rbenv or other tool and make it default"
+                    "Please install ruby via Homebrew, rvm, rbenv or other tool and make it default"
                 )
             } else {
                 result.addInfo(
                     title,
-                    "Consider installing ruby 2.7 via Homebrew, rvm or other package manager in case of issues with CocoaPods installation"
+                    "Consider installing ruby via Homebrew, rvm or other package manager in case of issues with CocoaPods installation"
                 )
             }
         }
@@ -78,12 +67,6 @@ class CocoapodsDiagnostic : Diagnostic() {
                     "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
                 )
             }
-            return result.build()
-        } else if (cocoapods.version < Version(1, 8, 0)) {
-            result.addFailure(
-                "cocoapods version ${cocoapods.version.rawString} is outdated",
-                "Update your cocoapods installation to the latest available version"
-            )
             return result.build()
         }
         result.addSuccess("${cocoapods.name} (${cocoapods.version})")

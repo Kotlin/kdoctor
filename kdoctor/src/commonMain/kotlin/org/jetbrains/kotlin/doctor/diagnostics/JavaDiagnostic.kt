@@ -50,47 +50,45 @@ class JavaDiagnostic : Diagnostic() {
                         """.trimIndent()
                     )
                 }
-                if (javaHome != systemJavaHome) {
-                    val xcodeJavaHome =
-                        System.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
-                            ?.lines()
-                            ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
-                            ?.split("=")
-                            ?.lastOrNull()
-                            ?.trim(' ', '"', ';')
-                    if (xcodeJavaHome == null) {
-                        result.addInfo(
-                            """
-                            Note that, by default, Xcode uses Java environment returned by /usr/libexec/java_home:
-                            $systemJavaHome
-                            It does not match current JAVA_HOME environment variable:
-                            $javaHome
-                        """.trimIndent(),
-                            """
-                            Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to
-                            $javaHome
-                        """.trimIndent()
-                        )
-                    } else if (javaHome != xcodeJavaHome) {
-                        result.addInfo(
-                            """
-                            Xcode JAVA_HOME is set to
-                            $xcodeJavaHome
-                            It does not match current JAVA_HOME environment variable:
-                            $javaHome 
-                            """.trimIndent(),
-                            "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
-                        )
-                    }
-
-                }
-
-                result.addInfo(
-                    "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
-                    "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
-                )
             }
         }
+
+        val xcodeJavaHome =
+            System.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
+                ?.lines()
+                ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
+                ?.split("=")
+                ?.lastOrNull()
+                ?.trim(' ', '"', ';')
+        if (xcodeJavaHome == null && (javaHome != systemJavaHome)) {
+            result.addInfo(
+                """
+                    Note that, by default, Xcode uses Java environment returned by /usr/libexec/java_home:
+                    $systemJavaHome
+                    It does not match current JAVA_HOME environment variable:
+                    $javaHome
+                """.trimIndent(),
+                """
+                    Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to
+                    $javaHome
+                """.trimIndent()
+            )
+        } else if (xcodeJavaHome != javaHome) {
+            result.addInfo(
+                """
+                    Xcode JAVA_HOME is set to
+                    $xcodeJavaHome
+                    It does not match current JAVA_HOME environment variable:
+                    $javaHome 
+                """.trimIndent(),
+                "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
+            )
+        }
+
+        result.addInfo(
+            "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+            "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
+        )
 
         return result.build()
     }
