@@ -28,6 +28,14 @@ object Doctor {
         val failures = results.count { it.conclusion == DiagnosisResult.Failure }
         val warnings = results.count { it.conclusion == DiagnosisResult.Warning }
 
+        val checkedEnvironments = results.map { it.checkedEnvironments }
+        val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
+            val environment = mutableMapOf<EnvironmentPiece, Version>()
+            combination.forEach { environment.putAll(it) }
+            environment
+        }
+        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments)
+
         val diagnosticConclusion = buildString {
             if (failures > 0) {
                 appendLine("Failures: $failures")
@@ -47,17 +55,9 @@ object Doctor {
             }
         }
 
-        val checkedEnvironments = results.map { it.checkedEnvironments }
-        val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
-            val environment = mutableMapOf<EnvironmentPiece, Version>()
-            combination.forEach { environment.putAll(it) }
-            environment
-        }
-        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments)
-
         results.joinToString("\n") { it.text }
-            .plus("\n$diagnosticConclusion")
             .plus("\n$compatibilityReport")
+            .plus("\n$diagnosticConclusion")
     }
 
     //input: [[@], [a, b], [1, 2], [#]]

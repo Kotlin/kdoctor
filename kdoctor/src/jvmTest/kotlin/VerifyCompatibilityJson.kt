@@ -9,6 +9,6 @@ class VerifyCompatibilityJson {
     fun verify() {
         val compatibilityJson = javaClass.getResource("compatibility.json")?.readText().orEmpty()
         val compatibility = Json.decodeFromString<Compatibility>(compatibilityJson)
-        println(compatibility.problems.joinToString("\n") { it.issueUrl })
+        println(compatibility.problems.joinToString("\n") { it.text })
     }
 }

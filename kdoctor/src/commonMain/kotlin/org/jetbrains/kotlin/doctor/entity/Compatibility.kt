@@ -38,10 +38,9 @@ data class CompatibilityRange(
 
 @Serializable
 data class CompatibilityProblem(
-    @SerialName("issueUrl") val issueUrl: String,
-    @SerialName("title") val title: String,
+    @SerialName("url") val url: String,
+    @SerialName("text") val text: String,
     @SerialName("priority") val priority: CompatibilityPriority,
-    @SerialName("hint") val hint: String? = null,
     @SerialName("matrix") val matrix: Map<EnvironmentPiece, CompatibilityRange>
 )
 
