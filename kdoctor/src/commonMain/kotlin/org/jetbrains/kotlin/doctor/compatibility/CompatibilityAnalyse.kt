@@ -11,8 +11,8 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
         val report = mutableListOf<String>()
         if (Version(KDOCTOR_VERSION) < Version(compatibility.latestKdoctor)) {
            report.add("""
-               Update the 'kdoctor' to the latest version: ${compatibility.latestKdoctor}
-                 'brew update kdoctor'
+               Update the kdoctor to the latest version: ${compatibility.latestKdoctor}
+                 `brew upgrade kdoctor`
            """.trimIndent())
         }
 
