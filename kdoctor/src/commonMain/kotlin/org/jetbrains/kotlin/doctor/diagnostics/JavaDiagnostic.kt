@@ -28,7 +28,7 @@ class JavaDiagnostic : Diagnostic() {
 
         val java = Application("Java", Version(javaVersion), javaLocation)
         result.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
-        result.addEnvironment(mapOf(EnvironmentPiece.Jdk to java.version))
+        result.addEnvironment(setOf(EnvironmentPiece.Jdk(java.version)))
 
         if (javaHome.isNullOrBlank()) {
             result.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))

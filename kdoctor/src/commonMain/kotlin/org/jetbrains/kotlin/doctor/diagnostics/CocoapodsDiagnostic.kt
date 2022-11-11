@@ -84,10 +84,10 @@ class CocoapodsDiagnostic : Diagnostic() {
             }
         }
 
-        result.addEnvironment(mapOf(
-            EnvironmentPiece.Ruby to ruby.version,
-            EnvironmentPiece.RubyGems to gems.version,
-            EnvironmentPiece.Cocoapods to cocoapods.version
+        result.addEnvironment(setOf(
+            EnvironmentPiece.Ruby(ruby.version),
+            EnvironmentPiece.RubyGems(gems.version),
+            EnvironmentPiece.Cocoapods(cocoapods.version)
         ))
         return result.build()
     }

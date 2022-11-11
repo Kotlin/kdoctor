@@ -29,7 +29,7 @@ class XcodeDiagnostic : Diagnostic() {
             result.addSuccess(
                 "${xcode.name} (${xcode.version})\nLocation: ${xcode.location}"
             )
-            result.addEnvironment(mapOf(EnvironmentPiece.Xcode to xcode.version))
+            result.addEnvironment(setOf(EnvironmentPiece.Xcode(xcode.version)))
         }
 
         if (xcodeInstallations.count() > 1) {

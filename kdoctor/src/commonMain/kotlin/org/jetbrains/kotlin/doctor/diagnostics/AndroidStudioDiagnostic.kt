@@ -79,10 +79,10 @@ class AndroidStudioDiagnostic : Diagnostic() {
                 result.addFailure(message, *hints.toTypedArray())
                 return@forEach
             }
-            result.addEnvironment(mapOf(
-                EnvironmentPiece.AndroidStudio to app.version,
-                EnvironmentPiece.KotlinPlugin to kotlinPlugin.version,
-                EnvironmentPiece.KmmPlugin to kmmPlugin.version
+            result.addEnvironment(setOf(
+                EnvironmentPiece.AndroidStudio(app.version),
+                EnvironmentPiece.KotlinPlugin(kotlinPlugin.version),
+                EnvironmentPiece.KmmPlugin(kmmPlugin.version)
             ))
 
             if (!kotlinPlugin.isEnabled) {

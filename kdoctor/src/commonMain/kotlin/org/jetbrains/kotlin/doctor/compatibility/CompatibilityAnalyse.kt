@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.Version
 
 class CompatibilityAnalyse(private val compatibility: Compatibility) {
-    fun check(environments: List<Map<EnvironmentPiece, Version>>): String {
+    fun check(environments: List<Set<EnvironmentPiece>>): String {
         val report = mutableListOf<String>()
         if (Version(KDOCTOR_VERSION) < Version(compatibility.latestKdoctor)) {
            report.add("""
@@ -19,10 +19,10 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
         val userProblems = mutableSetOf<CompatibilityProblem>()
         environments.forEach { environment ->
             val problems = compatibility.problems.filter { problem ->
-                problem.matrix.entries.all { (problemApp, problemAppRange) ->
-                    val userAppVersion = environment[problemApp] ?: return@all false
-                    val beforeProblem = problemAppRange.from?.let { userAppVersion < Version(it) } ?: false
-                    val fixedAlready = problemAppRange.fixedIn?.let { userAppVersion >= Version(it) } ?: false
+                problem.matrix.all { app ->
+                    val userAppVersion = environment.firstOrNull { it.name == app.name }?.version ?: return@all false
+                    val beforeProblem = app.from?.let { userAppVersion < Version(it) } ?: false
+                    val fixedAlready = app.fixedIn?.let { userAppVersion >= Version(it) } ?: false
                     return@all beforeProblem || fixedAlready
                 }
             }

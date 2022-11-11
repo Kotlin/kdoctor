@@ -10,7 +10,7 @@ class SystemDiagnostic : Diagnostic() {
 
         if (os == OS.MacOS && version != null) {
             result.addSuccess("OS: $os ($version)\n${System.getCPUInfo().orEmpty()}")
-            result.addEnvironment(mapOf(EnvironmentPiece.Macos to version))
+            result.addEnvironment(setOf(EnvironmentPiece.Macos(version)))
 
             if (System.isUsingRosetta) {
                 result.addInfo(

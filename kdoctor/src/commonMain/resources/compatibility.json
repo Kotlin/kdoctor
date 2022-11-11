@@ -1,24 +1,26 @@
 {
-  "latestKdoctor": "0.0.6",
+  "latestKdoctor": "0.0.5",
   "problems": [
     {
       "url": "https://youtrack.jetbrains.com/issue/KTIJ-20362",
       "text": "'No tests were found' when executing MPP android tests",
-      "matrix": {
-        "androidStudio": {
+      "matrix": [
+        {
+          "name": "AndroidStudio",
           "from": "2021.3",
           "fixedIn": "2022.1"
         }
-      }
+      ]
     },
     {
       "url": "https://youtrack.jetbrains.com/issue/KTIJ-22073",
       "text": "Run gutter in AndroidTest source-set suggests all targets of a project as an execution target",
-      "matrix": {
-        "androidStudio": {
+      "matrix": [
+        {
+          "name": "AndroidStudio",
           "from": "2022.1"
         }
-      }
+      ]
     }
   ]
 }

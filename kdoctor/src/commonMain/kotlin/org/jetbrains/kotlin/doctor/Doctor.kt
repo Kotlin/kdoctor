@@ -5,7 +5,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.kotlin.doctor.compatibility.CompatibilityAnalyse
 import org.jetbrains.kotlin.doctor.diagnostics.*
-import org.jetbrains.kotlin.doctor.entity.*
+import org.jetbrains.kotlin.doctor.entity.Compatibility
+import org.jetbrains.kotlin.doctor.entity.Diagnosis
+import org.jetbrains.kotlin.doctor.entity.DiagnosisResult
+import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -30,8 +33,8 @@ object Doctor {
 
         val checkedEnvironments = results.map { it.checkedEnvironments }
         val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
-            val environment = mutableMapOf<EnvironmentPiece, Version>()
-            combination.forEach { environment.putAll(it) }
+            val environment = mutableSetOf<EnvironmentPiece>()
+            combination.forEach { environment.addAll(it) }
             environment
         }
         val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments)

@@ -12,7 +12,7 @@ data class DiagnosisEntry(val result: DiagnosisResult, val text: String)
 data class Diagnosis(
     val title: String,
     val entries: List<DiagnosisEntry>,
-    val checkedEnvironments: List<Map<EnvironmentPiece, Version>>, //there maybe e.g. several AS with installed plugins
+    val checkedEnvironments: List<Set<EnvironmentPiece>>, //there maybe e.g. several AS with installed plugins
     val conclusion: DiagnosisResult
 ) {
 
@@ -25,7 +25,7 @@ data class Diagnosis(
         private val attentionPrefix = "* "
         private val entries = mutableListOf<DiagnosisEntry>()
         private var conclusion: DiagnosisResult? = null
-        private val checkedEnvironments: MutableList<Map<EnvironmentPiece, Version>> = mutableListOf()
+        private val checkedEnvironments: MutableList<Set<EnvironmentPiece>> = mutableListOf()
 
         private fun paragraph(
             prefix: String,
@@ -72,7 +72,7 @@ data class Diagnosis(
             this.conclusion = conclusion
         }
 
-        fun addEnvironment(environment: Map<EnvironmentPiece, Version>) {
+        fun addEnvironment(environment: Set<EnvironmentPiece>) {
             checkedEnvironments.add(environment)
         }
 
