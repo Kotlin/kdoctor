@@ -93,3 +93,7 @@ private fun readFd(fd: Int): String? = memScoped {
     }
     output.trim().takeIf { it.isNotEmpty() }
 }
+
+actual fun System.print(text: String) {
+    platform.posix.printf(text)
+}

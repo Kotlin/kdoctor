@@ -14,7 +14,7 @@ class SystemDiagnostic : Diagnostic() {
 
             if (System.isUsingRosetta) {
                 result.addInfo(
-                    title = "You are currently using Rosetta 2.",
+                    "You are currently using Rosetta 2.",
                     "It may cause some issues while trying to install packages using Homebrew.",
                     "Consider switching off Rosetta 2 or ignore this message in case you actually need it."
                 )

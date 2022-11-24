@@ -59,7 +59,7 @@ object Doctor {
         }
 
         buildString {
-            appendLine(results.joinToString(separator = "\n", transform =  { it.text }).trim())
+            appendLine(results.joinToString(separator = "\n\n", transform =  { it.text.trim() }))
             if (compatibilityReport.isNotBlank()) {
                 appendLine()
                 appendLine("Check following recommendations:")

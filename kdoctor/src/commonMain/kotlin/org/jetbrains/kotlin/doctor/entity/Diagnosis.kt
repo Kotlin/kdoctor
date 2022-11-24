@@ -1,10 +1,12 @@
 package org.jetbrains.kotlin.doctor.entity
 
-enum class DiagnosisResult(val symbol: Char) {
-    Success('v'),
-    Info('i'),
-    Warning('!'),
-    Failure('x')
+import org.jetbrains.kotlin.doctor.printer.TextPainter
+
+enum class DiagnosisResult(val symbol: Char, val color: String) {
+    Success('✓', TextPainter.GREEN),
+    Info('i', TextPainter.BLUE),
+    Warning('!', TextPainter.YELLOW),
+    Failure('✖', TextPainter.RED)
 }
 
 data class DiagnosisEntry(val result: DiagnosisResult, val text: String)
@@ -17,55 +19,47 @@ data class Diagnosis(
 ) {
 
     val text = buildString {
-        appendLine("[${conclusion.symbol}] $title")
-        append(entries.joinToString("\n") { it.text.prependIndent() })
+        val prefix = with(conclusion) {
+            "$color[$symbol]${TextPainter.RESET}"
+        }
+        appendLine("$prefix $title")
+        entries.forEach { entry ->
+            val mark = when (entry.result) {
+                DiagnosisResult.Success -> "  ➤ "
+                else -> "${entry.result.color}  ${entry.result.symbol} "
+            }
+            appendLine(entry.text.markLines(mark, "     "))
+        }
     }
 
+    private fun String.markLines(first: String, other: String) =
+        lines().mapIndexed { index, s ->
+            if (index == 0) {
+                "${TextPainter.BOLD}$first$s${TextPainter.RESET}"
+            } else {
+                "$other$s"
+            }
+        }.joinToString("\n")
+
     class Builder(private val title: String) {
-        private val attentionPrefix = "* "
         private val entries = mutableListOf<DiagnosisEntry>()
         private var conclusion: DiagnosisResult? = null
         private val checkedEnvironments: MutableList<Set<EnvironmentPiece>> = mutableListOf()
 
-        private fun paragraph(
-            prefix: String,
-            title: String,
-            vararg text: String
-        ) = buildString {
-            appendLine(
-                title.lines()
-                    .mapIndexed { i: Int, s: String ->
-                        if (i == 0) s.prependIndent(prefix) else s.prependIndent(" ".repeat(prefix.length))
-                    }
-                    .joinToString("\n")
-            )
-            if (text.isEmpty().not()) {
-                appendLine(
-                    text.joinToString("\n") {
-                        it.prependIndent().prependIndent(" ".repeat(prefix.length))
-                    }
-                )
-            }
+        fun addSuccess(vararg text: String) {
+            entries.add(DiagnosisEntry(DiagnosisResult.Success, text.joinToString("\n")))
         }
 
-        private fun addEntry(result: DiagnosisResult, prefix: String, title: String, vararg text: String) {
-            entries.add(DiagnosisEntry(result, paragraph(prefix, title, *text)))
+        fun addInfo(vararg text: String) {
+            entries.add(DiagnosisEntry(DiagnosisResult.Info, text.joinToString("\n")))
         }
 
-        fun addSuccess(title: String, vararg text: String) {
-            addEntry(DiagnosisResult.Success, "", title, *text)
+        fun addWarning(vararg text: String) {
+            entries.add(DiagnosisEntry(DiagnosisResult.Warning, text.joinToString("\n")))
         }
 
-        fun addInfo(title: String, vararg text: String) {
-            addEntry(DiagnosisResult.Info, attentionPrefix, title, *text)
-        }
-
-        fun addWarning(title: String, vararg text: String) {
-            addEntry(DiagnosisResult.Warning, attentionPrefix, title, *text)
-        }
-
-        fun addFailure(title: String, vararg text: String) {
-            addEntry(DiagnosisResult.Failure, attentionPrefix, title, *text)
+        fun addFailure(vararg text: String) {
+            entries.add(DiagnosisEntry(DiagnosisResult.Failure, text.joinToString("\n")))
         }
 
         fun setConclusion(conclusion: DiagnosisResult) {
@@ -80,7 +74,9 @@ data class Diagnosis(
             title,
             entries,
             checkedEnvironments,
-            conclusion ?: entries.minByOrNull { it.result }?.result ?: DiagnosisResult.Failure
+            conclusion
+                ?: entries.firstOrNull { it.result == DiagnosisResult.Failure }?.result
+                ?: DiagnosisResult.Success
         )
     }
 }

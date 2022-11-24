@@ -73,3 +73,4 @@ expect fun System.fileExists(path: String): Boolean
 expect fun System.readFile(path: String): String?
 expect fun System.execute(command: String, vararg args: String): ProcessResult
 expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
+expect fun System.print(text: String)
