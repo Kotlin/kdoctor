@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.DiagnosisResult
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
+import org.jetbrains.kotlin.doctor.printer.TextPainter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,11 +26,10 @@ object Doctor {
         it.resume(diagnose())
     }
 
-    suspend fun diagnoseKmmEnvironment(): String = coroutineScope {
+    suspend fun diagnoseKmmEnvironment(verbose: Boolean): String = coroutineScope {
         val compatibility = async { Compatibility.download() }
         val results = KmmDiagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
         val failures = results.count { it.conclusion == DiagnosisResult.Failure }
-        val warnings = results.count { it.conclusion == DiagnosisResult.Warning }
 
         val checkedEnvironments = results.map { it.checkedEnvironments }
         val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
@@ -39,36 +39,27 @@ object Doctor {
         }
         val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments)
 
-        val diagnosticConclusion = buildString {
-            if (failures > 0) {
-                appendLine("Failures: $failures")
-            }
-            if (warnings > 0) {
-                appendLine("Warnings: $warnings")
-            }
-            if (failures > 0) {
-                appendLine(
-                    """
-                        |KDoctor has diagnosed one or more problems while checking your environment.
-                        |Please check the output for problem description and possible solutions.
-                    """.trimMargin()
-                )
-            } else {
-                appendLine("Your system is ready for Kotlin Multiplatform Mobile Development!")
-            }
-        }
-
         buildString {
-            appendLine(results.joinToString(separator = "\n\n", transform =  { it.text.trim() }))
+            results.forEach { diagnosis ->
+                appendLine(diagnosis.getText(verbose))
+                if (verbose) appendLine()
+            }
             if (compatibilityReport.isNotBlank()) {
                 appendLine()
-                appendLine("Check following recommendations:")
+                appendLine("Recommendations:")
                 appendLine(compatibilityReport.prependIndent("    "))
             }
 
             appendLine()
             appendLine("Conclusion:")
-            appendLine(diagnosticConclusion.prependIndent("    "))
+            if (failures > 0) {
+                val prefix = "  ${DiagnosisResult.Failure.color}${DiagnosisResult.Failure.symbol}${TextPainter.RESET} "
+                appendLine("${prefix}KDoctor has diagnosed one or more problems while checking your environment.")
+                appendLine("    Please check the output for problem description and possible solutions.")
+            } else {
+                val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
+                appendLine("${prefix}Your system is ready for Kotlin Multiplatform Mobile Development!")
+            }
         }
     }
 

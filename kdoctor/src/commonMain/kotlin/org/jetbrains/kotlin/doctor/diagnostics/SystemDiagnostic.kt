@@ -4,12 +4,12 @@ import org.jetbrains.kotlin.doctor.entity.*
 
 class SystemDiagnostic : Diagnostic() {
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("System")
+        val result = Diagnosis.Builder("Operation System")
         val os = System.currentOS
         val version = System.getVersion()
 
         if (os == OS.MacOS && version != null) {
-            result.addSuccess("OS: $os ($version)\n${System.getCPUInfo().orEmpty()}")
+            result.addSuccess("Version OS: $os $version", System.getCPUInfo().orEmpty())
             result.addEnvironment(setOf(EnvironmentPiece.Macos(version)))
 
             if (System.isUsingRosetta) {

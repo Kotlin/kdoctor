@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.doctor.printer.TextPainter
 
 enum class DiagnosisResult(val symbol: Char, val color: String) {
     Success('✓', TextPainter.GREEN),
-    Info('i', TextPainter.BLUE),
-    Warning('!', TextPainter.YELLOW),
+    Info('i', TextPainter.YELLOW),
+    Warning('!', TextPainter.RED),
     Failure('✖', TextPainter.RED)
 }
 
@@ -18,28 +18,30 @@ data class Diagnosis(
     val conclusion: DiagnosisResult
 ) {
 
-    val text = buildString {
+    fun getText(verbose: Boolean) = buildString {
         val prefix = with(conclusion) {
             "$color[$symbol]${TextPainter.RESET}"
         }
         appendLine("$prefix $title")
-        entries.forEach { entry ->
-            val mark = when (entry.result) {
-                DiagnosisResult.Success -> "  ➤ "
-                else -> "${entry.result.color}  ${entry.result.symbol} "
-            }
-            appendLine(entry.text.markLines(mark, "     "))
-        }
-    }
+        val paragraphs = if (verbose) entries else entries.filter { it.result == DiagnosisResult.Failure }
 
-    private fun String.markLines(first: String, other: String) =
-        lines().mapIndexed { index, s ->
-            if (index == 0) {
-                "${TextPainter.BOLD}$first$s${TextPainter.RESET}"
-            } else {
-                "$other$s"
+        paragraphs.forEach { entry ->
+            entry.text.lines().forEachIndexed { index, s ->
+                if (index == 0) {
+                    when (entry.result) {
+                        DiagnosisResult.Success -> appendLine(
+                            "${TextPainter.BOLD}  ➤ $s${TextPainter.RESET}"
+                        )
+                        else -> appendLine(
+                            "${TextPainter.BOLD}${entry.result.color}  ${entry.result.symbol} $s${TextPainter.RESET}"
+                        )
+                    }
+                } else {
+                    appendLine("    $s")
+                }
             }
-        }.joinToString("\n")
+        }
+    }.trim()
 
     class Builder(private val title: String) {
         private val entries = mutableListOf<DiagnosisEntry>()

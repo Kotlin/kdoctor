@@ -15,9 +15,14 @@ fun main(args: Array<String>) {
     val parser = ArgParser("kdoctor")
     val versionFlag by parser.option(
         ArgType.Boolean,
-        shortName = "v",
         fullName = "version",
         description = "print KDoctor version"
+    )
+    val verboseFlag by parser.option(
+        ArgType.Boolean,
+        shortName = "v",
+        fullName = "verbose",
+        description = "print extended information"
     )
     val debugFlag by parser.option(ArgType.Boolean, fullName = "debug", description = "debug mode")
     parser.parse(args)
@@ -28,15 +33,15 @@ fun main(args: Array<String>) {
 
     when (versionFlag) {
         true -> println(KDOCTOR_VERSION)
-        else -> run()
+        else -> run(verboseFlag == true)
     }
 }
 
-private fun run(): Unit = runBlocking {
+private fun run(verbose: Boolean): Unit = runBlocking {
     val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
 
     print(progressMsg)
-    val kmmDiagnostic = Doctor.diagnoseKmmEnvironment()
+    val kmmDiagnostic = Doctor.diagnoseKmmEnvironment(verbose)
     print("\r" + " ".repeat(progressMsg.length))
 
     System.print("\r${kmmDiagnostic.trim()}\n")

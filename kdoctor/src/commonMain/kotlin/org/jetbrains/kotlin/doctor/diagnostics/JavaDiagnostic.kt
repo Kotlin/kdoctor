@@ -11,12 +11,11 @@ class JavaDiagnostic : Diagnostic() {
         val systemJavaHome = System.execute("/usr/libexec/java_home").output
         val javaHome = System.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
-            javaLocation =
-                when {
-                    javaHome?.isNotBlank() == true -> javaHome.plus("/bin/java")
-                    systemJavaHome?.isNotBlank() == true -> systemJavaHome.plus("/bin/java")
-                    else -> javaLocation
-                }
+            javaLocation = when {
+                javaHome?.isNotBlank() == true -> javaHome.plus("/bin/java")
+                systemJavaHome?.isNotBlank() == true -> systemJavaHome.plus("/bin/java")
+                else -> javaLocation
+            }
         }
         if (javaLocation.isNullOrBlank() || javaVersion.isNullOrBlank()) {
             result.addFailure(
@@ -34,20 +33,21 @@ class JavaDiagnostic : Diagnostic() {
             result.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))
         } else {
             val javaHomeCanonical = javaHome.removeSuffix("/")
-            val javaCmdLocations = listOf(javaHomeCanonical, "$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
+            val javaCmdLocations =
+                listOf(javaHomeCanonical, "$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
             if (javaCmdLocations.none { System.fileExists(it) }) {
                 result.addFailure(
-                    "JAVA_HOME is set to an invalid directory: $javaHome",
+                    "JAVA_HOME is set to an invalid directory",
+                    "JAVA_HOME: $javaHome",
                     javaHomeHint(javaLocation)
                 )
             } else {
                 result.addSuccess("JAVA_HOME=$javaHome")
                 if (javaCmdLocations.none { it == javaLocation }) {
                     result.addInfo(
-                        """
-                            JAVA_HOME does not match Java binary location found in PATH: $javaLocation
-                            Note that, by default, Gradle will use Java environment provided by JAVA_HOME 
-                        """.trimIndent()
+                        "JAVA_HOME does not match Java binary location",
+                        "Java binary location found in PATH: $javaLocation",
+                        "Note that, by default, Gradle will use Java environment provided by JAVA_HOME"
                     )
                 }
             }
@@ -65,21 +65,15 @@ class JavaDiagnostic : Diagnostic() {
         if (xcodeJavaHome != javaHome) {
             if (javaHome != null) {
                 result.addInfo(
-                    """
-                    Xcode JAVA_HOME is set to
-                    $xcodeJavaHome
-                    It does not match current JAVA_HOME environment variable:
-                    $javaHome 
-                """.trimIndent(),
-                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths to $javaHome"
+                    "Xcode JAVA_HOME does not match the environment variable",
+                    "Xcode JAVA_HOME: $xcodeJavaHome",
+                    "System JAVA_HOME: $javaHome",
+                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
                 )
             } else {
                 result.addInfo(
-                    """
-                    Xcode JAVA_HOME is set to
-                    $xcodeJavaHome
-                    It does not match current JAVA_HOME environment variable
-                """.trimIndent(),
+                    "Xcode JAVA_HOME does not match the environment variable",
+                    "Xcode JAVA_HOME: $xcodeJavaHome",
                     "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
                 )
             }
