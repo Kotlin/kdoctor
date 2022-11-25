@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
@@ -30,7 +31,7 @@ class AndroidStudioDiagnostic : Diagnostic() {
         }
 
         val studioInstallations =
-            paths.mapNotNull { AppManager.findApp(it) }.filter { app -> //filter Toolbox backup versions
+            paths.mapNotNull { findAndroidStudio(it) }.filter { app -> //filter Toolbox backup versions
                 if (app.location != null && app.location.contains("Toolbox", ignoreCase = true)) {
                     val channelPath = app.location.substringBeforeLast('/').substringBeforeLast('/')
                     val historyFile = "$channelPath/.history.json"
@@ -107,5 +108,14 @@ class AndroidStudioDiagnostic : Diagnostic() {
         }
 
         return result.build()
+    }
+
+    private fun findAndroidStudio(path: String): Application? {
+        Logger.d("findAndroidStudio($path)")
+        val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
+        val version = plist["CFBundleVersion"]?.toString()?.trim('"') ?: return null
+        val name = plist["CFBundleName"]?.toString()?.trim('"')
+            ?: path.substringAfterLast("/").substringBeforeLast(".")
+        return Application(name, Version(version), path)
     }
 }

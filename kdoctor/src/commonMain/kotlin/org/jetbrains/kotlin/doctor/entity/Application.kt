@@ -69,15 +69,5 @@ class AppManager(private val app: Application) {
     companion object {
         const val KOTLIN_PLUGIN = "Kotlin"
         const val KMM_PLUGIN = "kmm"
-
-        fun findApp(path: String): Application? {
-            Logger.d("findApp($path)")
-            val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
-            val version = plist["CFBundleShortVersionString"]?.toString()?.trim('"') ?: return null
-            val name = plist["CFBundleName"]?.toString()
-                ?.trim('"')
-                ?: path.substringAfterLast("/").substringBeforeLast(".")
-            return Application(name, Version(version), path)
-        }
     }
 }

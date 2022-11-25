@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.entity.*
 
 class XcodeDiagnostic : Diagnostic() {
@@ -19,7 +20,7 @@ class XcodeDiagnostic : Diagnostic() {
             )
         }
 
-        val xcodeInstallations = paths.mapNotNull { AppManager.findApp(it) }
+        val xcodeInstallations = paths.mapNotNull { findXcode(it) }
 
         if (xcodeInstallations.count() > 1) {
             result.addInfo("Multiple Xcode installations found")
@@ -57,5 +58,15 @@ class XcodeDiagnostic : Diagnostic() {
             }
         }
         return result.build()
+    }
+
+    private fun findXcode(path: String): Application? {
+        Logger.d("findXcode($path)")
+        val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
+        val version = plist["CFBundleShortVersionString"]?.toString()?.trim('"') ?: return null
+        val name = plist["CFBundleName"]?.toString()
+            ?.trim('"')
+            ?: path.substringAfterLast("/").substringBeforeLast(".")
+        return Application(name, Version(version), path)
     }
 }
