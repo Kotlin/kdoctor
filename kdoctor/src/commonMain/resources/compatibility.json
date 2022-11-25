@@ -3,7 +3,8 @@
   "problems": [
     {
       "url": "https://youtrack.jetbrains.com/issue/KTIJ-20362",
-      "text": "'No tests were found' when executing MPP android tests",
+      "isCritical": true,
+      "text": "Android Studio 2021.3 has the issue with running shared unit tests via run gutters.\nUse a newer version.",
       "matrix": [
         {
           "name": "AndroidStudio",
@@ -13,12 +14,11 @@
       ]
     },
     {
-      "url": "https://youtrack.jetbrains.com/issue/KTIJ-22073",
-      "text": "Run gutter in AndroidTest source-set suggests all targets of a project as an execution target",
+      "url": "https://youtrack.jetbrains.com/issue/KTIJ-22078",
+      "text": "IDE doesn't suggest running all tests in file if it contains more than one class",
       "matrix": [
         {
-          "name": "AndroidStudio",
-          "from": "2022.1"
+          "name": "AndroidStudio"
         }
       ]
     }

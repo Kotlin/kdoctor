@@ -5,17 +5,10 @@ import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.CompatibilityProblem
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.Version
+import org.jetbrains.kotlin.doctor.printer.TextPainter
 
 class CompatibilityAnalyse(private val compatibility: Compatibility) {
-    fun check(environments: List<Set<EnvironmentPiece>>): String {
-        val report = mutableListOf<String>()
-        if (Version(KDOCTOR_VERSION) < Version(compatibility.latestKdoctor)) {
-           report.add("""
-               Update the kdoctor to the latest version: ${compatibility.latestKdoctor}
-                 `brew upgrade kdoctor`
-           """.trimIndent())
-        }
-
+    fun check(environments: List<Set<EnvironmentPiece>>, verbose: Boolean): String {
         val userProblems = mutableSetOf<CompatibilityProblem>()
         environments.forEach { environment ->
             val problems = compatibility.problems.filter { problem ->
@@ -28,10 +21,33 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
             }
             userProblems.addAll(problems)
         }
-        userProblems.forEach { problem ->
-            report.add("${problem.text}\nMore details: ${problem.url}")
+
+        val result = buildString {
+            if (Version(KDOCTOR_VERSION) < Version(compatibility.latestKdoctor)) {
+                appendLine("  ➤ Update the kdoctor to the latest version: ${compatibility.latestKdoctor}")
+                appendLine("    brew upgrade kdoctor")
+                appendLine()
+            }
+
+            userProblems
+                .filter { if (verbose) true else it.isCritical }
+                .forEach { problem ->
+                    problem.text.lines().forEachIndexed { index, s ->
+                        if (index == 0) {
+                            if (problem.isCritical) {
+                                appendLine("${TextPainter.RED}  ! ${TextPainter.RESET}$s")
+                            } else {
+                                appendLine("  ➤ $s")
+                            }
+                        } else {
+                            appendLine("    $s")
+                        }
+                    }
+                    appendLine("    More details: ${problem.url}")
+                    appendLine()
+                }
         }
 
-        return report.joinToString("\n\n")
+        return if (result.isNotBlank()) "Recommendations:\n$result" else ""
     }
 }

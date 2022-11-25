@@ -31,23 +31,28 @@ object Doctor {
         val results = KmmDiagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
         val failures = results.count { it.conclusion == DiagnosisResult.Failure }
 
+        val diagnosticsResult = buildString {
+            results.forEach { diagnosis ->
+                appendLine(diagnosis.getText(verbose))
+                if (verbose) appendLine()
+            }
+        }.trim()
+
         val checkedEnvironments = results.map { it.checkedEnvironments }
         val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
             val environment = mutableSetOf<EnvironmentPiece>()
             combination.forEach { environment.addAll(it) }
             environment
         }
-        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments)
+        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments, verbose).trim()
 
         buildString {
-            results.forEach { diagnosis ->
-                appendLine(diagnosis.getText(verbose))
-                if (verbose) appendLine()
+            if (diagnosticsResult.isNotBlank()) {
+                appendLine(diagnosticsResult)
             }
             if (compatibilityReport.isNotBlank()) {
                 appendLine()
-                appendLine("Recommendations:")
-                appendLine(compatibilityReport.prependIndent("    "))
+                appendLine(compatibilityReport)
             }
 
             appendLine()

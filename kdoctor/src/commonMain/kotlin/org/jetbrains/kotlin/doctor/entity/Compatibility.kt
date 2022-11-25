@@ -9,6 +9,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.KDOCTOR_VERSION
 
+private const val COMPATIBILITY_JSON = "https://github.com/Kotlin/kdoctor/raw/master/kdoctor/src/commonMain/resources/compatibility.json"
+
 @Suppress("FunctionName")
 data class EnvironmentPiece(
     val name: String,
@@ -51,6 +53,7 @@ data class EnvironmentRange(
 data class CompatibilityProblem(
     @SerialName("url") val url: String,
     @SerialName("text") val text: String,
+    @SerialName("isCritical") val isCritical: Boolean = false,
     @SerialName("matrix") val matrix: Set<EnvironmentRange>
 )
 
@@ -62,10 +65,7 @@ data class Compatibility(
     companion object {
         suspend fun download() = try {
             Logger.d("Compatibility.download")
-            //todo fix json url!
-            val compatibilityJson = System.httpClient.get(
-                "https://github.com/Kotlin/kdoctor/raw/wip/kdoctor/src/commonMain/resources/compatibility.json"
-            ).bodyAsText()
+            val compatibilityJson = System.httpClient.get(COMPATIBILITY_JSON).bodyAsText()
             Logger.d(compatibilityJson)
             Json.decodeFromString<Compatibility>(compatibilityJson)
         } catch (e: Exception) {
