@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.compatibility
 
+import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.KDOCTOR_VERSION
 import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.CompatibilityProblem
@@ -12,11 +13,16 @@ class CompatibilityAnalyse(private val compatibility: Compatibility) {
         val userProblems = mutableSetOf<CompatibilityProblem>()
         environments.forEach { environment ->
             val problems = compatibility.problems.filter { problem ->
+                Logger.d("Analyze problem: ${problem.url}")
                 problem.matrix.all { app ->
+                    Logger.d("Find app: ${app.name}")
                     val userAppVersion = environment.firstOrNull { it.name == app.name }?.version ?: return@all false
+                    Logger.d("User app (${app.name}): ${userAppVersion.semVersion}")
                     val beforeProblem = app.from?.let { userAppVersion < Version(it) } ?: false
                     val fixedAlready = app.fixedIn?.let { userAppVersion >= Version(it) } ?: false
-                    return@all beforeProblem || fixedAlready
+                    val result = !(beforeProblem || fixedAlready)
+                    Logger.d("App has problem: $result")
+                    return@all result
                 }
             }
             userProblems.addAll(problems)

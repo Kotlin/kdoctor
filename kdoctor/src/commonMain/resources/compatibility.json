@@ -8,8 +8,8 @@
       "matrix": [
         {
           "name": "AndroidStudio",
-          "from": "2021.3",
-          "fixedIn": "2022.1"
+          "from": "213",
+          "fixedIn": "221"
         }
       ]
     },
