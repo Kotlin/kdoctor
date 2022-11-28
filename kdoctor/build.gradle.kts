@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
+    id("com.google.devtools.ksp") version "1.7.20-1.0.8"
 }
 
 repositories {
@@ -46,6 +47,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.mockative:mockative:1.2.6")
             }
         }
         val macosX64Test by getting
@@ -56,6 +58,14 @@ kotlin {
         macosTest.dependsOn(commonTest)
         macosX64Test.dependsOn(macosTest)
         macosArm64Test.dependsOn(macosTest)
+    }
+
+    dependencies {
+        configurations
+            .filter { it.name.startsWith("ksp") && it.name.contains("Test") }
+            .forEach {
+                add(it.name, "io.mockative:mockative-processor:1.2.6")
+            }
     }
 }
 
