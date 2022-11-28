@@ -23,54 +23,41 @@ data class ProcessResult(val code: Int, val rawOutput: String?) {
     val output get() = if (code == 0) rawOutput else null
 }
 
-object System {
-    val isUsingRosetta: Boolean by lazy {
-        System.execute("sysctl", "sysctl.proc_translated").output
-            ?.substringAfter("sysctl.proc_translated: ")
-            ?.toIntOrNull() == 1
-    }
+interface System {
+    val currentOS: OS
+    val osVersion: Version?
+    val cpuInfo: String?
+    val homeDir: String
+    val shell: Shell?
 
-    val isUsingM1: Boolean by lazy {
-        getCPUInfo()?.contains("Apple") == true
-    }
+    fun getEnvVar(name: String): String?
+    fun execute(command: String, vararg args: String): ProcessResult
 
-    fun getVersion() =
-        System.execute("sw_vers", "-productVersion").output?.let { Version(it) }
+    fun findAppPaths(appId: String): List<String>
+    fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
 
-    fun getCPUInfo(): String? =
-        System.execute("sysctl", "-n", "machdep.cpu.brand_string", "").output?.let { "CPU: $it" }
+    fun print(text: String)
+    fun creteHttpClient(): HttpClient
 
-    fun findAppPaths(appId: String): List<String> =
-        System.execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
-            ?.split("\n")
-            ?.filter { it.isNotBlank() }
-            .orEmpty()
-
-    fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
-        System.execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
-
-    fun getShell(): Shell? =
-        getEnvVar("SHELL")?.let { shellPath ->
-            Shell.values().firstOrNull { it.path == shellPath }
-        }
-
-    fun parsePlist(path: String): Map<String, Any>? {
-        if (!fileExists(path)) return null
-        return try {
-            execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path).output
-                ?.let { Json.decodeFromString<JsonObject>(it) }
-        } catch (e: SerializationException) {
-            null
-        }
-    }
+    fun fileExists(path: String): Boolean
+    fun readFile(path: String): String?
+    fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
 }
 
-expect val System.currentOS: OS
-expect val System.homeDir: String
-expect val System.httpClient: HttpClient
-expect fun System.getEnvVar(name: String): String?
-expect fun System.fileExists(path: String): Boolean
-expect fun System.readFile(path: String): String?
-expect fun System.execute(command: String, vararg args: String): ProcessResult
-expect fun System.findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
-expect fun System.print(text: String)
+fun System.isUsingRosetta() =
+    execute("sysctl", "sysctl.proc_translated").output
+        ?.substringAfter("sysctl.proc_translated: ")
+        ?.toIntOrNull() == 1
+
+fun System.isUsingM1() =
+    cpuInfo?.contains("Apple") == true
+
+fun System.parsePlist(path: String): Map<String, Any>? {
+    if (!fileExists(path)) return null
+    return try {
+        execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path).output
+            ?.let { Json.decodeFromString<JsonObject>(it) }
+    } catch (e: SerializationException) {
+        null
+    }
+}

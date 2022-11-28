@@ -5,21 +5,18 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.kotlin.doctor.compatibility.CompatibilityAnalyse
 import org.jetbrains.kotlin.doctor.diagnostics.*
-import org.jetbrains.kotlin.doctor.entity.Compatibility
-import org.jetbrains.kotlin.doctor.entity.Diagnosis
-import org.jetbrains.kotlin.doctor.entity.DiagnosisResult
-import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
+import org.jetbrains.kotlin.doctor.entity.*
 import org.jetbrains.kotlin.doctor.printer.TextPainter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-object Doctor {
+class Doctor(private val system: System) {
     private val KmmDiagnostics = setOf(
-        SystemDiagnostic(),
-        JavaDiagnostic(),
-        AndroidStudioDiagnostic(),
-        XcodeDiagnostic(),
-        CocoapodsDiagnostic()
+        SystemDiagnostic(system),
+        JavaDiagnostic(system),
+        AndroidStudioDiagnostic(system),
+        XcodeDiagnostic(system),
+        CocoapodsDiagnostic(system)
     )
 
     private suspend fun Diagnostic.asyncDiagnose(): Diagnosis = suspendCoroutine {
@@ -27,7 +24,7 @@ object Doctor {
     }
 
     suspend fun diagnoseKmmEnvironment(verbose: Boolean): String = coroutineScope {
-        val compatibility = async { Compatibility.download() }
+        val compatibility = async { Compatibility.download(system.creteHttpClient()) }
         val results = KmmDiagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
         val failures = results.count { it.conclusion == DiagnosisResult.Failure }
 

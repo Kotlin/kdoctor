@@ -2,14 +2,14 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
 
-class JavaDiagnostic : Diagnostic() {
+class JavaDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder("Java")
 
-        var javaLocation = System.execute("which", "java").output
-        val javaVersion = System.execute("java", "-version").output?.lineSequence()?.firstOrNull()
-        val systemJavaHome = System.execute("/usr/libexec/java_home").output
-        val javaHome = System.getEnvVar("JAVA_HOME")
+        var javaLocation = system.execute("which", "java").output
+        val javaVersion = system.execute("java", "-version").output?.lineSequence()?.firstOrNull()
+        val systemJavaHome = system.execute("/usr/libexec/java_home").output
+        val javaHome = system.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
             javaLocation = when {
                 javaHome?.isNotBlank() == true -> javaHome.plus("/bin/java")
@@ -35,7 +35,7 @@ class JavaDiagnostic : Diagnostic() {
             val javaHomeCanonical = javaHome.removeSuffix("/")
             val javaCmdLocations =
                 listOf(javaHomeCanonical, "$javaHomeCanonical/bin/java", "$javaHomeCanonical/bin/jre/sh/java")
-            if (javaCmdLocations.none { System.fileExists(it) }) {
+            if (javaCmdLocations.none { system.fileExists(it) }) {
                 result.addFailure(
                     "JAVA_HOME is set to an invalid directory",
                     "JAVA_HOME: $javaHome",
@@ -54,7 +54,7 @@ class JavaDiagnostic : Diagnostic() {
         }
 
         val xcodeJavaHome =
-            System.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
+            system.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
                 ?.lines()
                 ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
                 ?.split("=")
@@ -88,7 +88,7 @@ class JavaDiagnostic : Diagnostic() {
     }
 
     private fun javaHomeHint(javaLocation: String?) = """
-        Consider adding the following to ${System.getShell()?.profile ?: "your shell profile"} for setting JAVA_HOME
+        Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME
         export JAVA_HOME=${javaLocation?.removeSuffix("/bin/java") ?: "<path to java>"}
     """.trimIndent()
 }

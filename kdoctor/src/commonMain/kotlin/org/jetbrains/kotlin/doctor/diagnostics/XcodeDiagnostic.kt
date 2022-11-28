@@ -3,15 +3,15 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.entity.*
 
-class XcodeDiagnostic : Diagnostic() {
+class XcodeDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder("Xcode")
 
         val paths = mutableSetOf<String>()
-        paths.addAll(System.findAppPaths("com.apple.dt.Xcode"))
+        paths.addAll(system.findAppPaths("com.apple.dt.Xcode"))
         if (paths.isEmpty()) {
-            paths.addAll(System.findAppsPathsInDirectory("Xcode", "/Applications"))
-            paths.addAll(System.findAppsPathsInDirectory("Xcode", "${System.homeDir}/Applications"))
+            paths.addAll(system.findAppsPathsInDirectory("Xcode", "/Applications"))
+            paths.addAll(system.findAppsPathsInDirectory("Xcode", "${system.homeDir}/Applications"))
         }
         if (paths.isEmpty()) {
             result.addFailure(
@@ -34,13 +34,13 @@ class XcodeDiagnostic : Diagnostic() {
         }
 
         if (xcodeInstallations.count() > 1) {
-            val tools = System.execute("xcode-select", "-p").output
+            val tools = system.execute("xcode-select", "-p").output
             if (tools != null) {
                 result.addSuccess("Current command line tools: $tools")
             }
         }
 
-        val xcrun = System.execute("xcrun", "cc").output
+        val xcrun = system.execute("xcrun", "cc").output
         if (xcrun?.contains("license") == true) {
             result.addFailure(
                 "Xcode license is not accepted",
@@ -49,7 +49,7 @@ class XcodeDiagnostic : Diagnostic() {
         }
 
         if (xcodeInstallations.isNotEmpty()) {
-            val launchStatus = System.execute("xcodebuild", "-checkFirstLaunchStatus")
+            val launchStatus = system.execute("xcodebuild", "-checkFirstLaunchStatus")
             if (launchStatus.code != 0) {
                 result.addFailure(
                     "Xcode requires to perform the First Launch tasks",
@@ -62,7 +62,7 @@ class XcodeDiagnostic : Diagnostic() {
 
     private fun findXcode(path: String): Application? {
         Logger.d("findXcode($path)")
-        val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
+        val plist = system.parsePlist("$path/Contents/Info.plist") ?: return null
         val version = plist["CFBundleShortVersionString"]?.toString()?.trim('"') ?: return null
         val name = plist["CFBundleName"]?.toString()
             ?.trim('"')

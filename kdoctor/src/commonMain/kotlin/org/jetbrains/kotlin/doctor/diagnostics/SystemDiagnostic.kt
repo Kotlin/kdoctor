@@ -2,17 +2,17 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
 
-class SystemDiagnostic : Diagnostic() {
+class SystemDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder("Operation System")
-        val os = System.currentOS
-        val version = System.getVersion()
+        val os = system.currentOS
+        val version = system.osVersion
 
         if (os == OS.MacOS && version != null) {
-            result.addSuccess("Version OS: $os $version", System.getCPUInfo().orEmpty())
+            result.addSuccess("Version OS: $os $version", system.cpuInfo?.let { "CPU: $it" }.orEmpty())
             result.addEnvironment(setOf(EnvironmentPiece.Macos(version)))
 
-            if (System.isUsingRosetta) {
+            if (system.isUsingRosetta()) {
                 result.addInfo(
                     "You are currently using Rosetta 2.",
                     "It may cause some issues while trying to install packages using Homebrew.",

@@ -2,12 +2,12 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
 
-class CocoapodsDiagnostic : Diagnostic() {
+class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder("Cocoapods")
 
-        val rubyVersion = System.execute("ruby", "-v").output
-        val rubyLocation = System.execute("which", "ruby").output
+        val rubyVersion = system.execute("ruby", "-v").output
+        val rubyLocation = system.execute("which", "ruby").output
         if (rubyLocation == null || rubyVersion == null) {
             result.addFailure(
                 "ruby not found",
@@ -21,7 +21,7 @@ class CocoapodsDiagnostic : Diagnostic() {
 
         if (ruby.location == "/usr/bin/ruby") {
             var title = "System ruby is currently used"
-            if (System.isUsingM1) {
+            if (system.isUsingM1()) {
                 result.addFailure(
                     title,
                     "CocoaPods is not compatible with system ruby installation on Apple M1 computers.",
@@ -35,7 +35,7 @@ class CocoapodsDiagnostic : Diagnostic() {
             }
         }
 
-        val rubyGemsVersion = System.execute("gem", "-v").output
+        val rubyGemsVersion = system.execute("gem", "-v").output
         if (rubyGemsVersion == null) {
             result.addFailure(
                 "ruby gems not found",
@@ -48,14 +48,14 @@ class CocoapodsDiagnostic : Diagnostic() {
         result.addSuccess("${gems.name} (${gems.version})")
 
         var cocoapods: Application? = null
-        val cocoapodsVersionOutput = System.execute("pod", "--version").output
+        val cocoapodsVersionOutput = system.execute("pod", "--version").output
         if (cocoapodsVersionOutput != null) {
             val cocoapodsVersion = Version(cocoapodsVersionOutput)
             cocoapods = Application("cocoapods", cocoapodsVersion)
         }
         if (cocoapods == null) {
             //check if installed via brew but not linked to /usr/bin
-            val cocoapodsBrewInstallation = System.execute("brew", "list", "cocoapods", "--versions").output
+            val cocoapodsBrewInstallation = system.execute("brew", "list", "cocoapods", "--versions").output
             if (cocoapodsBrewInstallation?.isNotBlank() == true) {
                 result.addFailure(
                     "Cocoapods are installed via Homebrew but not linked to /usr/local/bin",
@@ -71,10 +71,10 @@ class CocoapodsDiagnostic : Diagnostic() {
         }
         result.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
-        val locale = System.execute("/usr/bin/locale", "-k", "LC_CTYPE").output
+        val locale = system.execute("/usr/bin/locale", "-k", "LC_CTYPE").output
         if (locale == null || !locale.contains("UTF-8")) {
             val hint = """
-                Consider adding the following to ${System.getShell()?.profile ?: "shell profile"}
+                Consider adding the following to ${system.shell?.profile ?: "shell profile"}
                 export LC_ALL=en_US.UTF-8
             """.trimIndent()
             if (cocoapods.version > Version(1, 10, 2)) {

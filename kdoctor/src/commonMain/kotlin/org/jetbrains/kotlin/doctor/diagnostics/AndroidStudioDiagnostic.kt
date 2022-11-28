@@ -5,19 +5,19 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
 
-class AndroidStudioDiagnostic : Diagnostic() {
+class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder("Android Studio")
 
         val paths = mutableSetOf<String>()
-        paths.addAll(System.findAppPaths("com.google.android.studio*"))
+        paths.addAll(system.findAppPaths("com.google.android.studio*"))
         if (paths.isEmpty()) {
-            paths.addAll(System.findAppsPathsInDirectory("Android Studio", "/Applications"))
-            paths.addAll(System.findAppsPathsInDirectory("Android Studio", "${System.homeDir}/Applications"))
+            paths.addAll(system.findAppsPathsInDirectory("Android Studio", "/Applications"))
+            paths.addAll(system.findAppsPathsInDirectory("Android Studio", "${system.homeDir}/Applications"))
             paths.addAll(
-                System.findAppsPathsInDirectory(
+                system.findAppsPathsInDirectory(
                     "Android Studio",
-                    "${System.homeDir}/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio",
+                    "${system.homeDir}/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio",
                     true
                 )
             )
@@ -35,7 +35,7 @@ class AndroidStudioDiagnostic : Diagnostic() {
                 if (app.location != null && app.location.contains("Toolbox", ignoreCase = true)) {
                     val channelPath = app.location.substringBeforeLast('/').substringBeforeLast('/')
                     val historyFile = "$channelPath/.history.json"
-                    val historyJson = System.readFile(historyFile)
+                    val historyJson = system.readFile(historyFile)
                     val jsonFormatter = Json { ignoreUnknownKeys = true }
                     val history = historyJson?.let {
                         try {
@@ -56,7 +56,7 @@ class AndroidStudioDiagnostic : Diagnostic() {
         }
 
         studioInstallations.forEach { app ->
-            val androidStudio = AppManager(app)
+            val androidStudio = AppManager(system, app)
             val kotlinPlugin = androidStudio.getPlugin(AppManager.KOTLIN_PLUGIN)
             val kmmPlugin = androidStudio.getPlugin(AppManager.KMM_PLUGIN)
             val embeddedJavaVersion = androidStudio.getEmbeddedJavaVersion()
@@ -112,7 +112,7 @@ class AndroidStudioDiagnostic : Diagnostic() {
 
     private fun findAndroidStudio(path: String): Application? {
         Logger.d("findAndroidStudio($path)")
-        val plist = System.parsePlist("$path/Contents/Info.plist") ?: return null
+        val plist = system.parsePlist("$path/Contents/Info.plist") ?: return null
         val version = plist["CFBundleVersion"]?.toString()?.trim('"') ?: return null
         val name = plist["CFBundleName"]?.toString()?.trim('"')
             ?: path.substringAfterLast("/").substringBeforeLast(".")

@@ -7,7 +7,6 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.entity.System
-import org.jetbrains.kotlin.doctor.entity.print
 
 internal const val KDOCTOR_VERSION = "0.0.5"
 
@@ -39,10 +38,14 @@ fun main(args: Array<String>) {
 
 private fun run(verbose: Boolean): Unit = runBlocking {
     val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
+    val system = getSystem()
 
     print(progressMsg)
-    val kmmDiagnostic = Doctor.diagnoseKmmEnvironment(verbose)
+    val kmmDiagnostic = Doctor(system).diagnoseKmmEnvironment(verbose)
     print("\r" + " ".repeat(progressMsg.length))
 
-    System.print("\r${kmmDiagnostic.trim()}\n")
+    system.print("\r${kmmDiagnostic.trim()}\n")
 }
+
+//get platform implementation
+expect fun getSystem(): System
