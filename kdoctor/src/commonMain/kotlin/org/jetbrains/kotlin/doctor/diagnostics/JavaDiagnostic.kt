@@ -42,7 +42,7 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
                     javaHomeHint(javaLocation)
                 )
             } else {
-                result.addSuccess("JAVA_HOME=$javaHome")
+                result.addSuccess("JAVA_HOME: $javaHome")
                 if (javaCmdLocations.none { it == javaLocation }) {
                     result.addInfo(
                         "JAVA_HOME does not match Java binary location",

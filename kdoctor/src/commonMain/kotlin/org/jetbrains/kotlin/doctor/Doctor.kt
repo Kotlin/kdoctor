@@ -23,26 +23,34 @@ class Doctor(private val system: System) {
         it.resume(diagnose())
     }
 
+    suspend fun runDiagnostics(diagnostics: Set<Diagnostic>) = coroutineScope {
+        diagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
+    }
+
+    fun makeDiagnosticsReport(diagnosis: List<Diagnosis>, verbose: Boolean) = buildString {
+        diagnosis.forEach { diagnosis ->
+            appendLine(diagnosis.getText(verbose))
+            if (verbose) appendLine()
+        }
+    }.trim()
+
+
     suspend fun diagnoseKmmEnvironment(verbose: Boolean): String = coroutineScope {
         val compatibility = async { Compatibility.download(system.creteHttpClient()) }
-        val results = KmmDiagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
-        val failures = results.count { it.conclusion == DiagnosisResult.Failure }
 
-        val diagnosticsResult = buildString {
-            results.forEach { diagnosis ->
-                appendLine(diagnosis.getText(verbose))
-                if (verbose) appendLine()
-            }
-        }.trim()
+        val diagnosis = runDiagnostics(KmmDiagnostics)
+        val diagnosticsResult = makeDiagnosticsReport(diagnosis, verbose)
 
-        val checkedEnvironments = results.map { it.checkedEnvironments }
+        val checkedEnvironments = diagnosis.map { it.checkedEnvironments }
         val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
             val environment = mutableSetOf<EnvironmentPiece>()
             combination.forEach { environment.addAll(it) }
             environment
         }
-        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments, verbose).trim()
+        val compatibilityReport = CompatibilityAnalyse(compatibility.await())
+            .check(allUserEnvironments, verbose).trim()
 
+        val hasFailures = diagnosis.any { it.conclusion == DiagnosisResult.Failure }
         buildString {
             if (diagnosticsResult.isNotBlank()) {
                 appendLine(diagnosticsResult)
@@ -54,31 +62,13 @@ class Doctor(private val system: System) {
 
             appendLine()
             appendLine("Conclusion:")
-            if (failures > 0) {
+            if (hasFailures) {
                 val prefix = "  ${DiagnosisResult.Failure.color}${DiagnosisResult.Failure.symbol}${TextPainter.RESET} "
                 appendLine("${prefix}KDoctor has diagnosed one or more problems while checking your environment.")
                 appendLine("    Please check the output for problem description and possible solutions.")
             } else {
                 val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
                 appendLine("${prefix}Your system is ready for Kotlin Multiplatform Mobile Development!")
-            }
-        }
-    }
-
-    //input: [[@], [a, b], [1, 2], [#]]
-    //output: [[@, a, 1, #], [@, a, 2, #], [@, b, 1, #], [@, b, 2, #]]
-    private fun <T> allCombinations(input: List<List<T>>): List<List<T>> {
-        val list = input.filter { it.isNotEmpty() }
-        return when {
-            list.isEmpty() -> emptyList()
-            list.size == 1 -> list.first().map { listOf(it) }
-            else -> {
-                val head: List<T> = list.first()
-                val tail: List<List<T>> = list.drop(1)
-                val tailResult = allCombinations(tail)
-                head.flatMap { h ->
-                    tailResult.map { j -> listOf(h) + j }
-                }
             }
         }
     }

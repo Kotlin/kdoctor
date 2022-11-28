@@ -31,7 +31,7 @@ interface System {
     val shell: Shell?
 
     fun getEnvVar(name: String): String?
-    fun execute(command: String, args: List<String>): ProcessResult
+    fun execute(command: String, vararg args: String): ProcessResult
 
     fun findAppPaths(appId: String): List<String>
     fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
@@ -43,8 +43,6 @@ interface System {
     fun readFile(path: String): String?
     fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
 }
-
-fun System.execute(command: String, vararg args: String) = execute(command, args.asList())
 
 fun System.isUsingRosetta() =
     execute("sysctl", "sysctl.proc_translated").output

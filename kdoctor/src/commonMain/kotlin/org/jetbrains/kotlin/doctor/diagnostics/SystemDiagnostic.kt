@@ -20,7 +20,7 @@ class SystemDiagnostic(private val system: System) : Diagnostic() {
                 )
             }
         } else {
-            result.addFailure("OS: $os")
+            result.addFailure("OS: $os $version")
         }
         return result.build()
     }
