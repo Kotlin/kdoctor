@@ -30,7 +30,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             result.addSuccess(
                 "${xcode.name} (${xcode.version})\nLocation: ${xcode.location}"
             )
-            result.addEnvironment(setOf(EnvironmentPiece.Xcode(xcode.version)))
+            result.addEnvironment(EnvironmentPiece.Xcode(xcode.version))
         }
 
         if (xcodeInstallations.count() > 1) {

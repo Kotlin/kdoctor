@@ -68,8 +68,8 @@ data class Diagnosis(
             this.conclusion = conclusion
         }
 
-        fun addEnvironment(environment: Set<EnvironmentPiece>) {
-            checkedEnvironments.add(environment)
+        fun addEnvironment(vararg environment: EnvironmentPiece) {
+            checkedEnvironments.add(environment.toSet())
         }
 
         fun build() = Diagnosis(

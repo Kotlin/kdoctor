@@ -84,11 +84,11 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             }
         }
 
-        result.addEnvironment(setOf(
+        result.addEnvironment(
             EnvironmentPiece.Ruby(ruby.version),
             EnvironmentPiece.RubyGems(gems.version),
             EnvironmentPiece.Cocoapods(cocoapods.version)
-        ))
+        )
         return result.build()
     }
 }

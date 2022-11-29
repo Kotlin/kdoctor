@@ -10,7 +10,7 @@ class SystemDiagnostic(private val system: System) : Diagnostic() {
 
         if (os == OS.MacOS && version != null) {
             result.addSuccess("Version OS: $os $version", system.cpuInfo?.let { "CPU: $it" }.orEmpty())
-            result.addEnvironment(setOf(EnvironmentPiece.Macos(version)))
+            result.addEnvironment(EnvironmentPiece.Macos(version))
 
             if (system.isUsingRosetta()) {
                 result.addInfo(

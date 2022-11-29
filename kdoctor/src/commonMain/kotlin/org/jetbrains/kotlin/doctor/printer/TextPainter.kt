@@ -6,10 +6,4 @@ object TextPainter {
     const val GREEN = "\u001B[32m"
     const val YELLOW = "\u001B[33m"
     const val BOLD = "\u001B[1m"
-
-    fun String.removeColors(): String {
-        var result = this
-        listOf(RESET, RED, GREEN, YELLOW, BOLD).forEach { result = result.replace(it, "") }
-        return result
-    }
 }

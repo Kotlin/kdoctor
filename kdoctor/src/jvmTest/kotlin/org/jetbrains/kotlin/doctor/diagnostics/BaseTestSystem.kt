@@ -1,4 +1,4 @@
-package org.jetbrains.kotlin.doctor
+package org.jetbrains.kotlin.doctor.diagnostics
 
 import io.ktor.client.*
 import org.jetbrains.kotlin.doctor.entity.*

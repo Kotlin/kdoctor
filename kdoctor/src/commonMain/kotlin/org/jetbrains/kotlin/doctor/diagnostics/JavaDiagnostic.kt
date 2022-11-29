@@ -27,7 +27,7 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
 
         val java = Application("Java", Version(javaVersion), javaLocation)
         result.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
-        result.addEnvironment(setOf(EnvironmentPiece.Jdk(java.version)))
+        result.addEnvironment(EnvironmentPiece.Jdk(java.version))
 
         val javaHomeHint = """
             Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME

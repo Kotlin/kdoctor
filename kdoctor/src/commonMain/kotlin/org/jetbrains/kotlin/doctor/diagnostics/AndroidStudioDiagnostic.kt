@@ -68,11 +68,11 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
                 Kotlin Plugin: ${kotlinPlugin?.version ?: "not installed"}
                 Kotlin Multiplatform Mobile Plugin: ${kmmPlugin?.version ?: "not installed"}
             """.trimIndent()
-            result.addEnvironment(buildSet {
+            result.addEnvironment(*buildSet {
                 add(EnvironmentPiece.AndroidStudio(app.version))
                 if (kotlinPlugin != null) add(EnvironmentPiece.KotlinPlugin(kotlinPlugin.version))
                 if (kmmPlugin != null) add(EnvironmentPiece.KmmPlugin(kmmPlugin.version))
-            })
+            }.toTypedArray())
 
             if (kotlinPlugin == null) {
                 result.addFailure(
