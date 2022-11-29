@@ -26,6 +26,7 @@ open class BaseTestSystem : System {
                 OpenJDK Runtime Environment Corretto-11.0.16.8.1 (build 11.0.16+8-LTS)
                 OpenJDK 64-Bit Server VM Corretto-11.0.16.8.1 (build 11.0.16+8-LTS, mixed mode)
             """.trimIndent()
+
             "/usr/libexec/java_home" -> "$homeDir/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home"
             "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> "\"JAVA_HOME\"=$homeDir/.sdkman/candidates/java/current;"
             else -> null
@@ -46,7 +47,7 @@ open class BaseTestSystem : System {
         TODO("Not yet implemented")
     }
 
-    override fun fileExists(path: String): Boolean = when(path) {
+    override fun fileExists(path: String): Boolean = when (path) {
         "/Users/my/.sdkman/candidates/java/current/bin/java" -> true
         else -> false
     }

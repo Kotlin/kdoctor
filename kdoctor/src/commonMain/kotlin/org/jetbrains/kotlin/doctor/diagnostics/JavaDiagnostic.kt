@@ -29,8 +29,13 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
         result.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
         result.addEnvironment(setOf(EnvironmentPiece.Jdk(java.version)))
 
+        val javaHomeHint = """
+            Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME
+            export JAVA_HOME=${javaLocation.removeSuffix("/bin/java")}
+        """.trimIndent()
+
         if (javaHome.isNullOrBlank()) {
-            result.addInfo("JAVA_HOME is not set", javaHomeHint(javaLocation))
+            result.addInfo("JAVA_HOME is not set", javaHomeHint)
         } else {
             val javaHomeCanonical = javaHome.removeSuffix("/")
             val javaCmdLocations =
@@ -39,8 +44,9 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
                 result.addFailure(
                     "JAVA_HOME is set to an invalid directory",
                     "JAVA_HOME: $javaHome",
-                    javaHomeHint(javaLocation)
+                    javaHomeHint
                 )
+                return result.build()
             } else {
                 result.addSuccess("JAVA_HOME: $javaHome")
                 if (javaCmdLocations.none { it == javaLocation }) {
@@ -86,9 +92,4 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
 
         return result.build()
     }
-
-    private fun javaHomeHint(javaLocation: String?) = """
-        Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME
-        export JAVA_HOME=${javaLocation?.removeSuffix("/bin/java") ?: "<path to java>"}
-    """.trimIndent()
 }
