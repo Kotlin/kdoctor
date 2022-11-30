@@ -60,7 +60,7 @@ kotlin {
 }
 
 tasks.register<Exec>("assembleReleaseExecutableMacos") {
-    dependsOn("linkReleaseExecutableMacosX64", "linkReleaseExecutableMacosArm64")
+    dependsOn(":kdoctor:jvmTest", ":kdoctor:linkReleaseExecutableMacosX64", ":kdoctor:linkReleaseExecutableMacosArm64")
     commandLine("lipo", "-create", "-output", "kdoctor", "bin/macosX64/releaseExecutable/kdoctor.kexe", "bin/macosArm64/releaseExecutable/kdoctor.kexe")
     workingDir = buildDir
     group = "Build"
