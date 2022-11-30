@@ -49,6 +49,21 @@ open class BaseTestSystem : System {
             "xcodebuild -checkFirstLaunchStatus" -> {
                 return ProcessResult(0, null)
             }
+            "ruby -v" -> {
+                "ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21]"
+            }
+            "which ruby" -> {
+                "$homeDir/.rbenv/shims/ruby"
+            }
+            "gem -v" -> {
+                "3.3.26"
+            }
+            "pod --version" -> {
+                "1.11.3"
+            }
+            "/usr/bin/locale -k LC_CTYPE" -> {
+                "charmap=\"UTF-8\""
+            }
             else -> {
                 null
             }
