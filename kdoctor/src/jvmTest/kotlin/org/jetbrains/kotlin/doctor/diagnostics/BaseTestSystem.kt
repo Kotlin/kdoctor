@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import org.jetbrains.kotlin.doctor.entity.*
 
@@ -15,8 +16,11 @@ open class BaseTestSystem : System {
         else -> null
     }
 
-    override fun execute(command: String, vararg args: String): ProcessResult =
-        executeCmd((command + " " + args.joinToString(" ")).trim())
+    override fun execute(command: String, vararg args: String): ProcessResult {
+        val cmd = (command + " " + args.joinToString(" ")).trim()
+        Logger.d("exec '$cmd'")
+        return executeCmd(cmd)
+    }
 
     open fun executeCmd(cmd: String): ProcessResult {
         val output = when (cmd) {
@@ -43,6 +47,22 @@ open class BaseTestSystem : System {
             "/usr/bin/plutil -convert json -o - /Applications/Xcode.app/Contents/Info.plist" -> {
                 "{\"CFBundleShortVersionString\":\"13.4.1\", \"CFBundleName\":\"Xcode\"}"
             }
+            "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.google.android.studio*\"" -> {
+                "$homeDir/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app"
+            }
+            "/usr/bin/plutil -convert json -o - $homeDir/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app/Contents/Info.plist" -> {
+                """
+                    {
+                      "CFBundleVersion": "AI-222.4345.14.2221.9252092",
+                      "CFBundleName": "Android Studio",
+                      "JVMOptions": {
+                        "Properties": {
+                          "idea.paths.selector": "data/Directory/Name"
+                        }
+                      }
+                    }
+                """.trimIndent()
+            }
             "xcrun cc" -> {
                 "clang: error: no input files"
             }
@@ -63,6 +83,15 @@ open class BaseTestSystem : System {
             }
             "/usr/bin/locale -k LC_CTYPE" -> {
                 "charmap=\"UTF-8\""
+            }
+            "find $homeDir/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib -name \"*.jar\"" -> {
+                "$homeDir/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar"
+            }
+            "find $homeDir/Library/Application Support/Google/data/Directory/Name/plugins/kmm/lib -name \"*.jar\"" -> {
+                "$homeDir/Library/Application Support/Google/data/Directory/Name/plugins/kmm/lib/kmm.jar"
+            }
+            "$homeDir/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app/Contents/jre/Contents/Home/bin/java --version" -> {
+                "openjdk version \"11.0.16\" 2022-07-19 LTS"
             }
             else -> {
                 null
@@ -86,5 +115,19 @@ open class BaseTestSystem : System {
 
     override fun readFile(path: String): String? = null
 
-    override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? = null
+    override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
+        if (pathToArchive == "/Users/my/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar" && pathToFile == "META-INF/plugin.xml") {
+            return """
+                <version>1.7.20</version>
+                <id>org.jetbrains.kotlin</id>
+            """.trimIndent()
+        }
+        if (pathToArchive == "/Users/my/Library/Application Support/Google/data/Directory/Name/plugins/kmm/lib/kmm.jar" && pathToFile == "META-INF/plugin.xml") {
+            return """
+                <version>0.5.0</version>
+                <id>org.jetbrains.kmm</id>
+            """.trimIndent()
+        }
+        return null
+    }
 }
