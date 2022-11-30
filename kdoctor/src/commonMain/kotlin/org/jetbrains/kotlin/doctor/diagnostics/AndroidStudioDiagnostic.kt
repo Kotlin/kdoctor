@@ -10,7 +10,7 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
         val result = Diagnosis.Builder("Android Studio")
 
         val paths = mutableSetOf<String>()
-        paths.addAll(system.findAppPaths("com.google.android.studio*"))
+        paths.addAll(system.spotlightFindAppPaths("com.google.android.studio*"))
         if (paths.isEmpty()) {
             paths.addAll(system.findAppsPathsInDirectory("Android Studio", "/Applications"))
             paths.addAll(system.findAppsPathsInDirectory("Android Studio", "${system.homeDir}/Applications"))

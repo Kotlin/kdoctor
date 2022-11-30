@@ -20,21 +20,41 @@ open class BaseTestSystem : System {
 
     open fun executeCmd(cmd: String): ProcessResult {
         val output = when (cmd) {
-            "which java" -> "$homeDir/.sdkman/candidates/java/current/bin/java"
-            "java -version" -> """
-                openjdk version "11.0.16" 2022-07-19 LTS
-                OpenJDK Runtime Environment Corretto-11.0.16.8.1 (build 11.0.16+8-LTS)
-                OpenJDK 64-Bit Server VM Corretto-11.0.16.8.1 (build 11.0.16+8-LTS, mixed mode)
-            """.trimIndent()
+            "which java" -> {
+                "$homeDir/.sdkman/candidates/java/current/bin/java"
+            }
+            "java -version" -> {
+                """
+                    openjdk version "11.0.16" 2022-07-19 LTS
+                    OpenJDK Runtime Environment Corretto-11.0.16.8.1 (build 11.0.16+8-LTS)
+                    OpenJDK 64-Bit Server VM Corretto-11.0.16.8.1 (build 11.0.16+8-LTS, mixed mode)
+                """.trimIndent()
+            }
 
-            "/usr/libexec/java_home" -> "$homeDir/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home"
-            "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> "\"JAVA_HOME\"=$homeDir/.sdkman/candidates/java/current;"
-            else -> null
+            "/usr/libexec/java_home" -> {
+                "$homeDir/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home"
+            }
+            "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> {
+                "\"JAVA_HOME\"=$homeDir/.sdkman/candidates/java/current;"
+            }
+            "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.apple.dt.Xcode\"" -> {
+                "/Applications/Xcode.app"
+            }
+            "/usr/bin/plutil -convert json -o - /Applications/Xcode.app/Contents/Info.plist" -> {
+                "{\"CFBundleShortVersionString\":\"13.4.1\", \"CFBundleName\":\"Xcode\"}"
+            }
+            "xcrun cc" -> {
+                "clang: error: no input files"
+            }
+            "xcodebuild -checkFirstLaunchStatus" -> {
+                return ProcessResult(0, null)
+            }
+            else -> {
+                null
+            }
         }
         return output?.let { ProcessResult(0, output) } ?: ProcessResult(-1, null)
     }
-
-    override fun findAppPaths(appId: String): List<String> = emptyList()
 
     override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> =
         emptyList()
@@ -47,10 +67,7 @@ open class BaseTestSystem : System {
         TODO("Not yet implemented")
     }
 
-    override fun fileExists(path: String): Boolean = when (path) {
-        "/Users/my/.sdkman/candidates/java/current/bin/java" -> true
-        else -> false
-    }
+    override fun fileExists(path: String): Boolean = true
 
     override fun readFile(path: String): String? = null
 

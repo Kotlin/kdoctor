@@ -8,7 +8,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
         val result = Diagnosis.Builder("Xcode")
 
         val paths = mutableSetOf<String>()
-        paths.addAll(system.findAppPaths("com.apple.dt.Xcode"))
+        paths.addAll(system.spotlightFindAppPaths("com.apple.dt.Xcode"))
         if (paths.isEmpty()) {
             paths.addAll(system.findAppsPathsInDirectory("Xcode", "/Applications"))
             paths.addAll(system.findAppsPathsInDirectory("Xcode", "${system.homeDir}/Applications"))

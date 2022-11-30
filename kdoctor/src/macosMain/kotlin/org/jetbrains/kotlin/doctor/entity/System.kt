@@ -53,12 +53,6 @@ class MacosSystem : System {
         ProcessResult(exitCode, result.trim().takeIf { it.isNotBlank() })
     }
 
-    override fun findAppPaths(appId: String): List<String> =
-        execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
-            ?.split("\n")
-            ?.filter { it.isNotBlank() }
-            .orEmpty()
-
     override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> {
         val paths = mutableListOf<String>()
         val dp = opendir(directory) ?: return paths

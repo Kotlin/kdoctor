@@ -33,15 +33,13 @@ interface System {
     fun getEnvVar(name: String): String?
     fun execute(command: String, vararg args: String): ProcessResult
 
-    fun findAppPaths(appId: String): List<String>
-    fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
-
     fun print(text: String)
     fun creteHttpClient(): HttpClient
 
     fun fileExists(path: String): Boolean
     fun readFile(path: String): String?
     fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
+    fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
 }
 
 fun System.isUsingRosetta() =
@@ -61,3 +59,9 @@ fun System.parsePlist(path: String): Map<String, Any>? {
         null
     }
 }
+
+fun System.spotlightFindAppPaths(appId: String): List<String> =
+    execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
+        ?.split("\n")
+        ?.filter { it.isNotBlank() }
+        .orEmpty()

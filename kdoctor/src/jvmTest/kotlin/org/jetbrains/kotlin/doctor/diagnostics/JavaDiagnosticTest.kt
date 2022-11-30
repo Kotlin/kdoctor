@@ -180,6 +180,13 @@ internal class JavaDiagnosticTest {
                 "JAVA_HOME" -> "/wrong/path"
                 else -> super.getEnvVar(name)
             }
+
+            override fun fileExists(path: String): Boolean = when (path) {
+                "/wrong/path",
+                "/wrong/path/bin/java",
+                "/wrong/path/bin/jre/sh/java" -> false
+                else -> super.fileExists(path)
+            }
         }
         val diagnose = JavaDiagnostic(system).diagnose()
 
@@ -208,11 +215,6 @@ internal class JavaDiagnosticTest {
             override fun getEnvVar(name: String): String? = when (name) {
                 "JAVA_HOME" -> "/some/path"
                 else -> super.getEnvVar(name)
-            }
-
-            override fun fileExists(path: String): Boolean = when (path) {
-                "/some/path" -> true
-                else -> super.fileExists(path)
             }
         }
         val diagnose = JavaDiagnostic(system).diagnose()
