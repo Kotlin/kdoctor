@@ -48,7 +48,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
         result.addSuccess("${gems.name} (${gems.version})")
 
         var cocoapods: Application? = null
-        val cocoapodsVersionOutput = system.execute("pod", "--version").output
+        val cocoapodsVersionOutput = system.execute("pod", "--version").output?.lines()?.last()
         if (cocoapodsVersionOutput != null) {
             val cocoapodsVersion = Version(cocoapodsVersionOutput)
             cocoapods = Application("cocoapods", cocoapodsVersion)

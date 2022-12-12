@@ -19,6 +19,10 @@ class XcodeDiagnosticTest {
                 "Xcode (13.4.1)",
                 "Location: /Applications/Xcode.app",
             )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
             addEnvironment(
                 EnvironmentPiece.Xcode(Version("13.4.1"))
             )
@@ -86,6 +90,10 @@ class XcodeDiagnosticTest {
             addEnvironment(
                 EnvironmentPiece.Xcode(Version("77.7.7"))
             )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
         }.build()
 
         assertEquals(expected, diagnose)
@@ -137,6 +145,10 @@ class XcodeDiagnosticTest {
             addSuccess(
                 "Current command line tools: /Applications/Xcode.app/Contents/Developer",
             )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
         }.build()
 
         assertEquals(expected, diagnose)
@@ -167,6 +179,10 @@ class XcodeDiagnosticTest {
                 "Xcode license is not accepted",
                 "Accept Xcode license on the first Xcode launch or execute 'sudo xcodebuild -license' in the terminal"
             )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
         }.build()
 
         assertEquals(expected, diagnose)
@@ -196,6 +212,70 @@ class XcodeDiagnosticTest {
             addFailure(
                 "Xcode requires to perform the First Launch tasks",
                 "Launch Xcode or execute 'xcodebuild -runFirstLaunch' in terminal"
+            )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
+    fun `check Xcode custom JAVA_HOME`() {
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> {
+                    ProcessResult(0, "\"JAVA_HOME\"=/custom/path;")
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = XcodeDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Xcode").apply {
+            addSuccess(
+                "Xcode (13.4.1)",
+                "Location: /Applications/Xcode.app",
+            )
+            addInfo(
+                "Xcode JAVA_HOME: /custom/path",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
+    fun `check Xcode system JAVA_HOME info`() {
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> {
+                    ProcessResult(-1, null)
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = XcodeDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Xcode").apply {
+            addSuccess(
+                "Xcode (13.4.1)",
+                "Location: /Applications/Xcode.app",
+            )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home",
+                "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+            )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
             )
         }.build()
 

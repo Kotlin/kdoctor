@@ -19,6 +19,10 @@ class AndroidStudioDiagnosticTest {
                 "Kotlin Plugin: 1.7.20",
                 "Kotlin Multiplatform Mobile Plugin: 0.5.0"
             )
+            addInfo(
+                "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+                "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
+            )
             addEnvironment(
                 EnvironmentPiece.AndroidStudio(Version("AI-222.4345.14.2221.9252092")),
                 EnvironmentPiece.KotlinPlugin(Version("1.7.20")),
@@ -71,6 +75,10 @@ class AndroidStudioDiagnosticTest {
                 "Kotlin Multiplatform Mobile Plugin: 0.5.0",
                 "Kotlin plugin is disabled. Enable Kotlin in Android Studio settings."
             )
+            addInfo(
+                "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+                "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
+            )
             addEnvironment(
                 EnvironmentPiece.AndroidStudio(Version("AI-222.4345.14.2221.9252092")),
                 EnvironmentPiece.KotlinPlugin(Version("1.7.20")),
@@ -102,6 +110,10 @@ class AndroidStudioDiagnosticTest {
                 "Kotlin Plugin: 1.7.20",
                 "Kotlin Multiplatform Mobile Plugin: not installed",
                 "Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile"
+            )
+            addInfo(
+                "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+                "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
             )
             addEnvironment(
                 EnvironmentPiece.AndroidStudio(Version("AI-222.4345.14.2221.9252092")),
@@ -182,6 +194,10 @@ class AndroidStudioDiagnosticTest {
                 EnvironmentPiece.AndroidStudio(Version("AI-213.7172.25.2113.9123335")),
                 EnvironmentPiece.KotlinPlugin(Version("1.7.20")),
                 EnvironmentPiece.KmmPlugin(Version("0.5.0"))
+            )
+            addInfo(
+                "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+                "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
             )
             setConclusion(DiagnosisResult.Success)
         }.build()

@@ -107,6 +107,11 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
             result.setConclusion(DiagnosisResult.Success) //at least one AS is fine
         }
 
+        result.addInfo(
+            "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
+            "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
+        )
+
         return result.build()
     }
 

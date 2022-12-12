@@ -102,12 +102,6 @@ kdoctor -v
   ➤ Java (openjdk version "11.0.16" 2022-07-19 LTS)
     Location: /Users/my/.sdkman/candidates/java/current/bin/java
   ➤ JAVA_HOME: /Users/my/.sdkman/candidates/java/current
-  i Xcode JAVA_HOME does not match the environment variable
-    Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
-    System JAVA_HOME: /Users/my/.sdkman/candidates/java/current
-    Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths
-  i Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.
-    Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section
 
 [✓] Android Studio
   i Multiple Android Studio installations found
@@ -122,10 +116,14 @@ kdoctor -v
     Kotlin Plugin: 213-1.7.20-release-for-android-studio-AS6777.52
     Kotlin Multiplatform Mobile Plugin: not installed
     Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile
+  i Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.
+    Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section
 
 [✓] Xcode
   ➤ Xcode (13.4.1)
     Location: /Applications/Xcode.app
+  i Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
+    Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths
 
 [✓] Cocoapods
   ➤ ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])

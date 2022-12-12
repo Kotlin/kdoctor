@@ -56,7 +56,23 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
                     "Launch Xcode or execute 'xcodebuild -runFirstLaunch' in terminal"
                 )
             }
+
+            val xcodeJavaHome =
+                system.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
+                    ?.lines()
+                    ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
+                    ?.split("=")
+                    ?.lastOrNull()
+                    ?.trim(' ', '"', ';')
+                    ?: system.execute("/usr/libexec/java_home").output
+            if (xcodeJavaHome != null) {
+                result.addInfo(
+                    "Xcode JAVA_HOME: $xcodeJavaHome",
+                    "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+                )
+            }
         }
+
         return result.build()
     }
 

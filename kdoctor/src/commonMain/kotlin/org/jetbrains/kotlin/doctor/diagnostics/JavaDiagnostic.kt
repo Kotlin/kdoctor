@@ -59,37 +59,6 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
             }
         }
 
-        val xcodeJavaHome =
-            system.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
-                ?.lines()
-                ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
-                ?.split("=")
-                ?.lastOrNull()
-                ?.trim(' ', '"', ';')
-                ?: systemJavaHome
-
-        if (xcodeJavaHome != javaHome) {
-            if (javaHome != null) {
-                result.addInfo(
-                    "Xcode JAVA_HOME does not match the environment variable",
-                    "Xcode JAVA_HOME: $xcodeJavaHome",
-                    "System JAVA_HOME: $javaHome",
-                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
-                )
-            } else {
-                result.addInfo(
-                    "Xcode JAVA_HOME does not match the environment variable",
-                    "Xcode JAVA_HOME: $xcodeJavaHome",
-                    "Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
-                )
-            }
-        }
-
-        result.addInfo(
-            "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
-            "Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section"
-        )
-
         return result.build()
     }
 }
