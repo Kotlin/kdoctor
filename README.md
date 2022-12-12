@@ -123,7 +123,7 @@ kdoctor -v
   ➤ Xcode (13.4.1)
     Location: /Applications/Xcode.app
   i Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
-    Set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths
+    Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths
 
 [✓] Cocoapods
   ➤ ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])

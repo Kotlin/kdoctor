@@ -68,7 +68,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             if (xcodeJavaHome != null) {
                 result.addInfo(
                     "Xcode JAVA_HOME: $xcodeJavaHome",
-                    "You can set JAVA_HOME in Xcode -> Preferences -> Locations -> Custom Paths"
+                    "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
                 )
             }
         }
