@@ -2,6 +2,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
+import org.jetbrains.kotlin.doctor.entity.Version
 import org.junit.Test
 
 class VerifyCompatibilityJson {
@@ -18,6 +19,27 @@ class VerifyCompatibilityJson {
                 error("Unknown env name: $jsonEnvName")
             }
         }
+        val invalidVersions = mutableListOf<String>()
+        compatibility.problems.forEach { problem ->
+            problem.matrix.forEach { range ->
+                range.from?.let {  str ->
+                    val version = Version(str)
+                    if (version.semVersion == null) {
+                        invalidVersions.add(str)
+                    }
+                }
+                range.fixedIn?.let {  str ->
+                    val version = Version(str)
+                    if (version.semVersion == null) {
+                        invalidVersions.add(str)
+                    }
+                }
+            }
+        }
+        if (invalidVersions.isNotEmpty()) {
+            error("Invalid semantic versions: $invalidVersions")
+        }
+
         println(compatibility.problems.joinToString("\n") { it.url })
     }
 }

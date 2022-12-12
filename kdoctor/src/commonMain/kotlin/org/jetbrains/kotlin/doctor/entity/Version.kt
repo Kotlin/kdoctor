@@ -4,11 +4,11 @@ import kotlin.math.max
 
 class Version : Comparable<Version> {
     val rawString: String
-    private val major: Int?
-    private val minor: Int?
-    private val patch: Int?
-    private val prerelease: String?
-    private val meta: String?
+    val major: Int?
+    val minor: Int?
+    val patch: Int?
+    val prerelease: String?
+    val meta: String?
 
     constructor(major: Int, minor: Int, patch: Int? = null, prerelease: String? = null, meta: String? = null) {
         this.major = major
@@ -42,7 +42,7 @@ class Version : Comparable<Version> {
     val nextMinorVersion: Version
         get() {
             if (major == null || minor == null) return unknown
-            return Version(major, minor + 1,0)
+            return Version(major, minor + 1, 0)
         }
 
     override fun compareTo(other: Version): Int {
