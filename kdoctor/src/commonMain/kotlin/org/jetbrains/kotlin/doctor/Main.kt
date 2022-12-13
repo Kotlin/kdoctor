@@ -8,7 +8,7 @@ import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.entity.System
 
-internal const val KDOCTOR_VERSION = "0.0.5"
+internal const val KDOCTOR_VERSION = "0.0.6"
 
 fun main(args: Array<String>) {
     val parser = ArgParser("kdoctor")
