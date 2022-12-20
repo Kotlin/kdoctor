@@ -61,4 +61,12 @@ class VersionTest {
         assertNull(v.prerelease)
         assertNull(v.meta)
     }
+
+    @Test
+    fun checkNullVersion() {
+        assert(Version("0.0") > Version("null"))
+        assert(Version("0.0-RC") > Version("0.0-BETA"))
+        assert(Version("0.0-RC2") > Version("0.0-RC1"))
+        assert(Version("0.0") > Version("0.0-RC1"))
+    }
 }

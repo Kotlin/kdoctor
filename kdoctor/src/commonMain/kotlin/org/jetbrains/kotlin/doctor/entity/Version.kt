@@ -53,8 +53,6 @@ class Version : Comparable<Version> {
         if (major != null && other.major != null && major != other.major) {
             return major.compareTo(other.major)
         }
-        if (patch != null && other.patch == null) return greater
-        if (patch == null && other.patch != null) return less
         if (minor != null && other.minor != null && minor != other.minor) {
             return minor.compareTo(other.minor)
         }
@@ -62,6 +60,11 @@ class Version : Comparable<Version> {
         if (patch == null && other.patch != null) return less
         if (patch != null && other.patch != null && patch != other.patch) {
             return patch.compareTo(other.patch)
+        }
+        if (prerelease != null && other.prerelease == null) return less
+        if (prerelease == null && other.prerelease != null) return greater
+        if (prerelease != null && other.prerelease != null && prerelease != other.prerelease) {
+            return prerelease.compareTo(other.prerelease)
         }
 
         return equal
