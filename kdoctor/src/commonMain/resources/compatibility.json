@@ -32,7 +32,7 @@
           "from": "14.0"
         },
         {
-          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform.gradle.plugin)",
           "fixedIn": "1.8.0"
         }
       ]
@@ -47,23 +47,8 @@
           "from": "14.0"
         },
         {
-          "name": "GradlePlugin(org.jetbrains.kotlin.native.cocoapods)",
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform.gradle.plugin)",
           "fixedIn": "1.8.20"
-        }
-      ]
-    },
-    {
-      "url": "https://youtrack.jetbrains.com/issue/KTIJ-20110",
-      "isCritical": true,
-      "text": "Can't run K/N tests via IDE with gradle 7.3-rc1 and android gradle plugin applied to project.\nUpdate Gradle to 7.4.1+",
-      "matrix": [
-        {
-          "name": "Gradle",
-          "from": "7.3",
-          "fixedIn": "7.4.1"
-        },
-        {
-          "name": "GradlePlugin(com.android.application)"
         }
       ]
     }

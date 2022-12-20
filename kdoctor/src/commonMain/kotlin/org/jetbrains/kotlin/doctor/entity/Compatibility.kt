@@ -69,12 +69,19 @@ data class Compatibility(
 ) {
     companion object {
         suspend fun download(httpClient: HttpClient) = try {
-            Logger.d("Compatibility.download")
+            Logger.d("Compatibility.download: $COMPATIBILITY_JSON")
             val compatibilityJson = httpClient.get(COMPATIBILITY_JSON).bodyAsText()
-            Logger.d(compatibilityJson)
-            Json.decodeFromString<Compatibility>(compatibilityJson)
+            from(compatibilityJson)
         } catch (e: Exception) {
             Logger.e("Compatibility.download error ${e.message}", e)
+            Compatibility(KDOCTOR_VERSION, emptyList())
+        }
+
+        fun from(compatibilityJson: String) = try {
+            Logger.d(compatibilityJson)
+            Json.decodeFromString(compatibilityJson)
+        } catch (e: Exception) {
+            Logger.e("Compatibility json error ${e.message}", e)
             Compatibility(KDOCTOR_VERSION, emptyList())
         }
     }

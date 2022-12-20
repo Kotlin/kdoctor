@@ -38,9 +38,16 @@ class Doctor(private val system: System) {
 
     suspend fun diagnoseKmmEnvironment(
         verbose: Boolean,
-        projectPath: String?
+        projectPath: String?,
+        localCompatibilityJson: String?
     ): String = coroutineScope {
-        val compatibility = async { Compatibility.download(system.creteHttpClient()) }
+        val compatibility = async {
+            if (localCompatibilityJson == null) {
+                Compatibility.download(system.creteHttpClient())
+            } else {
+                Compatibility.from(system.readFile(localCompatibilityJson).orEmpty())
+            }
+        }
         val diagnostics = buildSet {
             addAll(KmmDiagnostics)
             if (projectPath != null) {

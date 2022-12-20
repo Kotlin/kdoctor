@@ -26,6 +26,11 @@ class Arguments(args: Array<String>) {
         description = "debug mode"
     ).default(false)
 
+    val localCompatibilityJson: String? by parser.option(
+        ArgType.String,
+        fullName = "compatibilityJson"
+    )
+
     val projectPath: String? by parser.option(
         ArgType.String,
         shortName = "p",
