@@ -15,7 +15,7 @@ class VerifyCompatibilityJson {
         compatibility.problems.flatMap { problem ->
             problem.matrix.map { it.name }
         }.forEach { jsonEnvName ->
-            if (!knownEnvNames.contains(jsonEnvName)) {
+            if (!knownEnvNames.contains(jsonEnvName) && !jsonEnvName.startsWith("GradlePlugin(")) {
                 error("Unknown env name: $jsonEnvName")
             }
         }

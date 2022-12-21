@@ -38,6 +38,7 @@ interface System {
 
     fun fileExists(path: String): Boolean
     fun readFile(path: String): String?
+    fun writeTempFile(content: String): String
     fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
     fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
 }

@@ -21,6 +21,51 @@
           "name": "AndroidStudio"
         }
       ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KT-54060",
+      "isCritical": true,
+      "text": "Xcode 14.0+ requires to disable a bitcode embedding.\nIt was supported in Kotlin 1.8.0+",
+      "matrix": [
+        {
+          "name": "Xcode",
+          "from": "14.0"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "fixedIn": "1.8.0"
+        }
+      ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KT-54314",
+      "isCritical": true,
+      "text": "Xcode 14.0+ requires to sign some transitive Cocoapods dependencies.\nIt was supported in Kotlin 1.8.20+",
+      "matrix": [
+        {
+          "name": "Xcode",
+          "from": "14.0"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.native.cocoapods)",
+          "fixedIn": "1.8.20"
+        }
+      ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KTIJ-20110",
+      "isCritical": true,
+      "text": "Can't run K/N tests via IDE with gradle 7.3-rc1 and android gradle plugin applied to project.\nUpdate Gradle to 7.4.1+",
+      "matrix": [
+        {
+          "name": "Gradle",
+          "from": "7.3",
+          "fixedIn": "7.4.1"
+        },
+        {
+          "name": "GradlePlugin(com.android.application)"
+        }
+      ]
     }
   ]
 }

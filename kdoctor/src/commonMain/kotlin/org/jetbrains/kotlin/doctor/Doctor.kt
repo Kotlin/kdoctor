@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -23,11 +24,11 @@ class Doctor(private val system: System) {
         it.resume(diagnose())
     }
 
-    suspend fun runDiagnostics(diagnostics: Set<Diagnostic>) = coroutineScope {
+    private suspend fun runDiagnostics(diagnostics: Set<Diagnostic>) = coroutineScope {
         diagnostics.map { d -> async { d.asyncDiagnose() } }.awaitAll()
     }
 
-    fun makeDiagnosticsReport(diagnosis: List<Diagnosis>, verbose: Boolean) = buildString {
+    private fun makeDiagnosticsReport(diagnosis: List<Diagnosis>, verbose: Boolean) = buildString {
         diagnosis.forEach { diagnosis ->
             appendLine(diagnosis.getText(verbose))
             if (verbose) appendLine()
@@ -35,13 +36,24 @@ class Doctor(private val system: System) {
     }.trim()
 
 
-    suspend fun diagnoseKmmEnvironment(verbose: Boolean): String = coroutineScope {
+    suspend fun diagnoseKmmEnvironment(
+        verbose: Boolean,
+        projectPath: String?
+    ): String = coroutineScope {
         val compatibility = async { Compatibility.download(system.creteHttpClient()) }
+        val diagnostics = buildSet {
+            addAll(KmmDiagnostics)
+            if (projectPath != null) {
+                add(GradleProjectDiagnostic(system, projectPath))
+            }
+        }
 
-        val diagnosis = runDiagnostics(KmmDiagnostics)
+        val diagnosis = runDiagnostics(diagnostics)
         val diagnosticsResult = makeDiagnosticsReport(diagnosis, verbose)
 
         val checkedEnvironments = diagnosis.map { it.checkedEnvironments }
+        Logger.d("Environments: \n${checkedEnvironments.joinToString("\n")}")
+
         val allUserEnvironments = allCombinations(checkedEnvironments).map { combination ->
             val environment = mutableSetOf<EnvironmentPiece>()
             combination.forEach { environment.addAll(it) }

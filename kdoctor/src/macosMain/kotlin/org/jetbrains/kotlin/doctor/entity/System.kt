@@ -90,6 +90,21 @@ class MacosSystem : System {
         readFd(fd)
     }
 
+    override fun writeTempFile(content: String): String = memScoped {
+        Logger.d("writeTempFile")
+
+        val tempFile = execute("mktemp").output?.trim().orEmpty()
+        if (tempFile.isBlank()) error("writeFile error: couldn't make temp file")
+        Logger.d("tempFile = $tempFile")
+
+        val fd = open(tempFile, O_CREAT or O_WRONLY)
+        if (fd == -1) error("writeFile error: $fd")
+
+        write(fd, content.cstr, strlen(content))
+        close(fd)
+        tempFile
+    }
+
     override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
         execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
 

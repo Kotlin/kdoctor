@@ -27,8 +27,10 @@ data class EnvironmentPiece(
         private const val Ruby = "Ruby"
         private const val RubyGems = "RubyGems"
         private const val Xcode = "Xcode"
+        private const val Gradle = "Gradle"
+        private const val GradlePlugin = "GradlePlugin"
         val allNames get() = setOf(
-            Macos, Jdk, AndroidStudio, KotlinPlugin, Cocoapods, KmmPlugin, Ruby, RubyGems, Xcode
+            Macos, Jdk, AndroidStudio, KotlinPlugin, Cocoapods, KmmPlugin, Ruby, RubyGems, Xcode, Gradle, GradlePlugin
         )
 
         fun Macos(version: Version) = EnvironmentPiece(Macos, version)
@@ -40,6 +42,8 @@ data class EnvironmentPiece(
         fun Ruby(version: Version) = EnvironmentPiece(Ruby, version)
         fun RubyGems(version: Version) = EnvironmentPiece(RubyGems, version)
         fun Xcode(version: Version) = EnvironmentPiece(Xcode, version)
+        fun Gradle(version: Version) = EnvironmentPiece(Gradle, version)
+        fun GradlePlugin(id: String, version: Version) = EnvironmentPiece("$GradlePlugin($id)", version)
     }
 }
 

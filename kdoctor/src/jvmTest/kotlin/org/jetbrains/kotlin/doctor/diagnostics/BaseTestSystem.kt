@@ -4,7 +4,9 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import org.jetbrains.kotlin.doctor.entity.*
 
-open class BaseTestSystem : System {
+open class BaseTestSystem(
+    val testProjectPath: String = "./test/my_project"
+) : System {
     override val currentOS: OS = OS.MacOS
     override val osVersion: Version? = Version("42.777")
     override val cpuInfo: String? = "test_cpu"
@@ -84,6 +86,32 @@ open class BaseTestSystem : System {
             "/usr/bin/locale -k LC_CTYPE" -> {
                 "charmap=\"UTF-8\""
             }
+            "ls $testProjectPath" -> {
+                "settings.gradle.kts gradle.properties"
+            }
+            "rm $testProjectPath/init.gradle.kts" -> {
+                "" //OK
+            }
+            "mv $testProjectPath/temp.file $testProjectPath/init.gradle.kts" -> {
+                "" //OK
+            }
+            "$testProjectPath/gradlew -p $testProjectPath -I $testProjectPath/init.gradle.kts" -> {
+                """
+                    kdoctor >>> pluginA=1.2.3
+                    kdoctor >>> pluginB=4.5.6
+                """.trimIndent()
+            }
+            "$testProjectPath/gradlew -v" -> {
+                """
+                    
+                    ------------------------------------------------------------
+                    Gradle 7.6
+                    ------------------------------------------------------------
+
+                    Build time:   2022-11-25 13:35:10 UTC
+                    Revision:     daece9dbc5b79370cc8e4fd6fe4b2cd400e150a8
+                """.trimIndent()
+            }
             "find $homeDir/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib -name \"*.jar\"" -> {
                 "$homeDir/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar"
             }
@@ -114,6 +142,11 @@ open class BaseTestSystem : System {
     override fun fileExists(path: String): Boolean = true
 
     override fun readFile(path: String): String? = null
+
+    override fun writeTempFile(content: String): String {
+        //do nothing for test
+        return "$testProjectPath/temp.file"
+    }
 
     override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
         if (pathToArchive == "/Users/my/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar" && pathToFile == "META-INF/plugin.xml") {

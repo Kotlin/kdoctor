@@ -23,25 +23,43 @@ fun main(args: Array<String>) {
         fullName = "verbose",
         description = "print extended information"
     )
-    val debugFlag by parser.option(ArgType.Boolean, fullName = "debug", description = "debug mode")
+    val projectPath by parser.option(
+        ArgType.String,
+        shortName = "p",
+        fullName = "project",
+        description = "path to a Gradle project root directory"
+    )
+    val debugFlag by parser.option(
+        ArgType.Boolean,
+        fullName = "debug",
+        description = "debug mode"
+    )
     parser.parse(args)
 
     Logger.setLogWriters(object : CommonWriter() {
         override fun isLoggable(severity: Severity) = debugFlag == true
     })
 
-    when (versionFlag) {
-        true -> println(KDOCTOR_VERSION)
-        else -> run(verboseFlag == true)
+    val verbose = verboseFlag == true
+    when {
+        versionFlag == true -> {
+            println(KDOCTOR_VERSION)
+        }
+        else -> {
+            diagnoseKmmEnvironment(verbose, projectPath)
+        }
     }
 }
 
-private fun run(verbose: Boolean): Unit = runBlocking {
+private fun diagnoseKmmEnvironment(
+    verbose: Boolean,
+    projectPath: String?
+): Unit = runBlocking {
     val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
     val system = getSystem()
 
     print(progressMsg)
-    val kmmDiagnostic = Doctor(system).diagnoseKmmEnvironment(verbose)
+    val kmmDiagnostic = Doctor(system).diagnoseKmmEnvironment(verbose, projectPath)
     print("\r" + " ".repeat(progressMsg.length))
 
     system.print("\r${kmmDiagnostic.trim()}\n")
