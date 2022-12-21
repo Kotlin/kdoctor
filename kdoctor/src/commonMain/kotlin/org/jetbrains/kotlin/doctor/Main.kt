@@ -35,14 +35,10 @@ private fun diagnoseKmmEnvironment(
     projectPath: String?,
     localCompatibilityJson: String?
 ): Unit = runBlocking {
-    val progressMsg = "Diagnosing Kotlin Multiplatform Mobile environment..."
     val system = getSystem()
-
-    print(progressMsg)
-    val kmmDiagnostic = Doctor(system).diagnoseKmmEnvironment(verbose, projectPath, localCompatibilityJson)
-    print("\r" + " ".repeat(progressMsg.length))
-
-    system.print("\r${kmmDiagnostic.trim()}\n")
+    Doctor(system).diagnoseKmmEnvironment(verbose, projectPath, localCompatibilityJson).collect { line ->
+        system.print(line)
+    }
 }
 
 //get platform implementation
