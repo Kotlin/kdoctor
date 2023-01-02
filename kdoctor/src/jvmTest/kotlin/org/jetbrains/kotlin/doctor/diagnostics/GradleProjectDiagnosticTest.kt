@@ -110,7 +110,7 @@ class GradleProjectDiagnosticTest {
         val expected = Diagnosis.Builder("Project: $projectPath").apply {
             addInfo(
                 "Project doesn't use a Gradle wrapper",
-                "System Gradle was used for the analyse",
+                "System Gradle was used for the analysis",
                 "For better experience we recommend to use a Gradle wrapper"
             )
             addSuccess(
