@@ -44,7 +44,7 @@ To build from source use:
 ```bash
 git clone https://github.com/Kotlin/kdoctor
 cd kdoctor
-./gradlew assembleReleaseExecutableMacOs
+./gradlew assembleReleaseExecutableMacos -PlinkWithSystemLibcurl
 ```
 
 ## Usage
