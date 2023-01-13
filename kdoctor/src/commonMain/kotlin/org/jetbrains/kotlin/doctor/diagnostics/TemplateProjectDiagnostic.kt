@@ -7,8 +7,10 @@ class TemplateProjectDiagnostic(
     private val system: System,
     private val tag: String = "template"
 ) : Diagnostic() {
+    override val title = "Synthetic generated project"
+
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Synthetic generated project")
+        val result = Diagnosis.Builder(title)
 
         val dir = system.execute("mktemp", "-d").output?.trim().orEmpty()
         if (dir.isEmpty()) {

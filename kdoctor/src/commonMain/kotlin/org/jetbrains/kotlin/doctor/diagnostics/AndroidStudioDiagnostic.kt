@@ -6,8 +6,10 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
 
 class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
+    override val title = "Android Studio"
+
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Android Studio")
+        val result = Diagnosis.Builder(title)
 
         val paths = mutableSetOf<String>()
         paths.addAll(system.spotlightFindAppPaths("com.google.android.studio*"))

@@ -143,10 +143,6 @@ open class BaseTestSystem : System {
     override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> =
         emptyList()
 
-    override fun print(text: String) {
-        TODO("Not yet implemented")
-    }
-
     override fun fileExists(path: String): Boolean = true
 
     override fun readFile(path: String): String? = null

@@ -4,8 +4,10 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.entity.*
 
 class XcodeDiagnostic(private val system: System) : Diagnostic() {
+    override val title = "Xcode"
+
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Xcode")
+        val result = Diagnosis.Builder(title)
 
         val paths = mutableSetOf<String>()
         paths.addAll(system.spotlightFindAppPaths("com.apple.dt.Xcode"))

@@ -39,7 +39,7 @@ private fun diagnoseKmmEnvironment(
 ): Unit = runBlocking {
     val system = getSystem()
     Doctor(system).diagnoseKmmEnvironment(verbose, full, projectPath, localCompatibilityJson).collect { line ->
-        system.print(line)
+        print(line)
     }
 }
 
