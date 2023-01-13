@@ -3,14 +3,15 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.entity.*
 
-open class BaseTestSystem(
-    val testProjectPath: String = "./test/my_project"
-) : System {
+open class BaseTestSystem : System {
     override val currentOS: OS = OS.MacOS
     override val osVersion: Version? = Version("42.777")
     override val cpuInfo: String? = "test_cpu"
     override val homeDir: String = "/Users/my"
     override val shell: Shell? = Shell.Zsh
+
+    open val testProjectPath: String = "./test/my_project"
+    open val tempDir: String = "$homeDir/tmp/temp_dir"
 
     override fun getEnvVar(name: String): String? = when (name) {
         "JAVA_HOME" -> "$homeDir/.sdkman/candidates/java/current"
@@ -63,6 +64,18 @@ open class BaseTestSystem(
                       }
                     }
                 """.trimIndent()
+            }
+            "mktemp -d" -> {
+                tempDir
+            }
+            "curl --location --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
+                "" //OK
+            }
+            "unzip $tempDir/archive.zip -d $tempDir" -> {
+                "" //OK
+            }
+            "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar" -> {
+                "BUILD SUCCESSFUL"
             }
             "xcrun cc" -> {
                 "clang: error: no input files"

@@ -12,7 +12,9 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `check success`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {}
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
+        }
         val diagnose = GradleProjectDiagnostic(system, projectPath).diagnose()
 
         val expected = Diagnosis.Builder("Project: $projectPath").apply {
@@ -37,7 +39,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `invalid project path`() {
         val projectPath = "./broken"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "ls $projectPath" -> {
                     ProcessResult(-1, "ls: $projectPath: No such file or directory")
@@ -58,7 +61,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `invalid gradle project`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "ls $projectPath" -> {
                     ProcessResult(0, "some.txt")
@@ -82,7 +86,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `system gradle info`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -v" -> {
                     ProcessResult(-1, null)
@@ -134,7 +139,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `no gradle error`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -v" -> {
                     ProcessResult(-1, null)
@@ -158,7 +164,11 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `temp file error`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
+            override val homeDir: String
+                get() = super.homeDir
+
             override fun writeTempFile(content: String): String {
                 error("Temp file error")
             }
@@ -182,7 +192,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `rename init script error`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "mv $projectPath/temp.file $projectPath/init.gradle.kts" -> {
                     ProcessResult(-77, null)
@@ -209,7 +220,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `gradle error`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(-1, null)
@@ -236,7 +248,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `gradle unknown output`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(0, "some unknown text")
@@ -265,7 +278,8 @@ class GradleProjectDiagnosticTest {
     @Test
     fun `get right gradle plugin versions`() {
         val projectPath = "./test/my_test_project"
-        val system = object : BaseTestSystem(projectPath) {
+        val system = object : BaseTestSystem() {
+            override val testProjectPath = projectPath
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(

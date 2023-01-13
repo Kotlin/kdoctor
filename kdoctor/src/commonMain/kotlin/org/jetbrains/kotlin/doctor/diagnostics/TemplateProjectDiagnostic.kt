@@ -12,7 +12,7 @@ class TemplateProjectDiagnostic(
 
         val dir = system.execute("mktemp", "-d").output?.trim().orEmpty()
         if (dir.isEmpty()) {
-            result.addWarning(
+            result.addFailure(
                 "Error: impossible to create temporary directory",
                 "Check your file system write permissions"
             )
@@ -28,7 +28,7 @@ class TemplateProjectDiagnostic(
             "https://github.com/Kotlin/kdoctor/archive/refs/tags/$tag.zip"
         )
         if (download.code != 0) {
-            result.addWarning(
+            result.addFailure(
                 "Error: impossible to download a template project",
                 "Check your internet connection"
             )
@@ -41,7 +41,7 @@ class TemplateProjectDiagnostic(
             "-d", dir
         )
         if (unzip.code != 0) {
-            result.addWarning(
+            result.addFailure(
                 "Error: impossible to unzip a template project"
             )
             return result.build()
@@ -64,7 +64,7 @@ class TemplateProjectDiagnostic(
         }
 
         result.addSuccess(
-            "Template project build is successful"
+            "Template project build was successful"
         )
         return result.build()
     }
