@@ -60,7 +60,7 @@ class Doctor(private val system: System) {
 
 
         val compatibility = if (localCompatibilityJson == null) {
-            Compatibility.download(system.creteHttpClient())
+            Compatibility.download(system)
         } else {
             Compatibility.from(system.readFile(localCompatibilityJson).orEmpty())
         }

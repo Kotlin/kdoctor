@@ -23,8 +23,8 @@ class TemplateProjectDiagnostic(
 
         val download = system.execute(
             "curl",
-            "-L", //for redirects
-            "-o", zip,
+            "--location", //for redirects
+            "--output", zip,
             "https://github.com/Kotlin/kdoctor/archive/refs/tags/$tag.zip"
         )
         if (download.code != 0) {

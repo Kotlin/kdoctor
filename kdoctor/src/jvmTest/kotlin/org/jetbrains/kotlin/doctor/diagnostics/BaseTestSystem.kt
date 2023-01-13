@@ -1,7 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 import co.touchlab.kermit.Logger
-import io.ktor.client.*
 import org.jetbrains.kotlin.doctor.entity.*
 
 open class BaseTestSystem(
@@ -132,10 +131,6 @@ open class BaseTestSystem(
         emptyList()
 
     override fun print(text: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun creteHttpClient(): HttpClient {
         TODO("Not yet implemented")
     }
 

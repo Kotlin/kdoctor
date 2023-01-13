@@ -1,8 +1,6 @@
 package org.jetbrains.kotlin.doctor.entity
 
 import co.touchlab.kermit.Logger
-import io.ktor.client.*
-import io.ktor.client.engine.curl.*
 import kotlinx.cinterop.*
 import platform.Foundation.NSHomeDirectory
 import platform.posix.*
@@ -75,8 +73,6 @@ class MacosSystem : System {
     override fun print(text: String) {
         printf(text)
     }
-
-    override fun creteHttpClient(): HttpClient = HttpClient(Curl)
 
     override fun fileExists(path: String): Boolean = access(path, F_OK) == 0
 

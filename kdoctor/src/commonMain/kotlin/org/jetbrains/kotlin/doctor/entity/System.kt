@@ -1,6 +1,5 @@
 package org.jetbrains.kotlin.doctor.entity
 
-import io.ktor.client.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -34,7 +33,6 @@ interface System {
     fun execute(command: String, vararg args: String): ProcessResult
 
     fun print(text: String)
-    fun creteHttpClient(): HttpClient
 
     fun fileExists(path: String): Boolean
     fun readFile(path: String): String?

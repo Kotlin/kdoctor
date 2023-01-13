@@ -8,24 +8,12 @@ repositories {
     mavenCentral()
 }
 
-//by default a linker tries to find libcurl in '/opt/homebrew/opt/curl/lib'
-//(https://github.com/ktorio/ktor/blob/main/ktor-client/ktor-client-curl/desktop/interop/libcurl.def#L5)
-//it is right for a brew build because brew knows about the curl dependency and builds for one architecture
-//(https://github.com/Homebrew/homebrew-core/blob/master/Formula/kdoctor.rb#L27)
-//but for an independent binary distribution it's better to have dependency on system universal dylib located in '/usr/lib/'
-//To use during build run './gradlew assembleReleaseExecutableMacos -PlinkWithSystemLibcurl'
-//To check it run 'otool -L ./kdoctor/build/kdoctor'
-val linkWithSystemLibcurl = hasProperty("linkWithSystemLibcurl")
-
 kotlin {
     jvm() //for unit tests
     listOf(macosX64(), macosArm64()).forEach {
         it.binaries {
             executable {
                 entryPoint = "org.jetbrains.kotlin.doctor.main"
-                if (linkWithSystemLibcurl) {
-                    linkerOpts += "-L/usr/lib"
-                }
             }
         }
     }
@@ -38,16 +26,11 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
                 implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation ("co.touchlab:kermit:1.1.3")
-                implementation("io.ktor:ktor-client-core:2.1.3")
             }
         }
         val macosX64Main by getting
         val macosArm64Main by getting
-        val macosMain by creating {
-            dependencies {
-                implementation("io.ktor:ktor-client-curl:2.1.3")
-            }
-        }
+        val macosMain by creating
 
         /* Main hierarchy */
         macosMain.dependsOn(commonMain)

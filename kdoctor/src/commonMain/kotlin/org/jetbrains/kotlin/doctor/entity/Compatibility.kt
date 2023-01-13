@@ -1,9 +1,6 @@
 package org.jetbrains.kotlin.doctor.entity
 
 import co.touchlab.kermit.Logger
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -68,10 +65,13 @@ data class Compatibility(
     @SerialName("problems") val problems: List<CompatibilityProblem>
 ) {
     companion object {
-        suspend fun download(httpClient: HttpClient) = try {
+        fun download(system: System) = try {
             Logger.d("Compatibility.download: $COMPATIBILITY_JSON")
-            val compatibilityJson = httpClient.get(COMPATIBILITY_JSON).bodyAsText()
-            from(compatibilityJson)
+            val curlResult = system.execute("curl", "--location", "--silent", COMPATIBILITY_JSON)
+            if (curlResult.code != 0) {
+                error("curl error code = ${curlResult.code}")
+            }
+            from(curlResult.output.orEmpty())
         } catch (e: Exception) {
             Logger.e("Compatibility.download error ${e.message}", e)
             Compatibility(KDOCTOR_VERSION, emptyList())
