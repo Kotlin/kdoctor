@@ -2,18 +2,14 @@ package org.jetbrains.kotlin.doctor
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.flow.*
 import org.jetbrains.kotlin.doctor.compatibility.CompatibilityAnalyse
 import org.jetbrains.kotlin.doctor.diagnostics.*
 import org.jetbrains.kotlin.doctor.entity.*
 import org.jetbrains.kotlin.doctor.printer.TextPainter
-import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class Doctor(private val system: System) {
-    private val doctorScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val KmmDiagnostics = setOf(
         SystemDiagnostic(system),
         JavaDiagnostic(system),
@@ -27,10 +23,10 @@ class Doctor(private val system: System) {
         full: Boolean,
         projectPath: String?,
         localCompatibilityJson: String?
-    ): Flow<String> = flow {
-        emit("Environment diagnose (to see all details, run kdoctor -v):\n")
+    ): Flow<String> = channelFlow {
+        send("Environment diagnose (to see all details, run kdoctor -v):\n")
 
-        val compatibility = doctorScope.async {
+        val compatibility = async {
             if (localCompatibilityJson == null) {
                 Compatibility.download(system)
             } else {
@@ -49,14 +45,15 @@ class Doctor(private val system: System) {
         }
 
         val diagnosis = diagnostics.map { diagnostic ->
-            emit("${TextPainter.GREEN}[…]${TextPainter.RESET} ${diagnostic.title}")
+            val progress = showDiagnosticProgress(diagnostic.title)
             val diagnose = diagnostic.diagnose()
             val text = "\r" + diagnose.getText(verbose) + if (verbose) "\n\n" else "\n"
-            emit(text)
+            progress.cancel()
+            send(text)
             diagnose
         }
         if (!verbose) {
-            emit("\n")
+            send("\n")
         }
 
         val checkedEnvironments = diagnosis.map { it.checkedEnvironments }
@@ -68,22 +65,34 @@ class Doctor(private val system: System) {
             environment
         }
 
-        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments, verbose).trim()
+        val compatibilityReport =
+            CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments, verbose).trim()
 
         if (compatibilityReport.isNotBlank()) {
-            emit(compatibilityReport + "\n")
+            send(compatibilityReport + "\n")
         }
 
-        emit("Conclusion:\n")
+        send("Conclusion:\n")
 
         val hasFailures = diagnosis.any { it.conclusion == DiagnosisResult.Failure }
         if (hasFailures) {
             val prefix = "  ${DiagnosisResult.Failure.color}${DiagnosisResult.Failure.symbol}${TextPainter.RESET} "
-            emit("${prefix}KDoctor has diagnosed one or more problems while checking your environment.\n")
-            emit("    Please check the output for problem description and possible solutions.\n")
+            send("${prefix}KDoctor has diagnosed one or more problems while checking your environment.\n")
+            send("    Please check the output for problem description and possible solutions.\n")
         } else {
             val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
-            emit("${prefix}Your system is ready for Kotlin Multiplatform Mobile Development!\n")
+            send("${prefix}Your system is ready for Kotlin Multiplatform Mobile Development!\n")
+        }
+    }.buffer(0).flowOn(Dispatchers.Default)
+
+    private val progressSymbols = listOf("⣷", "⣯", "⣟", "⡿", "⢿", "⣻", "⣽", "⣾")
+    private fun ProducerScope<String>.showDiagnosticProgress(title: String) = launch {
+        var progressIndex = 0
+        while (isActive) {
+            progressIndex = (progressIndex + 1) % progressSymbols.size
+            val symbol = progressSymbols[progressIndex]
+            send("\r[$symbol] $title")
+            delay(60)
         }
     }
 }
