@@ -24,12 +24,16 @@ class Doctor(private val system: System) {
 
     fun diagnoseKmmEnvironment(
         verbose: Boolean,
+        full: Boolean,
         projectPath: String?,
         localCompatibilityJson: String?
     ): Flow<String> = flow {
         emit("Environment diagnose (to see all details, run kdoctor -v):\n")
         val diagnostics = buildSet {
             addAll(KmmDiagnostics)
+            if (full) {
+                add(TemplateProjectDiagnostic(system))
+            }
             if (projectPath != null) {
                 add(GradleProjectDiagnostic(system, projectPath))
             }

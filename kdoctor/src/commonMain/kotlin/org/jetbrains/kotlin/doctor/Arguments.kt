@@ -20,6 +20,13 @@ class Arguments(args: Array<String>) {
         description = "print extended information"
     ).default(false)
 
+    val isFull: Boolean by parser.option(
+        ArgType.Boolean,
+        shortName = "f",
+        fullName = "full",
+        description = "run extra diagnostics"
+    ).default(false)
+
     val isDebug: Boolean by parser.option(
         ArgType.Boolean,
         fullName = "debug",

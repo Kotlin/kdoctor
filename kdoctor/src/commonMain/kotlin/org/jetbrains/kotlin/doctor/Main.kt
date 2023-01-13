@@ -23,6 +23,7 @@ fun main(args: Array<String>) {
         else -> {
             diagnoseKmmEnvironment(
                 arguments.isVerbose,
+                arguments.isFull,
                 arguments.projectPath,
                 arguments.localCompatibilityJson.takeIf { arguments.isDebug }
             )
@@ -32,11 +33,12 @@ fun main(args: Array<String>) {
 
 private fun diagnoseKmmEnvironment(
     verbose: Boolean,
+    full: Boolean,
     projectPath: String?,
     localCompatibilityJson: String?
 ): Unit = runBlocking {
     val system = getSystem()
-    Doctor(system).diagnoseKmmEnvironment(verbose, projectPath, localCompatibilityJson).collect { line ->
+    Doctor(system).diagnoseKmmEnvironment(verbose, full, projectPath, localCompatibilityJson).collect { line ->
         system.print(line)
     }
 }
