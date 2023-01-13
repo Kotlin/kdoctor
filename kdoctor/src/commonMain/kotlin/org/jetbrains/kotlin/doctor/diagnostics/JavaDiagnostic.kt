@@ -3,8 +3,10 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import org.jetbrains.kotlin.doctor.entity.*
 
 class JavaDiagnostic(private val system: System) : Diagnostic() {
+    override val title = "Java"
+
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Java")
+        val result = Diagnosis.Builder(title)
 
         var javaLocation = system.execute("which", "java").output
         val javaVersion = system.execute("java", "-version").output?.lineSequence()?.firstOrNull()

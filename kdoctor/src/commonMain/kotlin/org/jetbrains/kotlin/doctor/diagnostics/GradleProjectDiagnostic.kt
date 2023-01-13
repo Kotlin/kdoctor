@@ -10,9 +10,10 @@ class GradleProjectDiagnostic(
     path: String
 ) : Diagnostic() {
     private val projectPath: String = path.removeSuffix("/")
+    override val title = "Project: $projectPath"
 
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Project: $projectPath")
+        val result = Diagnosis.Builder(title)
 
         val projectPathFiles = system.execute("ls", projectPath)
         val projectPathExists = projectPathFiles.code == 0

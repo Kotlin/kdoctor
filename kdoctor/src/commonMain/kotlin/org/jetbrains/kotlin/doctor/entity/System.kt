@@ -32,8 +32,6 @@ interface System {
     fun getEnvVar(name: String): String?
     fun execute(command: String, vararg args: String): ProcessResult
 
-    fun print(text: String)
-
     fun fileExists(path: String): Boolean
     fun readFile(path: String): String?
     fun writeTempFile(content: String): String

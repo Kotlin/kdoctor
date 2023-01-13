@@ -3,8 +3,10 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import org.jetbrains.kotlin.doctor.entity.*
 
 class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
+    override val title = "Cocoapods"
+
     override fun diagnose(): Diagnosis {
-        val result = Diagnosis.Builder("Cocoapods")
+        val result = Diagnosis.Builder(title)
 
         val rubyVersion = system.execute("ruby", "-v").output
         val rubyLocation = system.execute("which", "ruby").output

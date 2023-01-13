@@ -1,19 +1,19 @@
 package org.jetbrains.kotlin.doctor
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.jetbrains.kotlin.doctor.compatibility.CompatibilityAnalyse
 import org.jetbrains.kotlin.doctor.diagnostics.*
 import org.jetbrains.kotlin.doctor.entity.*
 import org.jetbrains.kotlin.doctor.printer.TextPainter
+import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class Doctor(private val system: System) {
+    private val doctorScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val KmmDiagnostics = setOf(
         SystemDiagnostic(system),
         JavaDiagnostic(system),
@@ -29,6 +29,15 @@ class Doctor(private val system: System) {
         localCompatibilityJson: String?
     ): Flow<String> = flow {
         emit("Environment diagnose (to see all details, run kdoctor -v):\n")
+
+        val compatibility = doctorScope.async {
+            if (localCompatibilityJson == null) {
+                Compatibility.download(system)
+            } else {
+                Compatibility.from(system.readFile(localCompatibilityJson).orEmpty())
+            }
+        }
+
         val diagnostics = buildSet {
             addAll(KmmDiagnostics)
             if (full) {
@@ -40,8 +49,9 @@ class Doctor(private val system: System) {
         }
 
         val diagnosis = diagnostics.map { diagnostic ->
+            emit("${TextPainter.GREEN}[…]${TextPainter.RESET} ${diagnostic.title}")
             val diagnose = diagnostic.diagnose()
-            val text = diagnose.getText(verbose) + if (verbose) "\n\n" else "\n"
+            val text = "\r" + diagnose.getText(verbose) + if (verbose) "\n\n" else "\n"
             emit(text)
             diagnose
         }
@@ -58,13 +68,7 @@ class Doctor(private val system: System) {
             environment
         }
 
-
-        val compatibility = if (localCompatibilityJson == null) {
-            Compatibility.download(system)
-        } else {
-            Compatibility.from(system.readFile(localCompatibilityJson).orEmpty())
-        }
-        val compatibilityReport = CompatibilityAnalyse(compatibility).check(allUserEnvironments, verbose).trim()
+        val compatibilityReport = CompatibilityAnalyse(compatibility.await()).check(allUserEnvironments, verbose).trim()
 
         if (compatibilityReport.isNotBlank()) {
             emit(compatibilityReport + "\n")

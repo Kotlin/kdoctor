@@ -70,10 +70,6 @@ class MacosSystem : System {
         return paths
     }
 
-    override fun print(text: String) {
-        printf(text)
-    }
-
     override fun fileExists(path: String): Boolean = access(path, F_OK) == 0
 
     override fun readFile(path: String): String? = memScoped {
