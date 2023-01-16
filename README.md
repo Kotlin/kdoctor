@@ -9,18 +9,18 @@ KDoctor is a command-line tool that helps to set up the environment for [Kotlin 
 
 ## Overview
 KDoctor ensures that all [required components](https://kotlinlang.org/docs/kmm-setup.html) are properly installed and ready for use.
-If something is missed or not configured Kdoctor highlights the problem and suggests how to fix the problem. 
+If something is missed or not configured, Kdoctor highlights the problem and suggests how to fix the problem. 
 
 KDoctor runs the following diagnostics:
-* System - checks operating system version
+* System - checks an operating system version
 * JDK - checks that JDK installation and JAVA_HOME setting
 * Android Studio - checks Android Studio installation, Kotlin and Kotlin Multiplatform Mobile plugins 
 * Xcode - checks Xcode installation and setup
-* Cocoapods - checks ruby environment, cocoapods and cocoapods-generate gems installation
+* Cocoapods - checks ruby environment and cocoapods gem installation
 
 ## Requirements
 
-KDoctor works on macOS only.
+KDoctor works on MacOS only.
 
 ## Installation
 
@@ -44,7 +44,7 @@ To build from source use:
 ```bash
 git clone https://github.com/Kotlin/kdoctor
 cd kdoctor
-./gradlew assembleReleaseExecutableMacos -PlinkWithSystemLibcurl
+./gradlew assembleReleaseExecutableMacos
 ```
 
 ## Usage
