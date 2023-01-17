@@ -26,13 +26,16 @@ class TemplateProjectDiagnostic(
         val download = system.execute(
             "curl",
             "--location", //for redirects
+            "--silent", //hide progress output
+            "--show-error", //show errors in silent mode
+            "--fail", //return error code for HTTP errors
             "--output", zip,
             "https://github.com/Kotlin/kdoctor/archive/refs/tags/$tag.zip"
         )
         if (download.code != 0) {
             result.addFailure(
                 "Error: impossible to download a template project",
-                "Check your internet connection"
+                download.rawOutput.orEmpty()
             )
             return result.build()
         }

@@ -67,7 +67,7 @@ data class Compatibility(
     companion object {
         fun download(system: System) = try {
             Logger.d("Compatibility.download: $COMPATIBILITY_JSON")
-            val curlResult = system.execute("curl", "--location", "--silent", COMPATIBILITY_JSON)
+            val curlResult = system.execute("curl", "--location", "--silent", "--fail", COMPATIBILITY_JSON)
             if (curlResult.code != 0) {
                 error("curl error code = ${curlResult.code}")
             }
