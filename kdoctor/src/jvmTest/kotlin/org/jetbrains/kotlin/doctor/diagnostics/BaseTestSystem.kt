@@ -68,7 +68,7 @@ open class BaseTestSystem : System {
             "mktemp -d" -> {
                 tempDir
             }
-            "curl --location --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
+            "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
                 "" //OK
             }
             "unzip $tempDir/archive.zip -d $tempDir" -> {

@@ -48,8 +48,8 @@ internal class TemplateProjectDiagnosticTest {
     fun `download template error`() {
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
-                "curl --location --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
-                    ProcessResult(-1, null)
+                "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
+                    ProcessResult(-1, "500: Server error")
                 }
 
                 else -> super.executeCmd(cmd)
@@ -60,7 +60,7 @@ internal class TemplateProjectDiagnosticTest {
         val expected = Diagnosis.Builder("Synthetic generated project").apply {
             addFailure(
                 "Error: impossible to download a template project",
-                "Check your internet connection"
+                "500: Server error"
             )
         }.build()
 
@@ -117,7 +117,7 @@ internal class TemplateProjectDiagnosticTest {
         val customTag = "test-tag"
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
-                "curl --location --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/$customTag.zip" -> {
+                "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/$customTag.zip" -> {
                     ProcessResult(0, "")
                 }
                 "$tempDir/kdoctor-$customTag/template/gradlew -p $tempDir/kdoctor-$customTag/template clean linkReleaseFrameworkIosArm64 jvmJar" -> {
