@@ -17,7 +17,11 @@ class Doctor(private val system: System) {
         localCompatibilityJson: String?,
         templateProjectTag: String?
     ): Flow<String> = channelFlow {
-        send("Environment diagnose (to see all options, run kdoctor -h):\n")
+        if (verbose) {
+            send("Environment diagnose:\n")
+        } else {
+            send("Environment diagnose (to see all details, run kdoctor -v):\n")
+        }
 
         val compatibility = async {
             if (localCompatibilityJson == null) {
