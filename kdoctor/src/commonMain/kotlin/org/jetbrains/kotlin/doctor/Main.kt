@@ -12,11 +12,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.entity.System
 
-internal const val KDOCTOR_VERSION = "0.0.6"
+internal const val KDOCTOR_VERSION = "1.0.0"
 
 fun main(args: Array<String>) = Main().main(args)
 
-private class Main : CliktCommand() {
+private class Main : CliktCommand(name = "kdoctor") {
     val showVersion: Boolean by option(
         "--version",
         help = "Report a version of KDoctor"
