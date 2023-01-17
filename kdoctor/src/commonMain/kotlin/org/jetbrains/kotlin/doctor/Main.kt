@@ -3,43 +3,53 @@ package org.jetbrains.kotlin.doctor
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.arguments.optional
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.entity.System
 
 internal const val KDOCTOR_VERSION = "0.0.6"
 
-fun main(args: Array<String>) {
-    val arguments = Arguments(args)
+fun main(args: Array<String>) = Main().main(args)
 
-    Logger.setLogWriters(object : CommonWriter() {
-        override fun isLoggable(severity: Severity) = arguments.isDebug
-    })
+private class Main : CliktCommand() {
+    val showVersion: Boolean by option(
+        "--version",
+        help = "Report a version of KDoctor"
+    ).flag()
+    val isVerbose: Boolean by option(
+        "--verbose", "-v",
+        help = "Report an extended information"
+    ).flag()
+    val isExtraDiagnostics: Boolean by option(
+        "--all", "-a",
+        help = "Run extra diagnostics such as a build of a synthetic project and an analysis of a project in the current directory"
+    ).flag()
 
-    when {
-        arguments.isShowVersion -> {
-            println(KDOCTOR_VERSION)
+    val isDebug: Boolean by option("--debug", hidden = true).flag()
+    val localCompatibilityJson: String? by option("--compatibilityJson", hidden = true)
+    val templateProjectTag: String? by option("--templateProject", hidden = true)
+
+    override fun run() {
+        Logger.setLogWriters(object : CommonWriter() {
+            override fun isLoggable(severity: Severity) = isDebug
+        })
+
+        when {
+            showVersion -> {
+                println(KDOCTOR_VERSION)
+            }
+
+            else -> runBlocking {
+                Doctor(getSystem())
+                    .diagnoseKmmEnvironment(isVerbose, isExtraDiagnostics, localCompatibilityJson, templateProjectTag)
+                    .collect { line -> print(line) }
+            }
         }
-
-        else -> {
-            diagnoseKmmEnvironment(
-                arguments.isVerbose,
-                arguments.isFull,
-                arguments.projectPath,
-                arguments.localCompatibilityJson.takeIf { arguments.isDebug }
-            )
-        }
-    }
-}
-
-private fun diagnoseKmmEnvironment(
-    verbose: Boolean,
-    full: Boolean,
-    projectPath: String?,
-    localCompatibilityJson: String?
-): Unit = runBlocking {
-    val system = getSystem()
-    Doctor(system).diagnoseKmmEnvironment(verbose, full, projectPath, localCompatibilityJson).collect { line ->
-        print(line)
     }
 }
 
