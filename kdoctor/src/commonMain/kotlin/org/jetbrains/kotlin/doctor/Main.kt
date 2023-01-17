@@ -36,7 +36,17 @@ private class Main : CliktCommand() {
 
     override fun run() {
         Logger.setLogWriters(object : CommonWriter() {
-            override fun isLoggable(severity: Severity) = isDebug
+            override fun isLoggable(severity: Severity) = if (isDebug) {
+                if (isVerbose) true
+                else severity != Severity.Verbose
+            } else false
+
+            override fun formatMessage(
+                severity: Severity,
+                message: String,
+                tag: String,
+                throwable: Throwable?
+            ) = "${severity.name.first().lowercaseChar()}: $message"
         })
 
         when {
@@ -46,7 +56,7 @@ private class Main : CliktCommand() {
 
             else -> runBlocking {
                 Doctor(getSystem())
-                    .diagnoseKmmEnvironment(isVerbose, isExtraDiagnostics, localCompatibilityJson, templateProjectTag)
+                    .diagnoseKmmEnvironment(isVerbose, isDebug, isExtraDiagnostics, localCompatibilityJson, templateProjectTag)
                     .collect { line -> print(line) }
             }
         }
