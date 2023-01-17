@@ -9,7 +9,7 @@ KDoctor is a command-line tool that helps to set up the environment for [Kotlin 
 
 ## Overview
 KDoctor ensures that all [required components](https://kotlinlang.org/docs/kmm-setup.html) are properly installed and ready for use.
-If something is missed or not configured, Kdoctor highlights the problem and suggests how to fix the problem. 
+If something is missed or not configured, KDoctor highlights the problem and suggests how to fix the problem. 
 
 KDoctor runs the following diagnostics:
 * System - checks an operating system version
@@ -17,6 +17,10 @@ KDoctor runs the following diagnostics:
 * Android Studio - checks Android Studio installation, Kotlin and Kotlin Multiplatform Mobile plugins 
 * Xcode - checks Xcode installation and setup
 * Cocoapods - checks ruby environment and cocoapods gem installation
+
+Extra diagnostics:
+* Synthetic generated project - downloads and builds project from https://github.com/Kotlin/kdoctor/tree/template
+* Local Gradle Project - checks a user's project in the current directory
 
 ## Requirements
 
@@ -81,48 +85,50 @@ It is also worth checking diagnostics with warnings (`[!]`) and even successful 
 Execute KDoctor with a `-h` option to print all available options
 
 ```
-kdoctor -h                            
-Usage: kdoctor options_list
-Options: 
-    --version -> print KDoctor version 
-    --verbose, -v -> print extended information 
-    --debug -> debug mode 
-    --help, -h -> Usage info 
+kdoctor -h
+Usage: kdoctor [OPTIONS]
+
+Options:
+  --version      Report a version of KDoctor
+  -v, --verbose  Report an extended information
+  -a, --all      Run extra diagnostics such as a build of a synthetic project
+                 and an analysis of a project in the current directory
+  -h, --help     Show this message and exit
 ```
 
 ## Sample verbose output
 
 ```
 kdoctor -v
+Environment diagnose:
 [✓] Operation System
-  ➤ Version OS: macOS 12.3
+  ➤ Version OS: macOS 13.1
     CPU: Apple M1 Max
 
 [✓] Java
   ➤ Java (openjdk version "11.0.16" 2022-07-19 LTS)
-    Location: /Users/my/.sdkman/candidates/java/current/bin/java
-  ➤ JAVA_HOME: /Users/my/.sdkman/candidates/java/current
+    Location: /Users/me/.sdkman/candidates/java/current/bin/java
+  ➤ JAVA_HOME: /Users/me/.sdkman/candidates/java/current
 
 [✓] Android Studio
   i Multiple Android Studio installations found
-  ➤ Android Studio (AI-222.4345.14.2221.9252092)
-    Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app
+  ➤ Android Studio (AI-222.4459.24.2221.9445173)
+    Location: /Users/me/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4459.24.2221.9445173/Android Studio Preview.app
     Bundled Java: openjdk 17.0.4.1 2022-08-12
-    Kotlin Plugin: 222-1.7.20-release-AS3739.54
+    Kotlin Plugin: 222-1.8.0-release-AS3739.54
     Kotlin Multiplatform Mobile Plugin: 1.0.0-SNAPSHOT
-  ! Android Studio (AI-213.7172.25.2113.9123335)
-    Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-1/213.7172.25.2113.9123335/Android Studio.app
-    Bundled Java: openjdk 11.0.13 2021-10-19
-    Kotlin Plugin: 213-1.7.20-release-for-android-studio-AS6777.52
-    Kotlin Multiplatform Mobile Plugin: not installed
-    Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile
+  ➤ Android Studio (AI-221.6008.13.2211.9477386)
+    Location: /Users/me/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-2/221.6008.13.2211.9477386/Android Studio.app
+    Bundled Java: openjdk 11.0.15 2022-04-19
+    Kotlin Plugin: 221-1.7.21-release-for-android-studio-AS5591.52
+    Kotlin Multiplatform Mobile Plugin: 0.5.2(221)-3
   i Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.
     Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section
 
 [✓] Xcode
-  ➤ Xcode (13.4.1)
-    Location: /Applications/Xcode.app
-  i Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
+  ➤ Xcode (14.2)
+    Location: /Applications/Xcode-14.2.0.app
+  i Xcode JAVA_HOME: /Users/me/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
     Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths
 
 [✓] Cocoapods
@@ -133,7 +139,6 @@ kdoctor -v
 Recommendations:
   ➤ IDE doesn't suggest running all tests in file if it contains more than one class
     More details: https://youtrack.jetbrains.com/issue/KTIJ-22078
-
 Conclusion:
   ✓ Your system is ready for Kotlin Multiplatform Mobile Development!
 ```
