@@ -10,21 +10,13 @@ import org.jetbrains.kotlin.doctor.entity.*
 import org.jetbrains.kotlin.doctor.printer.TextPainter
 
 class Doctor(private val system: System) {
-    private val KmmDiagnostics = setOf(
-        SystemDiagnostic(system),
-        JavaDiagnostic(system),
-        AndroidStudioDiagnostic(system),
-        XcodeDiagnostic(system),
-        CocoapodsDiagnostic(system)
-    )
-
     fun diagnoseKmmEnvironment(
         verbose: Boolean,
-        full: Boolean,
-        projectPath: String?,
-        localCompatibilityJson: String?
+        extraDiagnostics: Boolean,
+        localCompatibilityJson: String?,
+        templateProjectTag: String?
     ): Flow<String> = channelFlow {
-        send("Environment diagnose (to see all details, run kdoctor -v):\n")
+        send("Environment diagnose (to see all options, run kdoctor -h):\n")
 
         val compatibility = async {
             if (localCompatibilityJson == null) {
@@ -35,12 +27,20 @@ class Doctor(private val system: System) {
         }
 
         val diagnostics = buildSet {
-            addAll(KmmDiagnostics)
-            if (full) {
-                add(TemplateProjectDiagnostic(system))
-            }
-            if (projectPath != null) {
-                add(GradleProjectDiagnostic(system, projectPath))
+            add(SystemDiagnostic(system))
+            add(JavaDiagnostic(system))
+            add(AndroidStudioDiagnostic(system))
+            add(XcodeDiagnostic(system))
+            add(CocoapodsDiagnostic(system))
+            if (extraDiagnostics) {
+                if (templateProjectTag != null) {
+                    add(TemplateProjectDiagnostic(system, templateProjectTag))
+                } else {
+                    add(TemplateProjectDiagnostic(system))
+                }
+
+                val path = system.execute("pwd").output?.trim().orEmpty()
+                add(GradleProjectDiagnostic(system, path))
             }
         }
 
