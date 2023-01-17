@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.doctor.printer.TextPainter
 class Doctor(private val system: System) {
     fun diagnoseKmmEnvironment(
         verbose: Boolean,
+        debug: Boolean,
         extraDiagnostics: Boolean,
         localCompatibilityJson: String?,
         templateProjectTag: String?
@@ -45,10 +46,10 @@ class Doctor(private val system: System) {
         }
 
         val diagnosis = diagnostics.map { diagnostic ->
-            val progress = showDiagnosticProgress(diagnostic.title)
+            val progress = if (!debug) showDiagnosticProgress(diagnostic.title) else null
             val diagnose = diagnostic.diagnose()
             val text = "\r" + diagnose.getText(verbose) + if (verbose) "\n\n" else "\n"
-            progress.cancel()
+            progress?.cancel()
             send(text)
             diagnose
         }

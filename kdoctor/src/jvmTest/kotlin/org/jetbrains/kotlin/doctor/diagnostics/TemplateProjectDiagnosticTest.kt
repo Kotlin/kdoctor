@@ -93,7 +93,7 @@ internal class TemplateProjectDiagnosticTest {
     fun `template project build error`() {
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
-                "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar" -> {
+                "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar --info" -> {
                     ProcessResult(-1, "BUILD FAIL")
                 }
 
@@ -120,7 +120,7 @@ internal class TemplateProjectDiagnosticTest {
                 "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/$customTag.zip" -> {
                     ProcessResult(0, "")
                 }
-                "$tempDir/kdoctor-$customTag/template/gradlew -p $tempDir/kdoctor-$customTag/template clean linkReleaseFrameworkIosArm64 jvmJar" -> {
+                "$tempDir/kdoctor-$customTag/template/gradlew -p $tempDir/kdoctor-$customTag/template clean linkReleaseFrameworkIosArm64 jvmJar --info" -> {
                     ProcessResult(0, "BUILD SUCCESSFUL")
                 }
 

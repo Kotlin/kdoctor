@@ -58,7 +58,8 @@ class TemplateProjectDiagnostic(
         val gradleExecution = system.execute(
             gradlew,
             "-p", project,
-            "clean", "linkReleaseFrameworkIosArm64", "jvmJar"
+            "clean", "linkReleaseFrameworkIosArm64", "jvmJar",
+            "--info"
         )
         if (gradleExecution.code != 0) {
             result.addFailure(

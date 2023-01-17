@@ -74,7 +74,7 @@ open class BaseTestSystem : System {
             "unzip $tempDir/archive.zip -d $tempDir" -> {
                 "" //OK
             }
-            "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar" -> {
+            "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar --info" -> {
                 "BUILD SUCCESSFUL"
             }
             "xcrun cc" -> {

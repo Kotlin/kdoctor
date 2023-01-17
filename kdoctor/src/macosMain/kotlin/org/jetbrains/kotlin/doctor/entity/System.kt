@@ -35,20 +35,23 @@ class MacosSystem : System {
         val buffer = ByteArray(128)
         val exitCode: Int
         var result = ""
-        val pipe = popen("$cmd 2>&1", "r") //more info https://stackoverflow.com/a/44680326
+        val pipe = popen("$cmd 2>&1", "r") //write stderr together with stdout: https://stackoverflow.com/a/44680326
             ?: error("popen('$cmd 2>&1', 'r') error")
 
         try {
             while (true) {
                 val input = fgets(buffer.refTo(0), buffer.size, pipe) ?: break
-                result += input.toKString()
+                val inputString = input.toKString()
+                Logger.v(inputString.removeSuffix("\n"))
+                result += inputString
             }
         } finally {
-            exitCode = pclose(pipe) / 256 //more info https://stackoverflow.com/a/808995
-            Logger.d("Exit code '$cmd' = $exitCode")
+            exitCode = pclose(pipe) / 256 //get error code from a child process: https://stackoverflow.com/a/808995
+            if (exitCode != 0) Logger.d("Error code '$cmd' = $exitCode")
         }
 
-        ProcessResult(exitCode, result.trim().takeIf { it.isNotBlank() })
+        val rawOutput = result.trim().takeIf { it.isNotBlank() }
+        ProcessResult(exitCode, rawOutput)
     }
 
     override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> {
