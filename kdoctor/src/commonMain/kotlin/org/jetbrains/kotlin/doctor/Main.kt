@@ -4,9 +4,6 @@ import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.default
-import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
@@ -34,6 +31,8 @@ private class Main : CliktCommand(name = "kdoctor") {
     val localCompatibilityJson: String? by option("--compatibilityJson", hidden = true)
     val templateProjectTag: String? by option("--templateProject", hidden = true)
 
+    val showDevelopmentTeams: Boolean by option("--team-ids").flag()
+
     override fun run() {
         Logger.setLogWriters(object : CommonWriter() {
             override fun isLoggable(severity: Severity) = if (isDebug) {
@@ -54,9 +53,19 @@ private class Main : CliktCommand(name = "kdoctor") {
                 println(KDOCTOR_VERSION)
             }
 
+            showDevelopmentTeams -> {
+                println(DevelopmentTeams(getSystem()).getTeams().joinToString("\n"))
+            }
+
             else -> runBlocking {
                 Doctor(getSystem())
-                    .diagnoseKmmEnvironment(isVerbose, isDebug, isExtraDiagnostics, localCompatibilityJson, templateProjectTag)
+                    .diagnoseKmmEnvironment(
+                        isVerbose,
+                        isDebug,
+                        isExtraDiagnostics,
+                        localCompatibilityJson,
+                        templateProjectTag
+                    )
                     .collect { line -> print(line) }
             }
         }
