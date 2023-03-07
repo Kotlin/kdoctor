@@ -211,7 +211,7 @@ class XcodeDiagnosticTest {
             )
             addFailure(
                 "Xcode requires to perform the First Launch tasks",
-                "Launch Xcode or execute 'xcodebuild -runFirstLaunch' in terminal"
+                "Launch Xcode and complete setup"
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",

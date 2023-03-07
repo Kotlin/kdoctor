@@ -20,7 +20,7 @@ class Doctor(private val system: System) {
         if (verbose) {
             send("Environment diagnose:\n")
         } else {
-            send("Environment diagnose (to see all details, run kdoctor -v):\n")
+            send("Environment diagnose (to see all details, use -v option):\n")
         }
 
         val compatibility = async {

@@ -55,7 +55,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             if (launchStatus.code != 0) {
                 result.addFailure(
                     "Xcode requires to perform the First Launch tasks",
-                    "Launch Xcode or execute 'xcodebuild -runFirstLaunch' in terminal"
+                    "Launch Xcode and complete setup"
                 )
             }
 
