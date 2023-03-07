@@ -31,31 +31,42 @@ class Doctor(private val system: System) {
             }
         }
 
-        val diagnostics = buildSet {
-            add(SystemDiagnostic(system))
-            add(JavaDiagnostic(system))
-            add(AndroidStudioDiagnostic(system))
-            add(XcodeDiagnostic(system))
-            add(CocoapodsDiagnostic(system))
-            if (extraDiagnostics) {
-                if (templateProjectTag != null) {
-                    add(TemplateProjectDiagnostic(system, templateProjectTag))
-                } else {
-                    add(TemplateProjectDiagnostic(system))
-                }
-
-                val path = system.execute("pwd").output?.trim().orEmpty()
-                add(GradleProjectDiagnostic(system, path))
-            }
-        }
-
-        val diagnosis = diagnostics.map { diagnostic ->
-            val progress = if (!debug) showDiagnosticProgress(diagnostic.title) else null
-            val diagnose = diagnostic.diagnose()
+        suspend fun Diagnostic.run(): Diagnosis {
+            val progress = if (!debug) showDiagnosticProgress(title) else null
+            val diagnose = diagnose()
             val text = "\r" + diagnose.getText(verbose) + if (verbose) "\n\n" else "\n"
             progress?.cancel()
             send(text)
-            diagnose
+            return diagnose
+        }
+
+        val diagnosis = buildList<Diagnosis> {
+            add(SystemDiagnostic(system).run())
+            add(JavaDiagnostic(system).run())
+            add(AndroidStudioDiagnostic(system).run())
+            add(XcodeDiagnostic(system).run())
+
+            val mainEnvironmentIsNotReady = this.any { it.conclusion == DiagnosisResult.Failure }
+
+            add(CocoapodsDiagnostic(system).run())
+
+            if (extraDiagnostics) {
+                if (mainEnvironmentIsNotReady) {
+                    val msg = with(DiagnosisResult.Failure) {
+                        "$color[$symbol]${TextPainter.RESET} To run extra diagnostics setup your environment before."
+                    } + if (verbose) "\n\n" else "\n"
+                    send(msg)
+                } else {
+                    if (templateProjectTag != null) {
+                        add(TemplateProjectDiagnostic(system, templateProjectTag).run())
+                    } else {
+                        add(TemplateProjectDiagnostic(system).run())
+                    }
+
+                    val path = system.execute("pwd").output?.trim().orEmpty()
+                    add(GradleProjectDiagnostic(system, path).run())
+                }
+            }
         }
         if (!verbose) {
             send("\n")
