@@ -11,7 +11,8 @@ open class BaseTestSystem : System {
     override val shell: Shell? = Shell.Zsh
 
     open val testProjectPath: String = "./test/my_project"
-    open val tempDir: String = "$homeDir/tmp/temp_dir"
+    open val testTempFile: String get() = "$testProjectPath/temp.file"
+    open val tempDir: String get() = "$homeDir/tmp/temp_dir"
 
     override fun getEnvVar(name: String): String? = when (name) {
         "JAVA_HOME" -> "$homeDir/.sdkman/candidates/java/current"
@@ -147,10 +148,7 @@ open class BaseTestSystem : System {
 
     override fun readFile(path: String): String? = null
 
-    override fun writeTempFile(content: String): String {
-        //do nothing for test
-        return "$testProjectPath/temp.file"
-    }
+    override fun writeTempFile(content: String): String = testTempFile
 
     override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
         if (pathToArchive == "/Users/my/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar" && pathToFile == "META-INF/plugin.xml") {
