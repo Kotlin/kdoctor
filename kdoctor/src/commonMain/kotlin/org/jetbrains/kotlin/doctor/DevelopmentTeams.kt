@@ -2,8 +2,8 @@ package org.jetbrains.kotlin.doctor
 
 import org.jetbrains.kotlin.doctor.entity.System
 
-class DevelopmentTeam(val teamId: String, val teamName: String) {
-    override fun toString(): String = "$teamId ($teamName)"
+class DevelopmentTeam(val id: String, val name: String) {
+    override fun toString(): String = "$id ($name)"
 }
 
 class DevelopmentTeams(private val system: System) {
@@ -11,46 +11,37 @@ class DevelopmentTeams(private val system: System) {
         val allCertsResult = system.execute(
             "security",
             "find-certificate",
-            "-c",
-            "Apple Development",
+            "-c", "Apple Development",
             "-p",
             "-a"
         )
-        val allCerts = allCertsResult.output ?: error("Could not find certificates! ${allCertsResult.rawOutput}")
-        val certs = splitCerts(allCerts)
-        return certs.map {
-            getDevelopmentTeamForCert(it)
-        }
+        val allCerts = allCertsResult.output.orEmpty().splitCerts()
+        return allCerts.map { getDevelopmentTeamForCert(it) }
     }
-
 
     private fun getDevelopmentTeamForCert(s: String): DevelopmentTeam {
         val file = system.writeTempFile(s)
-        return getDevelopmentTeamIdFromOpenSslOutput(
-            system.execute(
-                "openssl",
-                "x509",
-                "-noout",
-                "-text",
-                "-in",
-                file
-            ).output ?: error("Couldn't read development certificate!")
-        )
+        val subject = system.execute(
+            "openssl",
+            "x509",
+            "-noout",
+            "-subject",
+            "-nameopt", "sep_multiline",
+            "-nameopt", "utf8",
+            "-in", file
+        ).output ?: error("Couldn't read development certificate!")
+        val info = subject.lines().associate { line ->
+            line.trim().substringBefore("=") to line.substringAfter("=")
+        }
+        return DevelopmentTeam(info["OU"]!!, info["O"]!!)
     }
 
-    private fun getDevelopmentTeamIdFromOpenSslOutput(o: String): DevelopmentTeam {
-        val regex = """OU=(\w{3,}), O=([^,]+)""".toRegex()
-        val res = regex.find(o) ?: error("Could not find development cert!")
-        val (organizationalUnit, organization) = res.destructured
-        return DevelopmentTeam(organizationalUnit, organization)
-    }
-
-    private fun splitCerts(allCertificates: String): List<String> {
+    private fun String.splitCerts(): List<String> {
         val certs = mutableListOf<String>()
         val currentCert = StringBuilder()
-        for (l in allCertificates.lines()) {
-            currentCert.appendLine(l)
-            if ("-----END CERTIFICATE-----" in l) {
+        lineSequence().forEach { line ->
+            currentCert.appendLine(line)
+            if ("-----END CERTIFICATE-----" in line) {
                 certs += currentCert.toString()
                 currentCert.clear()
             }

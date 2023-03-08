@@ -27,11 +27,14 @@ private class Main : CliktCommand(name = "kdoctor") {
         help = "Run extra diagnostics such as a build of a synthetic project and an analysis of a project in the current directory"
     ).flag()
 
+    val showDevelopmentTeams: Boolean by option(
+        "--team-ids",
+        help = "Report all available Apple dev team ids"
+    ).flag()
+
     val isDebug: Boolean by option("--debug", hidden = true).flag()
     val localCompatibilityJson: String? by option("--compatibilityJson", hidden = true)
     val templateProjectTag: String? by option("--templateProject", hidden = true)
-
-    val showDevelopmentTeams: Boolean by option("--team-ids").flag()
 
     override fun run() {
         Logger.setLogWriters(object : CommonWriter() {
