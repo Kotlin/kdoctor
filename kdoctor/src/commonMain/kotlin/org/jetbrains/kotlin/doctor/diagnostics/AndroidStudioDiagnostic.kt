@@ -32,22 +32,26 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
             return result.build()
         }
 
+        val jsonFormatter = Json { ignoreUnknownKeys = true }
         val studioInstallations =
             paths.mapNotNull { findAndroidStudio(it) }.filter { app -> //filter Toolbox backup versions
                 if (app.location != null && app.location.contains("Toolbox", ignoreCase = true)) {
                     val channelPath = app.location.substringBeforeLast('/').substringBeforeLast('/')
                     val historyFile = "$channelPath/.history.json"
-                    val historyJson = system.readFile(historyFile)
-                    val jsonFormatter = Json { ignoreUnknownKeys = true }
-                    val history = historyJson?.let {
-                        try {
-                            jsonFormatter.decodeFromString<ToolboxHistory>(it)
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }?.history
-                    val currentBuild = history?.maxByOrNull { it.timestamp }?.item?.build
-                    currentBuild?.let { app.location.contains(currentBuild) } ?: true
+                    val historyJson = system.readFile(historyFile) ?: return@filter true
+                    val history: ToolboxHistory = try {
+                        jsonFormatter.decodeFromString(historyJson)
+                    } catch (e: Exception) {
+                        Logger.e("Parse Toolbox history error: $e", e)
+                        return@filter true
+                    }
+                    val latestBuild = history.history.maxBy { it.timestamp }.item.build
+                    if (app.location.contains(latestBuild)) {
+                        return@filter true
+                    } else {
+                        Logger.d("Skip Toolbox backup: $app")
+                        return@filter false
+                    }
                 } else {
                     true
                 }

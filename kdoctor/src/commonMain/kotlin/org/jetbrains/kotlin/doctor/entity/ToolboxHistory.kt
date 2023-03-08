@@ -1,21 +1,20 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ToolboxItem(
-    val id: String,
-    val build: String
+    @SerialName("build") val build: String
 )
 
 @Serializable
 data class ToolboxHistoryEntry(
-    val action: String,
-    val item: ToolboxItem,
-    val timestamp: String
+    @SerialName("item") val item: ToolboxItem,
+    @SerialName("timestamp") val timestamp: String
 )
 
 @Serializable
 data class ToolboxHistory(
-    val history: List<ToolboxHistoryEntry>
+    @SerialName("history") val history: List<ToolboxHistoryEntry>
 )
