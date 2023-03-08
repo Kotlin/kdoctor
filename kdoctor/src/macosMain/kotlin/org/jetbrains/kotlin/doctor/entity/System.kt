@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import platform.Foundation.NSHomeDirectory
 import platform.Foundation.NSString
 import platform.Foundation.stringWithContentsOfFile
+import platform.Foundation.writeToFile
 import platform.posix.*
 
 class MacosSystem : System {
@@ -78,21 +79,19 @@ class MacosSystem : System {
     override fun fileExists(path: String): Boolean = access(path, F_OK) == 0
 
     override fun readFile(path: String): String? =
-        NSString.Companion.stringWithContentsOfFile(path)?.toString()
+        NSString.stringWithContentsOfFile(path)?.toString()
 
-    override fun writeTempFile(content: String): String = memScoped {
+    @Suppress("CAST_NEVER_SUCCEEDS")
+    override fun writeTempFile(content: String): String {
         Logger.d("writeTempFile")
 
         val tempFile = execute("mktemp").output?.trim().orEmpty()
         if (tempFile.isBlank()) error("writeFile error: couldn't make temp file")
         Logger.d("tempFile = $tempFile")
 
-        val fd = open(tempFile, O_CREAT or O_WRONLY)
-        if (fd == -1) error("writeFile error: $fd")
+        (content as NSString).writeToFile(tempFile, true)
 
-        write(fd, content.cstr, strlen(content))
-        close(fd)
-        tempFile
+        return tempFile
     }
 
     override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
