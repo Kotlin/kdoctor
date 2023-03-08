@@ -57,7 +57,12 @@ private class Main : CliktCommand(name = "kdoctor") {
             }
 
             showDevelopmentTeams -> {
-                println(DevelopmentTeams(getSystem()).getTeams().joinToString("\n"))
+                val teams = DevelopmentTeams(getSystem()).getTeams()
+                if (teams.isEmpty()) {
+                    println("Certificates are not found")
+                } else {
+                    println(teams.joinToString("\n"))
+                }
             }
 
             else -> runBlocking {

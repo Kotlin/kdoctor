@@ -1,8 +1,9 @@
 package org.jetbrains.kotlin.doctor
 
+import co.touchlab.kermit.Logger
 import org.jetbrains.kotlin.doctor.entity.System
 
-class DevelopmentTeam(val id: String, val name: String) {
+data class DevelopmentTeam(val id: String, val name: String) {
     override fun toString(): String = "$id ($name)"
 }
 
@@ -16,7 +17,14 @@ class DevelopmentTeams(private val system: System) {
             "-a"
         )
         val allCerts = allCertsResult.output.orEmpty().splitCerts()
-        return allCerts.map { getDevelopmentTeamForCert(it) }
+        return allCerts.mapNotNull {
+            try {
+                getDevelopmentTeamForCert(it)
+            } catch (e: Exception) {
+                Logger.e("Read certificate error: $e", e)
+                null
+            }
+        }
     }
 
     private fun getDevelopmentTeamForCert(s: String): DevelopmentTeam {
