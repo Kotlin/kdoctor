@@ -3,6 +3,8 @@ package org.jetbrains.kotlin.doctor.entity
 import co.touchlab.kermit.Logger
 import kotlinx.cinterop.*
 import platform.Foundation.NSHomeDirectory
+import platform.Foundation.NSString
+import platform.Foundation.stringWithContentsOfFile
 import platform.posix.*
 
 class MacosSystem : System {
@@ -75,15 +77,8 @@ class MacosSystem : System {
 
     override fun fileExists(path: String): Boolean = access(path, F_OK) == 0
 
-    override fun readFile(path: String): String? = memScoped {
-        Logger.d("readFile($path)")
-        val fd = open(path, O_RDONLY)
-        if (fd == -1) return null
-        val fs: stat = alloc()
-        fstat(fd, fs.ptr)
-
-        readFd(fd)
-    }
+    override fun readFile(path: String): String? =
+        NSString.Companion.stringWithContentsOfFile(path)?.toString()
 
     override fun writeTempFile(content: String): String = memScoped {
         Logger.d("writeTempFile")
