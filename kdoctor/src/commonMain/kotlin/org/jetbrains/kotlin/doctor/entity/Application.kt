@@ -52,6 +52,21 @@ class AppManager(
         val pluginXml = jars.firstNotNullOfOrNull { system.readArchivedFile(it, "META-INF/plugin.xml") } ?: return null
         val version = Regex("<version>(.+?)</version>").find(pluginXml)?.groups?.get(1)?.value ?: return null
         val id = Regex("<id>(.+?)</id>").find(pluginXml)?.groups?.get(1)?.value ?: return null
+
+        //try to solve a problem: there is incompatible plugin in '.plugins' directory from previous IDEA installation
+        //we try to check since/until platform versions
+        val sinceBuild = Regex(" since-build=\"(\\d\\d\\d).").find(pluginXml)?.groups?.get(1)?.value?.toInt()
+        val untilBuild = Regex(" until-build=\"(\\d\\d\\d).").find(pluginXml)?.groups?.get(1)?.value?.toInt()
+        val guessAppPlatform = Regex("\\D(\\d\\d\\d)\\.").find(app.version.rawString)?.groups?.get(1)?.value?.toInt()
+        if (sinceBuild != null && guessAppPlatform != null && guessAppPlatform < sinceBuild) {
+            Logger.d("Found incompatible '$pluginName' plugin: $version for $app")
+            return null
+        }
+        if (untilBuild != null && guessAppPlatform != null && guessAppPlatform > untilBuild) {
+            Logger.d("Found incompatible '$pluginName' plugin: $version for $app")
+            return null
+        }
+
         val isEnabled = !disabledPlugins.contains(id)
         return Plugin(pluginName, id, Version(version), isEnabled)
     }
