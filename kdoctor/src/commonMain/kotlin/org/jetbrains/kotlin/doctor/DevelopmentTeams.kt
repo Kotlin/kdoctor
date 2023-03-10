@@ -8,7 +8,7 @@ data class DevelopmentTeam(val id: String, val name: String) {
 }
 
 class DevelopmentTeams(private val system: System) {
-    fun getTeams(): List<DevelopmentTeam> {
+    fun getTeams(): Collection<DevelopmentTeam> {
         val allCertsResult = system.execute(
             "security",
             "find-certificate",
@@ -24,7 +24,7 @@ class DevelopmentTeams(private val system: System) {
                 Logger.e("Read certificate error: $e", e)
                 null
             }
-        }
+        }.toSet()
     }
 
     private fun getDevelopmentTeamForCert(s: String): DevelopmentTeam {
