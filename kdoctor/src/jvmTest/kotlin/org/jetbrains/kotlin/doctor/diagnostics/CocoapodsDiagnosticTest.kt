@@ -263,8 +263,8 @@ class CocoapodsDiagnosticTest {
                     ProcessResult(0, "1.10.2")
                 }
 
-                "/usr/bin/locale -k LC_CTYPE" -> {
-                    ProcessResult(0, "charmap=\"WTF\"")
+                "/usr/bin/locale" -> {
+                    ProcessResult(0, "LC_ALL=")
                 }
 
                 else -> super.executeCmd(cmd)
@@ -301,8 +301,8 @@ class CocoapodsDiagnosticTest {
     fun `check wrong Locale with new Cocoapods`() {
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
-                "/usr/bin/locale -k LC_CTYPE" -> {
-                    ProcessResult(0, "charmap=\"WTF\"")
+                "/usr/bin/locale" -> {
+                    ProcessResult(0, "LC_ALL=\"WTF\"")
                 }
 
                 else -> super.executeCmd(cmd)

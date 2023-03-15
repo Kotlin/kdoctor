@@ -22,7 +22,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
         result.addSuccess("${ruby.name} (${ruby.version})")
 
         if (ruby.location == "/usr/bin/ruby") {
-            var title = "System ruby is currently used"
+            val title = "System ruby is currently used"
             if (system.isUsingM1()) {
                 result.addFailure(
                     title,
@@ -73,8 +73,9 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
         }
         result.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
-        val locale = system.execute("/usr/bin/locale", "-k", "LC_CTYPE").output
-        if (locale == null || !locale.contains("UTF-8")) {
+        val locale = system.execute("/usr/bin/locale").output
+        val lcAll = locale?.lines()?.firstOrNull { it.startsWith("LC_ALL=") }?.substringAfter("=")
+        if (lcAll.isNullOrEmpty() || !lcAll.contains("UTF-8")) {
             val hint = """
                 Consider adding the following to ${system.shell?.profile ?: "shell profile"}
                 export LC_ALL=en_US.UTF-8
