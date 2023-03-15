@@ -74,16 +74,22 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
         result.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
         val locale = system.execute("/usr/bin/locale").output
+        val lang = locale?.lines()?.firstOrNull { it.startsWith("LANG=") }?.substringAfter("=")
         val lcAll = locale?.lines()?.firstOrNull { it.startsWith("LC_ALL=") }?.substringAfter("=")
-        if (lcAll.isNullOrEmpty() || !lcAll.contains("UTF-8")) {
-            val hint = """
-                Consider adding the following to ${system.shell?.profile ?: "shell profile"}
-                export LC_ALL=en_US.UTF-8
-            """.trimIndent()
+        val exportHint = buildString {
+            if (lang.isNullOrEmpty() || !lang.contains("UTF-8")) {
+                appendLine("export LANG=en_US.UTF-8")
+            }
+            if (lcAll.isNullOrEmpty() || !lcAll.contains("UTF-8")) {
+                appendLine("export LC_ALL=en_US.UTF-8")
+            }
+        }.trim()
+        if (exportHint.isNotEmpty()) {
+            val hint = "Consider adding the following to ${system.shell?.profile ?: "shell profile"}"
             if (cocoapods.version > Version(1, 10, 2)) {
-                result.addFailure("CocoaPods requires your terminal to be using UTF-8 encoding.", hint)
+                result.addFailure("CocoaPods requires your terminal to be using UTF-8 encoding.", hint, exportHint)
             } else {
-                result.addWarning("CocoaPods requires your terminal to be using UTF-8 encoding.", hint)
+                result.addWarning("CocoaPods requires your terminal to be using UTF-8 encoding.", hint, exportHint)
             }
         }
 

@@ -264,7 +264,7 @@ class CocoapodsDiagnosticTest {
                 }
 
                 "/usr/bin/locale" -> {
-                    ProcessResult(0, "LC_ALL=")
+                    ProcessResult(0, "LANG=WTF\nLC_ALL=")
                 }
 
                 else -> super.executeCmd(cmd)
@@ -285,6 +285,7 @@ class CocoapodsDiagnosticTest {
             addWarning(
                 "CocoaPods requires your terminal to be using UTF-8 encoding.",
                 "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "export LANG=en_US.UTF-8",
                 "export LC_ALL=en_US.UTF-8"
             )
             addEnvironment(
@@ -303,6 +304,83 @@ class CocoapodsDiagnosticTest {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/locale" -> {
                     ProcessResult(0, "LC_ALL=\"WTF\"")
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = CocoapodsDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Cocoapods").apply {
+            addSuccess(
+                "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
+            )
+            addSuccess(
+                "ruby gems (3.3.26)"
+            )
+            addSuccess(
+                "cocoapods (1.11.3)"
+            )
+            addFailure(
+                "CocoaPods requires your terminal to be using UTF-8 encoding.",
+                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "export LANG=en_US.UTF-8",
+                "export LC_ALL=en_US.UTF-8"
+            )
+            addEnvironment(
+                EnvironmentPiece.Ruby(Version("ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21]")),
+                EnvironmentPiece.RubyGems(Version("3.3.26")),
+                EnvironmentPiece.Cocoapods(Version("1.11.3"))
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
+    fun `check wrong LANG environment with new Cocoapods`() {
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "/usr/bin/locale" -> {
+                    ProcessResult(0, "LC_ALL=\"en_US.UTF-8\"")
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = CocoapodsDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Cocoapods").apply {
+            addSuccess(
+                "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
+            )
+            addSuccess(
+                "ruby gems (3.3.26)"
+            )
+            addSuccess(
+                "cocoapods (1.11.3)"
+            )
+            addFailure(
+                "CocoaPods requires your terminal to be using UTF-8 encoding.",
+                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "export LANG=en_US.UTF-8"
+            )
+            addEnvironment(
+                EnvironmentPiece.Ruby(Version("ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21]")),
+                EnvironmentPiece.RubyGems(Version("3.3.26")),
+                EnvironmentPiece.Cocoapods(Version("1.11.3"))
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
+    fun `check wrong LC_ALL environment with new Cocoapods`() {
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "/usr/bin/locale" -> {
+                    ProcessResult(0, "LANG=\"en_US.UTF-8\"\nLC_ALL=\"WAT\"")
                 }
 
                 else -> super.executeCmd(cmd)
