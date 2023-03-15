@@ -115,7 +115,8 @@ class CocoapodsDiagnosticTest {
             addFailure(
                 "System ruby is currently used",
                 "CocoaPods is not compatible with system ruby installation on Apple M1 computers.",
-                "Please install ruby via Homebrew, rvm, rbenv or other tool and make it default"
+                "Please install ruby via Homebrew, rvm, rbenv or other tool and make it default",
+                "Detailed information: https://stackoverflow.com/questions/64901180/how-to-run-cocoapods-on-apple-silicon-m1/66556339#66556339"
             )
             addSuccess(
                 "ruby gems (3.3.26)"
