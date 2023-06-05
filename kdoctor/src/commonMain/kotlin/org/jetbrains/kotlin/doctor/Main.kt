@@ -7,7 +7,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.entity.System
 
-internal const val KDOCTOR_VERSION = "1.0.0"
+internal const val KDOCTOR_VERSION = "1.0.1"
 
 fun main(args: Array<String>) = Main().main(args)
 
