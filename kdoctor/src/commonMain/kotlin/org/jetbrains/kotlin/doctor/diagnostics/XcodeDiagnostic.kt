@@ -35,13 +35,6 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             result.addEnvironment(EnvironmentPiece.Xcode(xcode.version))
         }
 
-        if (xcodeInstallations.count() > 1) {
-            val tools = system.execute("xcode-select", "-p").output
-            if (tools != null) {
-                result.addSuccess("Current command line tools: $tools")
-            }
-        }
-
         val xcrun = system.execute("xcrun", "cc").output
         if (xcrun?.contains("license") == true) {
             result.addFailure(
@@ -51,11 +44,31 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
         }
 
         if (xcodeInstallations.isNotEmpty()) {
-            val launchStatus = system.execute("xcodebuild", "-checkFirstLaunchStatus")
-            if (launchStatus.code != 0) {
+            val tools = system.execute("xcode-select", "-p").output
+            if (tools != null) {
+                if (xcodeInstallations.none { tools.startsWith(it.location!!) }) {
+                    result.addFailure(
+                        "Current command line tools: $tools",
+                        "You have to select command line tools bundled to Xcode",
+                        "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
+                    )
+                } else {
+                    if (xcodeInstallations.size > 1) {
+                        result.addSuccess("Current command line tools: $tools")
+                    }
+
+                    val launchStatus = system.execute("xcodebuild", "-checkFirstLaunchStatus")
+                    if (launchStatus.code != 0) {
+                        result.addFailure(
+                            "Xcode requires to perform the First Launch tasks",
+                            "Launch Xcode and complete setup"
+                        )
+                    }
+                }
+            } else {
                 result.addFailure(
-                    "Xcode requires to perform the First Launch tasks",
-                    "Launch Xcode and complete setup"
+                    "Command line tools are not configured",
+                    "Command line tools can be configured in Xcode -> Preferences -> Locations -> Locations"
                 )
             }
 

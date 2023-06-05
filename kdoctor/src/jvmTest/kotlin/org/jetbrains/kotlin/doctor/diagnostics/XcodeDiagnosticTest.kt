@@ -66,6 +66,10 @@ class XcodeDiagnosticTest {
                     ProcessResult(0, "{\"CFBundleShortVersionString\":\"77.7.7\", \"CFBundleName\":\"Xcode\"}")
                 }
 
+                "xcode-select -p" -> {
+                    ProcessResult(0, "$homeDir/Applications/Xcode.app/Contents/Developer")
+                }
+
                 else -> super.executeCmd(cmd)
             }
 

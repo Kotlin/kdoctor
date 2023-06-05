@@ -81,6 +81,9 @@ open class BaseTestSystem : System {
             "xcrun cc" -> {
                 "clang: error: no input files"
             }
+            "xcode-select -p" -> {
+                return ProcessResult(0, "/Applications/Xcode.app/Contents/Developer")
+            }
             "xcodebuild -checkFirstLaunchStatus" -> {
                 return ProcessResult(0, null)
             }
