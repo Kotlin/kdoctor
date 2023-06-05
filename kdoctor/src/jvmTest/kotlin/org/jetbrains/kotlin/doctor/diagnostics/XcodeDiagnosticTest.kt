@@ -193,6 +193,76 @@ class XcodeDiagnosticTest {
     }
 
     @Test
+    fun `check external Command line tools`() {
+        val cltPath = "/Library/Developer/CommandLineTools"
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "xcode-select -p" -> {
+                    ProcessResult(0, cltPath)
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = XcodeDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Xcode").apply {
+            addSuccess(
+                "Xcode (13.4.1)",
+                "Location: /Applications/Xcode.app",
+            )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
+            )
+            addFailure(
+                "Current command line tools: $cltPath",
+                "You have to select command line tools bundled to Xcode",
+                "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
+            )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
+    fun `check misconfigured Command line tools`() {
+        val system = object : BaseTestSystem() {
+            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+                "xcode-select -p" -> {
+                    ProcessResult(-1, null)
+                }
+
+                else -> super.executeCmd(cmd)
+            }
+        }
+        val diagnose = XcodeDiagnostic(system).diagnose()
+
+        val expected = Diagnosis.Builder("Xcode").apply {
+            addSuccess(
+                "Xcode (13.4.1)",
+                "Location: /Applications/Xcode.app",
+            )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
+            )
+            addFailure(
+                "Command line tools are not configured",
+                "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
+            )
+            addInfo(
+                "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
+            )
+        }.build()
+
+        assertEquals(expected, diagnose)
+    }
+
+    @Test
     fun `check Xcode requires first launch`() {
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
