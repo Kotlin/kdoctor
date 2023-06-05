@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "1.8.10"
-    kotlin("plugin.serialization") version "1.8.10"
+    kotlin("multiplatform") version "1.8.21"
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
 repositories {
@@ -22,10 +22,10 @@ kotlin {
         /* Main source sets */
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
                 implementation("com.github.ajalt.clikt:clikt:3.5.2")
-                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-                implementation ("co.touchlab:kermit:1.2.2")
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+                implementation ("co.touchlab:kermit:2.0.0-RC4")
             }
         }
         val macosX64Main by getting

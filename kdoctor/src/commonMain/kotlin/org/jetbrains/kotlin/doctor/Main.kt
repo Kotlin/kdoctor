@@ -1,8 +1,6 @@
 package org.jetbrains.kotlin.doctor
 
-import co.touchlab.kermit.CommonWriter
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
+import co.touchlab.kermit.*
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -37,18 +35,14 @@ private class Main : CliktCommand(name = "kdoctor") {
     val templateProjectTag: String? by option("--templateProject", hidden = true)
 
     override fun run() {
-        Logger.setLogWriters(object : CommonWriter() {
-            override fun isLoggable(severity: Severity) = if (isDebug) {
-                if (isVerbose) true
-                else severity != Severity.Verbose
+        val logFormatter = object : MessageStringFormatter {
+            override fun formatSeverity(severity: Severity) = severity.name.first() + ":"
+            override fun formatTag(tag: Tag) = ""
+        }
+        Logger.setLogWriters(object : CommonWriter(logFormatter) {
+            override fun isLoggable(tag: String, severity: Severity) = if (isDebug) {
+                if (isVerbose) true else severity != Severity.Verbose
             } else false
-
-            override fun formatMessage(
-                severity: Severity,
-                message: String,
-                tag: String,
-                throwable: Throwable?
-            ) = "${severity.name.first().lowercaseChar()}: $message"
         })
 
         when {
