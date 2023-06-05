@@ -68,7 +68,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             } else {
                 result.addFailure(
                     "Command line tools are not configured",
-                    "Command line tools can be configured in Xcode -> Preferences -> Locations -> Locations"
+                    "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
                 )
             }
 
@@ -83,7 +83,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             if (xcodeJavaHome != null) {
                 result.addInfo(
                     "Xcode JAVA_HOME: $xcodeJavaHome",
-                    "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                    "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
                 )
             }
         }

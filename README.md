@@ -129,7 +129,7 @@ Environment diagnose:
   ➤ Xcode (14.2)
     Location: /Applications/Xcode-14.2.0.app
   i Xcode JAVA_HOME: /Users/me/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home
-    Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths
+    Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths
 
 [✓] Cocoapods
   ➤ ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])

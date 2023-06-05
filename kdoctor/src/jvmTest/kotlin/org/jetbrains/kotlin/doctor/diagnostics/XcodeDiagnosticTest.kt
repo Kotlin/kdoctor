@@ -21,7 +21,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
             addEnvironment(
                 EnvironmentPiece.Xcode(Version("13.4.1"))
@@ -96,7 +96,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
         }.build()
 
@@ -151,7 +151,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
         }.build()
 
@@ -185,7 +185,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
         }.build()
 
@@ -219,7 +219,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
         }.build()
 
@@ -246,7 +246,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /custom/path",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
             addEnvironment(
                 EnvironmentPiece.Xcode(Version("13.4.1"))
@@ -276,7 +276,7 @@ class XcodeDiagnosticTest {
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/Library/Java/JavaVirtualMachines/jbr-17.0.5/Contents/Home",
-                "Xcode JAVA_HOME can be configured in Xcode -> Preferences -> Locations -> Custom Paths"
+                "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
             )
             addEnvironment(
                 EnvironmentPiece.Xcode(Version("13.4.1"))
