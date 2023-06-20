@@ -143,5 +143,8 @@ Conclusion:
   ✓ Your system is ready for Kotlin Multiplatform Mobile Development!
 ```
 
+## Issue Tracker
+[KDoctor](https://youtrack.jetbrains.com/issues/KT?q=Subsystems:%20KDoctor%20) subsystem in Kotlin issue tracker
+
 ## License
 [Apache-2.0](https://github.com/Kotlin/kdoctor/blob/master/LICENSE)
