@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Homebrew](https://badgen.net/homebrew/v/kdoctor)](https://formulae.brew.sh/formula/kdoctor)
 
-KDoctor is a command-line tool that helps to set up the environment for [Kotlin Multiplatform Mobile](https://kotlinlang.org/lp/mobile/) app development.
+KDoctor is a command-line tool that helps to set up the environment for mobile app development with [Kotlin Multiplatform](https://kotlinlang.org/lp/multiplatform/).
 
 ![](https://github.com/Kotlin/kdoctor/raw/master/img/screen_1.jpg)
 
@@ -57,13 +57,13 @@ Call KDoctor in the console and wait till it completes the diagnostics
 
 ```
 kdoctor
-Diagnosing Kotlin Multiplatform Mobile environment...
+Diagnosing environment for developing mobile apps with Kotlin Multiplatform...
 ```
 
-Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for Kotlin Multiplatform Mobile development:
+Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for developing mobile apps with Kotlin Multiplatform:
 
 ```
-Your system is ready for Kotlin Multiplatform Mobile Development!
+Your system is ready for mobile app development with Kotlin Multiplatform!
 ```
 
 If KDoctor notifies that there are problems, please review the report:
@@ -140,7 +140,7 @@ Recommendations:
   ➤ IDE doesn't suggest running all tests in file if it contains more than one class
     More details: https://youtrack.jetbrains.com/issue/KTIJ-22078
 Conclusion:
-  ✓ Your system is ready for Kotlin Multiplatform Mobile Development!
+  ✓ Your system is ready for mobile app development with Kotlin Multiplatform!
 ```
 
 ## Issue Tracker
