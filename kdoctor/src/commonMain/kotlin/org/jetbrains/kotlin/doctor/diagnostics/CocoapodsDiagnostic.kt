@@ -26,8 +26,8 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             if (system.isUsingM1()) {
                 result.addFailure(
                     title,
-                    "CocoaPods is not compatible with system ruby installation on Apple M1 computers.",
-                    "Please install ruby via Homebrew, rvm, rbenv or other tool and make it default",
+                    "CocoaPods is not compatible with the system ruby installation on Apple silicon computers.",
+                    "Please install ruby using Homebrew, rvm, rbenv or another tool and set it as the default.",
                     "Detailed information: https://stackoverflow.com/questions/64901180/how-to-run-cocoapods-on-apple-silicon-m1/66556339#66556339"
                 )
             } else {
