@@ -23,7 +23,9 @@ data class Diagnosis(
             "$color[$symbol]${TextPainter.RESET}"
         }
         appendLine("$prefix $title")
-        val paragraphs = if (verbose) entries else entries.filter { it.result == DiagnosisResult.Failure }
+        val paragraphs = if (verbose) entries else entries.filter {
+            it.result == DiagnosisResult.Failure || it.result == DiagnosisResult.Warning
+        }
 
         paragraphs.forEach { entry ->
             entry.text.lines().forEachIndexed { index, s ->
