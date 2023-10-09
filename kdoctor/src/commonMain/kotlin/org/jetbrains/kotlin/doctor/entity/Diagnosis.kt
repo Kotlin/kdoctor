@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.doctor.printer.TextPainter
 enum class DiagnosisResult(val symbol: Char, val color: String) {
     Success('✓', TextPainter.GREEN),
     Info('i', TextPainter.YELLOW),
-    Warning('!', TextPainter.RED),
+    Warning('!', TextPainter.YELLOW),
     Failure('✖', TextPainter.RED)
 }
 
