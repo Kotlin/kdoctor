@@ -16,7 +16,7 @@ KDoctor runs the following diagnostics:
 * JDK - checks that JDK installation and JAVA_HOME setting
 * Android Studio - checks Android Studio installation, Kotlin and Kotlin Multiplatform Mobile plugins 
 * Xcode - checks Xcode installation and setup
-* Cocoapods - checks ruby environment and cocoapods gem installation
+* CocoaPods - checks ruby environment and cocoapods gem installation
 
 Extra diagnostics:
 * Synthetic generated project - downloads and builds project from https://github.com/Kotlin/kdoctor/tree/template

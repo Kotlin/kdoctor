@@ -40,7 +40,7 @@
     {
       "url": "https://youtrack.jetbrains.com/issue/KT-54314",
       "isCritical": true,
-      "text": "Xcode 14.0+ requires to sign some transitive Cocoapods dependencies.\nIt was supported in Kotlin 1.8.20+",
+      "text": "Xcode 14.0+ requires to sign some transitive CocoaPods dependencies.\nIt was supported in Kotlin 1.8.20+",
       "matrix": [
         {
           "name": "Xcode",

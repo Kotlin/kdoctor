@@ -19,7 +19,7 @@ data class EnvironmentPiece(
         private const val Jdk = "Jdk"
         private const val AndroidStudio = "AndroidStudio"
         private const val KotlinPlugin = "KotlinPlugin"
-        private const val Cocoapods = "Cocoapods"
+        private const val Cocoapods = "CocoaPods"
         private const val KmmPlugin = "KmmPlugin"
         private const val Ruby = "Ruby"
         private const val RubyGems = "RubyGems"

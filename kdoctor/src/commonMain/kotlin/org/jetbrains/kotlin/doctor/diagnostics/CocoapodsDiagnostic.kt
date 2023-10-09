@@ -3,7 +3,7 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import org.jetbrains.kotlin.doctor.entity.*
 
 class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
-    override val title = "Cocoapods"
+    override val title = "CocoaPods"
 
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
@@ -13,7 +13,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             if (original.conclusion == DiagnosisResult.Failure) {
                 val info = DiagnosisEntry(
                     DiagnosisResult.Warning,
-                    "Cocoapods configuration is not required, but highly recommended for full-fledged development"
+                    "CocoaPods configuration is not required, but highly recommended for full-fledged development"
                 )
                 return original.copy(
                     conclusion = DiagnosisResult.Warning,
@@ -77,7 +77,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             val cocoapodsBrewInstallation = system.execute("brew", "list", "cocoapods", "--versions").output
             if (cocoapodsBrewInstallation?.isNotBlank() == true) {
                 result.addFailure(
-                    "Cocoapods are installed via Homebrew but not linked to /usr/local/bin",
+                    "CocoaPods are installed via Homebrew but not linked to /usr/local/bin",
                     "Execute 'brew link --overwrite cocoapods'"
                 )
             } else {
