@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "1.8.21"
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("multiplatform") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 repositories {
@@ -9,6 +9,7 @@ repositories {
 }
 
 kotlin {
+    targetHierarchy.default()
     jvm() //for unit tests
     listOf(macosX64(), macosArm64()).forEach {
         it.binaries {
@@ -19,38 +20,24 @@ kotlin {
     }
 
     sourceSets {
-        /* Main source sets */
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-                implementation("com.github.ajalt.clikt:clikt:3.5.2")
-                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-                implementation ("co.touchlab:kermit:2.0.0-RC4")
+        all {
+            languageSettings {
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
             }
         }
-        val macosX64Main by getting
-        val macosArm64Main by getting
-        val macosMain by creating
-
-        /* Main hierarchy */
-        macosMain.dependsOn(commonMain)
-        macosX64Main.dependsOn(macosMain)
-        macosArm64Main.dependsOn(macosMain)
-
-        /* Test source sets */
-        val commonTest by getting {
+        commonMain {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation("com.github.ajalt.clikt:clikt:4.2.1")
+                implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+                implementation ("co.touchlab:kermit:2.0.1")
+            }
+        }
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val macosX64Test by getting
-        val macosArm64Test by getting
-        val macosTest by creating
-
-        /* Test hierarchy */
-        macosTest.dependsOn(commonTest)
-        macosX64Test.dependsOn(macosTest)
-        macosArm64Test.dependsOn(macosTest)
     }
 }
 
