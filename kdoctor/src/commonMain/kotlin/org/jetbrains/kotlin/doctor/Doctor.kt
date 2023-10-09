@@ -97,7 +97,7 @@ class Doctor(private val system: System) {
             send("    Please check the output for problem description and possible solutions.\n")
         } else {
             val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
-            send("${prefix}Your system is ready for Kotlin Multiplatform Mobile Development!\n")
+            send("${prefix}Your operation system is ready for Kotlin Multiplatform Mobile Development!\n")
         }
     }.buffer(0).flowOn(Dispatchers.Default)
 
