@@ -8,6 +8,22 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
+        fun Diagnosis.Builder.buildWithRecommendation(): Diagnosis {
+            val original = build()
+            if (original.conclusion == DiagnosisResult.Failure) {
+                val info = DiagnosisEntry(
+                    DiagnosisResult.Warning,
+                    "Cocoapods configuration is not required, but highly recommended for full-fledged development"
+                )
+                return original.copy(
+                    conclusion = DiagnosisResult.Warning,
+                    entries = listOf(info) + original.entries
+                )
+            } else {
+                return original
+            }
+        }
+
         val rubyVersion = system.execute("ruby", "-v").output
         val rubyLocation = system.execute("which", "ruby").output
         if (rubyLocation == null || rubyVersion == null) {
@@ -15,7 +31,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
                 "ruby not found",
                 "Get ruby from https://www.ruby-lang.org/en/documentation/installation/"
             )
-            return result.build()
+            return result.buildWithRecommendation()
         }
 
         val ruby = Application("ruby", Version(rubyVersion), rubyLocation)
@@ -44,7 +60,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
                 "ruby gems not found",
                 "Get ruby gems from https://rubygems.org/pages/download"
             )
-            return result.build()
+            return result.buildWithRecommendation()
         }
 
         val gems = Application("ruby gems", Version(rubyGemsVersion))
@@ -70,7 +86,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
                     "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
                 )
             }
-            return result.build()
+            return result.buildWithRecommendation()
         }
         result.addSuccess("${cocoapods.name} (${cocoapods.version})")
 
@@ -99,6 +115,6 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             EnvironmentPiece.RubyGems(gems.version),
             EnvironmentPiece.Cocoapods(cocoapods.version)
         )
-        return result.build()
+        return result.buildWithRecommendation()
     }
 }

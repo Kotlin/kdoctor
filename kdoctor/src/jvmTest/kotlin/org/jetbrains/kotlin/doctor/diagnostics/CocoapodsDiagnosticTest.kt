@@ -1,13 +1,11 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
-import org.jetbrains.kotlin.doctor.entity.Diagnosis
-import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
-import org.jetbrains.kotlin.doctor.entity.ProcessResult
-import org.jetbrains.kotlin.doctor.entity.Version
+import org.jetbrains.kotlin.doctor.entity.*
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class CocoapodsDiagnosticTest {
+    private val recommendation = "Cocoapods configuration is not required, but highly recommended for full-fledged development"
 
     @Test
     fun `check success`() {
@@ -48,10 +46,12 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addFailure(
                 "ruby not found",
                 "Get ruby from https://www.ruby-lang.org/en/documentation/installation/"
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -109,6 +109,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -129,6 +130,7 @@ class CocoapodsDiagnosticTest {
                 EnvironmentPiece.RubyGems(Version("3.3.26")),
                 EnvironmentPiece.Cocoapods(Version("1.11.3"))
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -182,6 +184,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -189,6 +192,7 @@ class CocoapodsDiagnosticTest {
                 "ruby gems not found",
                 "Get ruby gems from https://rubygems.org/pages/download"
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -208,6 +212,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -218,6 +223,7 @@ class CocoapodsDiagnosticTest {
                 "cocoapods not found",
                 "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -241,6 +247,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -251,6 +258,7 @@ class CocoapodsDiagnosticTest {
                 "Cocoapods are installed via Homebrew but not linked to /usr/local/bin",
                 "Execute 'brew link --overwrite cocoapods'"
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -313,6 +321,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -333,6 +342,7 @@ class CocoapodsDiagnosticTest {
                 EnvironmentPiece.RubyGems(Version("3.3.26")),
                 EnvironmentPiece.Cocoapods(Version("1.11.3"))
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -352,6 +362,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -371,6 +382,7 @@ class CocoapodsDiagnosticTest {
                 EnvironmentPiece.RubyGems(Version("3.3.26")),
                 EnvironmentPiece.Cocoapods(Version("1.11.3"))
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
@@ -390,6 +402,7 @@ class CocoapodsDiagnosticTest {
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Cocoapods").apply {
+            addWarning(recommendation)
             addSuccess(
                 "ruby (ruby 3.1.3p185 (2022-11-24 revision 1a6b16756e) [arm64-darwin21])"
             )
@@ -409,6 +422,7 @@ class CocoapodsDiagnosticTest {
                 EnvironmentPiece.RubyGems(Version("3.3.26")),
                 EnvironmentPiece.Cocoapods(Version("1.11.3"))
             )
+            setConclusion(DiagnosisResult.Warning)
         }.build()
 
         assertEquals(expected, diagnose)
