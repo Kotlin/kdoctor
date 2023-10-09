@@ -22,6 +22,39 @@ class DiagnosisBuilderTest {
                 "info 1",
                 "info 2",
             )
+            addEnvironment(*env1.toTypedArray())
+            addEnvironment(*env2.toTypedArray())
+        }.build()
+
+        assertEquals("Title", diagnosis.title)
+        assertEquals(DiagnosisResult.Success, diagnosis.conclusion)
+        assertEquals(listOf(env1, env2), diagnosis.checkedEnvironments)
+        assertEquals(
+            listOf(
+                DiagnosisEntry(DiagnosisResult.Success, "success 1"),
+                DiagnosisEntry(DiagnosisResult.Info, "info 1\ninfo 2"),
+            ),
+            diagnosis.entries
+        )
+    }
+
+    @Test
+    fun `check warning diagnosis`() {
+        val env1 = setOf(
+            EnvironmentPiece.Macos(Version("1.1.1")),
+            EnvironmentPiece.Jdk(Version("1.1.1")),
+        )
+        val env2 = setOf(
+            EnvironmentPiece.Macos(Version("2.2.2"))
+        )
+        val diagnosis = Diagnosis.Builder("Title").apply {
+            addSuccess(
+                "success 1",
+            )
+            addInfo(
+                "info 1",
+                "info 2",
+            )
             addWarning(
                 "warning 1\nwarning 2",
             )
@@ -30,7 +63,7 @@ class DiagnosisBuilderTest {
         }.build()
 
         assertEquals("Title", diagnosis.title)
-        assertEquals(DiagnosisResult.Success, diagnosis.conclusion)
+        assertEquals(DiagnosisResult.Warning, diagnosis.conclusion)
         assertEquals(listOf(env1, env2), diagnosis.checkedEnvironments)
         assertEquals(
             listOf(

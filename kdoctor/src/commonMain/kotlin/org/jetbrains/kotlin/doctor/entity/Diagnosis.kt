@@ -76,9 +76,12 @@ data class Diagnosis(
             title,
             entries,
             checkedEnvironments,
-            conclusion
-                ?: entries.firstOrNull { it.result == DiagnosisResult.Failure }?.result
-                ?: DiagnosisResult.Success
+            when {
+                conclusion != null -> conclusion!!
+                entries.any { it.result == DiagnosisResult.Failure } -> DiagnosisResult.Failure
+                entries.any { it.result == DiagnosisResult.Warning } -> DiagnosisResult.Warning
+                else -> DiagnosisResult.Success
+            }
         )
     }
 }
