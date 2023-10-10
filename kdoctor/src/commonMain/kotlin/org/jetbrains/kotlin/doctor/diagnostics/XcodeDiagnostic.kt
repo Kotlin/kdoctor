@@ -32,6 +32,7 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
             result.addSuccess(
                 "${xcode.name} (${xcode.version})\nLocation: ${xcode.location}"
             )
+            result.addEnvironment(EnvironmentPiece.Xcode(xcode.version))
         }
 
         val xcrun = system.execute("xcrun", "cc").output
@@ -45,16 +46,13 @@ class XcodeDiagnostic(private val system: System) : Diagnostic() {
         if (xcodeInstallations.isNotEmpty()) {
             val tools = system.execute("xcode-select", "-p").output
             if (tools != null) {
-                val selectedXcode = xcodeInstallations.firstOrNull { tools.startsWith(it.location!!) }
-                if (selectedXcode == null) {
+                if (xcodeInstallations.none { tools.startsWith(it.location!!) }) {
                     result.addFailure(
                         "Current command line tools: $tools",
                         "You have to select command line tools bundled to Xcode",
                         "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
                     )
                 } else {
-                    //Only selected Xcode matters for environment checks
-                    result.addEnvironment(EnvironmentPiece.Xcode(selectedXcode.version))
                     if (xcodeInstallations.size > 1) {
                         result.addSuccess("Current command line tools: $tools")
                     }

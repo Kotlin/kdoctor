@@ -136,15 +136,18 @@ class XcodeDiagnosticTest {
                 "Xcode (11.1)",
                 "Location: /Applications/Xcode.app",
             )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("11.1"))
+            )
             addSuccess(
                 "Xcode Beta (22.2)",
                 "Location: /Applications/XcodeBeta.app",
             )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("22.2"))
+            )
             addSuccess(
                 "Current command line tools: /Applications/Xcode.app/Contents/Developer",
-            )
-            addEnvironment(
-                EnvironmentPiece.Xcode(Version("11.1"))
             )
             addInfo(
                 "Xcode JAVA_HOME: /Users/my/.sdkman/candidates/java/current",
@@ -208,6 +211,9 @@ class XcodeDiagnosticTest {
                 "Xcode (13.4.1)",
                 "Location: /Applications/Xcode.app",
             )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
+            )
             addFailure(
                 "Current command line tools: $cltPath",
                 "You have to select command line tools bundled to Xcode",
@@ -239,6 +245,9 @@ class XcodeDiagnosticTest {
             addSuccess(
                 "Xcode (13.4.1)",
                 "Location: /Applications/Xcode.app",
+            )
+            addEnvironment(
+                EnvironmentPiece.Xcode(Version("13.4.1"))
             )
             addFailure(
                 "Command line tools are not configured",
