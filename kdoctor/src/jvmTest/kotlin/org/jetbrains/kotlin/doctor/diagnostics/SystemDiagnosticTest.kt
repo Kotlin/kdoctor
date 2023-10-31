@@ -59,13 +59,13 @@ internal class SystemDiagnosticTest {
     @Test
     fun `check invalid OS`() {
         val system = object : BaseTestSystem() {
-            override val currentOS = OS.Linux
+            override val currentOS = OS.UNKNOWN
         }
         val diagnose = SystemDiagnostic(system).diagnose()
 
         val expected = Diagnosis.Builder("Operation System").apply {
             addFailure(
-                "OS: Linux 42.777"
+                "OS: Unknown 42.777"
             )
         }.build()
 

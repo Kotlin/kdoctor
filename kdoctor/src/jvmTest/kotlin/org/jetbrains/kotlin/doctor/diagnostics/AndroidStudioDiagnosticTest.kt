@@ -49,7 +49,7 @@ class AndroidStudioDiagnosticTest {
         val expected = Diagnosis.Builder("Android Studio").apply {
             addFailure(
                 "No Android Studio installation found",
-                "Get Android Studio from https://developer.android.com/studio"
+                "Get Android Studio from https://developer.android.com/studio or Jetbrains Toolbox."
             )
         }.build()
 

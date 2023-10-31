@@ -16,10 +16,12 @@ private class Main : CliktCommand(name = "kdoctor") {
         "--version",
         help = "Report a version of KDoctor"
     ).flag()
-    val isVerbose: Boolean by option(
-        "--verbose", "-v",
-        help = "Report an extended information"
-    ).flag()
+    // TODO: Change this
+//    val isVerbose: Boolean by option(
+//        "--verbose", "-v",
+//        help = "Report an extended information"
+//    ).flag()
+    val isVerbose = true
     val isExtraDiagnostics: Boolean by option(
         "--all", "-a",
         help = "Run extra diagnostics such as a build of a synthetic project and an analysis of a project in the current directory"

@@ -44,11 +44,12 @@ class Doctor(private val system: System) {
             add(SystemDiagnostic(system).run())
             add(JavaDiagnostic(system).run())
             add(AndroidStudioDiagnostic(system).run())
-            add(XcodeDiagnostic(system).run())
+            if (system.currentOS == OS.MacOS && system.hasXcodeSupport) {
+                add(XcodeDiagnostic(system).run())
+                add(CocoapodsDiagnostic(system).run())
+            }
 
             val mainEnvironmentIsNotReady = this.any { it.conclusion == DiagnosisResult.Failure }
-
-            add(CocoapodsDiagnostic(system).run())
 
             if (extraDiagnostics) {
                 if (mainEnvironmentIsNotReady) {

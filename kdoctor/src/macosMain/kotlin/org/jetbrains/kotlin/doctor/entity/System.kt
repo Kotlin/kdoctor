@@ -25,6 +25,8 @@ class MacosSystem : System {
             Shell.entries.firstOrNull { it.path == shellPath }
         }
     }
+    override val hasXcodeSupport: Boolean
+        get() = true
 
     override fun getEnvVar(name: String): String? = getenv(name)?.toKString()
 
