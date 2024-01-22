@@ -4,6 +4,10 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+    plugins {
+        kotlin("multiplatform") version "1.9.22"
+        kotlin("plugin.serialization") version "1.9.22"
+    }
 }
 
 dependencyResolutionManagement {
@@ -14,4 +18,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "kdoctor"
-include(":kdoctor")
+include(":kdoctor-checks")
+include(":kdoctor-cli")
