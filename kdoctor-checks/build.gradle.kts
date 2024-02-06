@@ -18,7 +18,7 @@ kotlin {
             dependencies {
                 api(project.dependencies.platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.0-RC"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
             }
         }
         val jvmAndMacosMain by creating {
@@ -30,7 +30,8 @@ kotlin {
         macosMain {
             dependsOn(jvmAndMacosMain)
             dependencies {
-                implementation("co.touchlab:kermit:2.0.1")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.23.2")
+                implementation("co.touchlab:kermit:2.0.3")
             }
         }
         commonTest {
@@ -42,7 +43,7 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation("co.touchlab:kermit:2.0.1")
+                implementation("co.touchlab:kermit:2.0.3")
             }
         }
     }
