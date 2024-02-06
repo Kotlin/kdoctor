@@ -1,15 +1,18 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import kotlinx.coroutines.*
+
+@OptIn(DelicateCoroutinesApi::class)
 abstract class MacosSystem : System {
     override val currentOS: OS = OS.MacOS
-    override val osVersion: Version? by lazy {
+    override val osVersion: Deferred<Version?> = GlobalScope.async(start = CoroutineStart.LAZY) {
         execute("sw_vers", "-productVersion").output
             ?.let { Version(it) }
     }
-    override val cpuInfo: String? by lazy {
+    override val cpuInfo: Deferred<String?> = GlobalScope.async(start = CoroutineStart.LAZY) {
         execute("sysctl", "-n", "machdep.cpu.brand_string").output
     }
-    override val shell: Shell? by lazy {
+    override val shell: Deferred<Shell?> = scope.async(start = CoroutineStart.LAZY) {
         getEnvVar("SHELL")?.let { shellPath ->
             Shell.entries.firstOrNull { it.path == shellPath }
         }

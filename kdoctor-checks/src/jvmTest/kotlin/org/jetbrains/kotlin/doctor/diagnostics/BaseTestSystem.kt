@@ -12,19 +12,19 @@ open class BaseTestSystem : NativeMacosSystemBase() {
     open val testTempFile: String get() = "$testProjectPath/temp.file"
     open val tempDir: String get() = "$homeDir/tmp/temp_dir"
 
-    override fun getEnvVar(name: String): String? = when (name) {
+    override suspend fun getEnvVar(name: String): String? = when (name) {
         "SHELL" -> "/bin/zsh"
         "JAVA_HOME" -> "$homeDir/.sdkman/candidates/java/current"
         else -> null
     }
 
-    override fun execute(command: String, vararg args: String): ProcessResult {
+    override suspend fun execute(command: String, vararg args: String): ProcessResult {
         val cmd = (command + " " + args.joinToString(" ")).trim()
         logger.d("exec '$cmd'")
         return executeCmd(cmd)
     }
 
-    open fun executeCmd(cmd: String): ProcessResult {
+    open suspend fun executeCmd(cmd: String): ProcessResult {
         val output = when (cmd) {
             "sw_vers -productVersion" -> "42.777"
             "sysctl -n machdep.cpu.brand_string" -> "test_cpu"
@@ -154,16 +154,16 @@ open class BaseTestSystem : NativeMacosSystemBase() {
         return output?.let { ProcessResult(0, output) } ?: ProcessResult(-1, null)
     }
 
-    override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> =
+    override suspend fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> =
         emptyList()
 
-    override fun fileExists(path: String): Boolean = true
+    override suspend fun fileExists(path: String): Boolean = true
 
-    override fun readFile(path: String): String? = null
+    override suspend fun readFile(path: String): String? = null
 
-    override fun writeTempFile(content: String): String = testTempFile
+    override suspend fun writeTempFile(content: String): String = testTempFile
 
-    override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
+    override suspend fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
         if (pathToArchive == "/Users/my/Library/Application Support/Google/data/Directory/Name/plugins/Kotlin/lib/kotlin.jar" && pathToFile == "META-INF/plugin.xml") {
             return """
                 <version>1.7.20</version>

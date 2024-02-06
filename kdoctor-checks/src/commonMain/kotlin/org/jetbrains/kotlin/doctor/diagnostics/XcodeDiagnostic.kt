@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.doctor.entity.*
 class XcodeDiagnostic(private val system: System, private val checkCliTools: Boolean) : Diagnostic() {
     override val title = "Xcode"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         val paths = mutableSetOf<String>()
@@ -90,7 +90,7 @@ class XcodeDiagnostic(private val system: System, private val checkCliTools: Boo
         return result.build()
     }
 
-    private fun findXcode(path: String): Application? {
+    private suspend fun findXcode(path: String): Application? {
         system.logger.d("findXcode($path)")
         val plist = system.parsePlist("$path/Contents/Info.plist") ?: return null
         val version = plist["CFBundleShortVersionString"]?.toString()?.trim('"') ?: return null

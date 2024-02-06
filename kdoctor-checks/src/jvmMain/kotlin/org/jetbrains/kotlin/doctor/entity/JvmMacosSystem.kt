@@ -1,5 +1,7 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.kotlin.doctor.logging.KdoctorLogger
 import java.io.IOException
 import java.lang.System
@@ -19,18 +21,21 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.streams.asSequence
 
-class JvmMacosSystem(override val logger: KdoctorLogger, private val envOverride: Map<String, String> = emptyMap()) : MacosSystem() {
+class JvmMacosSystem(
+    override val logger: KdoctorLogger,
+    private val envOverride: Map<String, String> = emptyMap(),
+) : MacosSystem() {
     override val homeDir: String by lazy { System.getProperty("user.home") }
 
-    override fun getEnvVar(name: String): String? = envOverride[name] ?: System.getenv(name)
+    override suspend fun getEnvVar(name: String): String? = envOverride[name] ?: System.getenv(name)
 
-    override fun execute(command: String, vararg args: String): ProcessResult {
+    override suspend fun execute(command: String, vararg args: String): ProcessResult = withContext(Dispatchers.IO) {
         val cmdArgs = listOf(command, *args)
         val cmd by lazy(LazyThreadSafetyMode.NONE) {
             cmdArgs.joinToString(separator = " ") { it.replace(" ", "\\ ") }
         }
 
-        return try {
+        try {
             logger.i { "Execute '$cmd'" }
             val process = ProcessBuilder(cmdArgs).apply {
                 if (envOverride.isNotEmpty()) environment().putAll(envOverride)
@@ -58,19 +63,20 @@ class JvmMacosSystem(override val logger: KdoctorLogger, private val envOverride
         }
     }
 
-    override fun retrieveUrl(url: String): String {
+    override suspend fun retrieveUrl(url: String): String = withContext(Dispatchers.IO) {
         val connection = URL(url).openConnection() as HttpURLConnection
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 error("HTTP error code = ${connection.responseCode}")
             }
 
-            return runCatching { connection.inputStream.bufferedReader().use { it.readText() } }.getOrNull().orEmpty()
+            runCatching { connection.inputStream.bufferedReader().use { it.readText() } }.getOrNull().orEmpty()
         } finally {
             connection.disconnect()
         }
     }
-    override fun downloadUrl(url: String, targetPath: String) {
+
+    override suspend fun downloadUrl(url: String, targetPath: String): Unit = withContext(Dispatchers.IO) {
         val connection = URL(url).openConnection() as HttpURLConnection
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
@@ -85,9 +91,9 @@ class JvmMacosSystem(override val logger: KdoctorLogger, private val envOverride
         }
     }
 
-    override fun pwd(): String = Paths.get("").toAbsolutePath().toString()
+    override suspend fun pwd(): String = withContext(Dispatchers.IO) { Paths.get("").toAbsolutePath().toString() }
     @OptIn(ExperimentalEncodingApi::class)
-    override fun parseCert(certString: String): Map<String, String> {
+    override suspend fun parseCert(certString: String): Map<String, String> {
         val factory = CertificateFactory.getInstance("X.509")
 
         val cleanCert = certString
@@ -104,10 +110,15 @@ class JvmMacosSystem(override val logger: KdoctorLogger, private val envOverride
         return info
     }
 
-    override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> =
+    override suspend fun findAppsPathsInDirectory(
+        prefix: String,
+        directory: String,
+        recursively: Boolean
+    ): List<String> = withContext(Dispatchers.IO) {
         buildList {
             findAppsPathsInDirectoryImpl(directory, prefix, recursively)
         }
+    }
 
     private fun MutableList<String>.findAppsPathsInDirectoryImpl(
         directory: String, prefix: String, recursively: Boolean
@@ -123,52 +134,66 @@ class JvmMacosSystem(override val logger: KdoctorLogger, private val envOverride
         }
     }
 
-    override fun fileExists(path: String): Boolean = Files.exists(Paths.get(path))
+    override suspend fun fileExists(path: String): Boolean = withContext(Dispatchers.IO) {
+        Files.exists(Paths.get(path))
+    }
 
-    override fun readFile(path: String): String? = Paths.get(path).takeIf { Files.isReadable(it) }?.readText()
+    override suspend fun readFile(path: String): String? = withContext(Dispatchers.IO) {
+        Paths.get(path).takeIf { Files.isReadable(it) }?.readText()
+    }
 
-    override fun writeTempFile(content: String): String {
+    override suspend fun writeTempFile(content: String): String = withContext(Dispatchers.IO) {
         logger.d("writeTempFile")
 
         val tempFile = Files.createTempFile(null, null)
         logger.d { "tempFile = $tempFile" }
 
         tempFile.writeText(content)
-        return tempFile.toString()
+        tempFile.toString()
     }
 
-    override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? {
+    override suspend fun readArchivedFile(pathToArchive: String, pathToFile: String): String? = withContext(Dispatchers.IO) {
         ZipInputStream(Paths.get(pathToArchive).inputStream()).use { zis ->
             var zipEntry = zis.nextEntry
             while (zipEntry != null) {
                 if (zipEntry.name == pathToFile) {
-                    return zis.reader().readText()
+                    return@withContext zis.reader().readText()
                 }
                 zipEntry = zis.nextEntry
             }
         }
-        return null
+        null
     }
 
-    override fun createTempDir(): String = Files.createTempDirectory(null).toString()
+    override suspend fun createTempDir(): String = withContext(Dispatchers.IO) {
+        Files.createTempDirectory(null)
+    }.toString()
 
-    override fun find(path: String, nameFilter: String): List<String>? = runCatching {
-        val start = Paths.get(path)
-        val globMatcher = start.fileSystem.getPathMatcher("glob:$nameFilter")
-        Files.find(start, 10, { p, attr -> attr.isRegularFile && globMatcher.matches(p.fileName) }).use { files ->
-            files.map(Path::toString).toList()
-        }
-    }.getOrNull()
+    override suspend fun find(path: String, nameFilter: String): List<String>? = withContext(Dispatchers.IO) {
+        runCatching {
+            val start = Paths.get(path)
+            val globMatcher = start.fileSystem.getPathMatcher("glob:$nameFilter")
+            Files.find(start, 10, { p, attr -> attr.isRegularFile && globMatcher.matches(p.fileName) }).use { files ->
+                files.map(Path::toString).toList()
+            }
+        }.getOrNull()
+    }
 
-    override fun list(path: String): String? = runCatching {
-        Files.list(Paths.get(path)).asSequence().joinToString("\n")
-    }.getOrNull()
+    override suspend fun list(path: String): String? = withContext(Dispatchers.IO) {
+        runCatching {
+            Files.list(Paths.get(path)).asSequence().joinToString("\n")
+        }.getOrNull()
+    }
 
-    override fun rm(path: String): Boolean = runCatching {
-        Files.deleteIfExists(Paths.get(path))
-    }.getOrElse { false }
+    override suspend fun rm(path: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            Files.deleteIfExists(Paths.get(path))
+        }.getOrElse { false }
+    }
 
-    override fun mv(from: String, to: String): Boolean = runCatching {
-        Files.move(Paths.get(from), Paths.get(to)); true
-    }.getOrElse { false }
+    override suspend fun mv(from: String, to: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            Files.move(Paths.get(from), Paths.get(to)); true
+        }.getOrElse { false }
+    }
 }

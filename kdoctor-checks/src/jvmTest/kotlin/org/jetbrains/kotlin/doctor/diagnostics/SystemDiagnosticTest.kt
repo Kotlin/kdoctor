@@ -1,14 +1,17 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.*
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
 internal class SystemDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = SystemDiagnostic(system).diagnose()
 
@@ -26,9 +29,9 @@ internal class SystemDiagnosticTest {
     }
 
     @Test
-    fun `check success info with Rosetta`() {
+    fun `check success info with Rosetta`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "sysctl sysctl.proc_translated" -> {
                     ProcessResult(0, "sysctl.proc_translated: 1")
                 }
@@ -57,7 +60,7 @@ internal class SystemDiagnosticTest {
     }
 
     @Test
-    fun `check invalid OS`() {
+    fun `check invalid OS`() = runTest {
         val system = object : BaseTestSystem() {
             override val currentOS = OS.Linux
         }
@@ -73,9 +76,9 @@ internal class SystemDiagnosticTest {
     }
 
     @Test
-    fun `check invalid OS version`() {
+    fun `check invalid OS version`() = runTest {
         val system = object : BaseTestSystem() {
-            override val osVersion = null
+            override val osVersion: Deferred<Version?> = CompletableDeferred(null as Version?)
         }
         val diagnose = SystemDiagnostic(system).diagnose()
 

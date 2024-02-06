@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.doctor.entity.*
 class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
     override val title = "CocoaPods"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         fun Diagnosis.Builder.buildWithRecommendation(): Diagnosis {
@@ -102,7 +102,7 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             }
         }.trim()
         if (exportHint.isNotEmpty()) {
-            val hint = "Consider adding the following to ${system.shell?.profile ?: "shell profile"}"
+            val hint = "Consider adding the following to ${system.shell.await()?.profile ?: "shell profile"}"
             if (cocoapods.version > Version(1, 10, 2)) {
                 result.addFailure("CocoaPods requires your terminal to be using UTF-8 encoding.", hint, exportHint)
             } else {

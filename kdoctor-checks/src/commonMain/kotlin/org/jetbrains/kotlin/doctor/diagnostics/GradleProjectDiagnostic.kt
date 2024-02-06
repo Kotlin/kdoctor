@@ -11,7 +11,7 @@ class GradleProjectDiagnostic(
     private val projectPath: String = path.removeSuffix("/")
     override val title = "Project: $projectPath"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         val projectPathFiles = system.list(projectPath)

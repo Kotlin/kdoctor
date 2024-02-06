@@ -16,7 +16,8 @@ kotlin {
         }
         commonMain {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                api(project.dependencies.platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.8.0-RC"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
             }
         }
@@ -35,6 +36,8 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug")
             }
         }
         jvmTest {
@@ -45,4 +48,10 @@ kotlin {
     }
 
     applyDefaultHierarchyTemplate()
+}
+
+tasks {
+    val jvmTest by getting(Test::class) {
+        systemProperties["kotlinx.coroutines.test.default_timeout"] = "1s"
+    }
 }

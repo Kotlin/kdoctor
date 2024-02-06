@@ -1,14 +1,15 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.ProcessResult
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class TemplateProjectDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = TemplateProjectDiagnostic(system).diagnose()
 
@@ -22,9 +23,9 @@ internal class TemplateProjectDiagnosticTest {
     }
 
     @Test
-    fun `temp dir error`() {
+    fun `temp dir error`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "mktemp -d" -> {
                     ProcessResult(-1, null)
                 }
@@ -45,9 +46,9 @@ internal class TemplateProjectDiagnosticTest {
     }
 
     @Test
-    fun `download template error`() {
+    fun `download template error`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/template.zip" -> {
                     ProcessResult(-1, "500: Server error")
                 }
@@ -69,9 +70,9 @@ internal class TemplateProjectDiagnosticTest {
     }
 
     @Test
-    fun `unzip template error`() {
+    fun `unzip template error`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "unzip $tempDir/archive.zip -d $tempDir" -> {
                     ProcessResult(-1, null)
                 }
@@ -91,9 +92,9 @@ internal class TemplateProjectDiagnosticTest {
     }
 
     @Test
-    fun `template project build error`() {
+    fun `template project build error`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$tempDir/kdoctor-template/template/gradlew -p $tempDir/kdoctor-template/template clean linkReleaseFrameworkIosArm64 jvmJar --info" -> {
                     ProcessResult(-1, "BUILD FAIL")
                 }
@@ -114,10 +115,10 @@ internal class TemplateProjectDiagnosticTest {
     }
 
     @Test
-    fun `custom template project success`() {
+    fun `custom template project success`() = runTest {
         val customTag = "test-tag"
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "curl --location --silent --show-error --fail --output $tempDir/archive.zip https://github.com/Kotlin/kdoctor/archive/refs/tags/$customTag.zip" -> {
                     ProcessResult(0, "")
                 }

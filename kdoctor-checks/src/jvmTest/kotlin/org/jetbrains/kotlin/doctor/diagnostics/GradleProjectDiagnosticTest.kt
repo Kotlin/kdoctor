@@ -1,16 +1,17 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.ProcessResult
 import org.jetbrains.kotlin.doctor.entity.Version
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GradleProjectDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
@@ -37,11 +38,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `invalid project path`() {
+    fun `invalid project path`() = runTest {
         val projectPath = "./broken"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "ls $projectPath" -> {
                     ProcessResult(-1, "ls: $projectPath: No such file or directory")
                 }
@@ -59,11 +60,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `invalid gradle project`() {
+    fun `invalid gradle project`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "ls $projectPath" -> {
                     ProcessResult(0, "some.txt")
                 }
@@ -84,11 +85,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `system gradle info`() {
+    fun `system gradle info`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -v" -> {
                     ProcessResult(-1, null)
                 }
@@ -137,11 +138,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `no gradle error`() {
+    fun `no gradle error`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -v" -> {
                     ProcessResult(-1, null)
                 }
@@ -162,12 +163,12 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `temp file error`() {
+    fun `temp file error`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
 
-            override fun writeTempFile(content: String): String {
+            override suspend fun writeTempFile(content: String): String {
                 error("Temp file error")
             }
         }
@@ -188,11 +189,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `rename init script error`() {
+    fun `rename init script error`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "mv $projectPath/temp.file $projectPath/init.gradle.kts" -> {
                     ProcessResult(-77, null)
                 }
@@ -216,11 +217,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `gradle error`() {
+    fun `gradle error`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(-1, null)
                 }
@@ -244,11 +245,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `gradle unknown output`() {
+    fun `gradle unknown output`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(0, "some unknown text")
                 }
@@ -274,11 +275,11 @@ class GradleProjectDiagnosticTest {
     }
 
     @Test
-    fun `get right gradle plugin versions`() {
+    fun `get right gradle plugin versions`() = runTest {
         val projectPath = "./test/my_test_project"
         val system = object : BaseTestSystem() {
             override val testProjectPath = projectPath
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "$projectPath/gradlew -p $projectPath -I $projectPath/init.gradle.kts" -> {
                     ProcessResult(
                         0,

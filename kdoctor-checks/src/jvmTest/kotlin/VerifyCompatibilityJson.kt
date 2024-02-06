@@ -3,7 +3,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.Version
-import org.junit.Test
+import kotlin.test.Test
 
 class VerifyCompatibilityJson {
 

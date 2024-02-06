@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.doctor.entity
 
 import kotlinx.cinterop.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import org.jetbrains.kotlin.doctor.logging.KdoctorLogger
 import org.jetbrains.kotlin.doctor.logging.KermitKdoctorLogger
 import platform.Foundation.NSHomeDirectory
@@ -13,9 +14,9 @@ class NativeMacosSystem : NativeMacosSystemBase() {
     override val logger: KdoctorLogger = KermitKdoctorLogger()
     override val homeDir: String by lazy { NSHomeDirectory() }
 
-    override fun getEnvVar(name: String): String? = getenv(name)?.toKString()
+    override suspend fun getEnvVar(name: String): String? = getenv(name)?.toKString()
 
-    override fun execute(command: String, vararg args: String): ProcessResult = memScoped {
+    override suspend fun execute(command: String, vararg args: String): ProcessResult = memScoped {
         val cmd = mutableListOf<String>().apply {
             add(command)
             addAll(args)
@@ -44,7 +45,7 @@ class NativeMacosSystem : NativeMacosSystemBase() {
         ProcessResult(exitCode, rawOutput)
     }
 
-    override fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> {
+    override suspend fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean): List<String> {
         val paths = mutableListOf<String>()
         val dp = opendir(directory) ?: return paths
         do {
@@ -63,13 +64,13 @@ class NativeMacosSystem : NativeMacosSystemBase() {
         return paths
     }
 
-    override fun fileExists(path: String): Boolean = access(path, F_OK) == 0
+    override suspend fun fileExists(path: String): Boolean = access(path, F_OK) == 0
 
-    override fun readFile(path: String): String? =
+    override suspend fun readFile(path: String): String? =
         NSString.stringWithContentsOfFile(path)?.toString()
 
     @Suppress("CAST_NEVER_SUCCEEDS")
-    override fun writeTempFile(content: String): String {
+    override suspend fun writeTempFile(content: String): String {
         logger.d("writeTempFile")
 
         val tempFile = execute("mktemp").output?.trim().orEmpty()
@@ -81,7 +82,7 @@ class NativeMacosSystem : NativeMacosSystemBase() {
         return tempFile
     }
 
-    override fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
+    override suspend fun readArchivedFile(pathToArchive: String, pathToFile: String): String? =
         execute("/usr/bin/unzip", "-p", pathToArchive, pathToFile).output
 
     //checks if file descriptor is ready

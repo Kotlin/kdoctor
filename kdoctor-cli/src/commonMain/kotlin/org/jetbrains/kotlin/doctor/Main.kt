@@ -33,7 +33,7 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
     val localCompatibilityJson: String? by option("--compatibilityJson", hidden = true)
     val templateProjectTag: String? by option("--templateProject", hidden = true)
 
-    override fun run() {
+    override fun run(): Unit = runBlocking {
         val logFormatter = object : MessageStringFormatter {
             override fun formatSeverity(severity: Severity) = severity.name.first() + ":"
             override fun formatTag(tag: Tag) = ""
@@ -58,7 +58,7 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
                 }
             }
 
-            else -> runBlocking {
+            else -> {
                 Doctor(system)
                     .diagnoseKmmEnvironment(
                         isVerbose,

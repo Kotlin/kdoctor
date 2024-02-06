@@ -1,17 +1,18 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.ProcessResult
 import org.jetbrains.kotlin.doctor.entity.Version
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
 internal class JavaDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = JavaDiagnostic(system).diagnose()
 
@@ -32,9 +33,9 @@ internal class JavaDiagnosticTest {
     }
 
     @Test
-    fun `check no java`() {
+    fun `check no java`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "which java" -> {
                     ProcessResult(0, null)
                 }
@@ -55,9 +56,9 @@ internal class JavaDiagnosticTest {
     }
 
     @Test
-    fun `check no JAVA_HOME`() {
+    fun `check no JAVA_HOME`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun getEnvVar(name: String): String? = when (name) {
+            override suspend fun getEnvVar(name: String): String? = when (name) {
                 "JAVA_HOME" -> null
                 else -> super.getEnvVar(name)
             }
@@ -83,14 +84,14 @@ internal class JavaDiagnosticTest {
     }
 
     @Test
-    fun `check invalid JAVA_HOME`() {
+    fun `check invalid JAVA_HOME`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun getEnvVar(name: String): String? = when (name) {
+            override suspend fun getEnvVar(name: String): String? = when (name) {
                 "JAVA_HOME" -> "/wrong/path"
                 else -> super.getEnvVar(name)
             }
 
-            override fun fileExists(path: String): Boolean = when (path) {
+            override suspend fun fileExists(path: String): Boolean = when (path) {
                 "/wrong/path",
                 "/wrong/path/bin/java",
                 "/wrong/path/bin/jre/sh/java" -> false
@@ -119,9 +120,9 @@ internal class JavaDiagnosticTest {
     }
 
     @Test
-    fun `check JAVA_HOME != java location`() {
+    fun `check JAVA_HOME != java location`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun getEnvVar(name: String): String? = when (name) {
+            override suspend fun getEnvVar(name: String): String? = when (name) {
                 "JAVA_HOME" -> "/some/path"
                 else -> super.getEnvVar(name)
             }
