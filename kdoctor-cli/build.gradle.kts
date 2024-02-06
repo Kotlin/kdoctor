@@ -26,8 +26,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":kdoctor-checks"))
-                implementation("com.github.ajalt.clikt:clikt:4.2.1")
-                implementation("co.touchlab:kermit:2.0.1")
+                implementation("com.github.ajalt.clikt:clikt:4.2.2")
+                implementation("co.touchlab:kermit:2.0.3")
             }
         }
     }
