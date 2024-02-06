@@ -5,13 +5,13 @@ import org.jetbrains.kotlin.doctor.entity.*
 class SystemDiagnostic(private val system: System) : Diagnostic() {
     override val title = "Operation System"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
         val os = system.currentOS
-        val version = system.osVersion
+        val version = system.osVersion.await()
 
         if (os == OS.MacOS && version != null) {
-            result.addSuccess("Version OS: $os $version", system.cpuInfo?.let { "CPU: $it" }.orEmpty())
+            result.addSuccess("Version OS: $os $version", system.cpuInfo.await()?.let { "CPU: $it" }.orEmpty())
             result.addEnvironment(EnvironmentPiece.Macos(version))
 
             if (system.isUsingRosetta()) {

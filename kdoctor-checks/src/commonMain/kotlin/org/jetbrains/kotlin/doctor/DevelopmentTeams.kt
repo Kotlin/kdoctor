@@ -7,7 +7,7 @@ data class DevelopmentTeam(val id: String, val name: String) {
 }
 
 class DevelopmentTeams(private val system: System) {
-    fun getTeams(): Collection<DevelopmentTeam> {
+    suspend fun getTeams(): Collection<DevelopmentTeam> {
         val allCertsResult = system.execute(
             "security",
             "find-certificate",
@@ -26,7 +26,7 @@ class DevelopmentTeams(private val system: System) {
         }.toSet()
     }
 
-    private fun getDevelopmentTeamForCert(s: String): DevelopmentTeam {
+    private suspend fun getDevelopmentTeamForCert(s: String): DevelopmentTeam {
         val info = system.parseCert(s)
         return DevelopmentTeam(info["OU"]!!, info["O"]!!)
     }

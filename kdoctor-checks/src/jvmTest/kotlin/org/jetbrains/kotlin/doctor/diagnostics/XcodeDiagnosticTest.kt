@@ -1,16 +1,17 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
 import org.jetbrains.kotlin.doctor.entity.ProcessResult
 import org.jetbrains.kotlin.doctor.entity.Version
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class XcodeDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = XcodeDiagnostic(system, true).diagnose()
 
@@ -32,9 +33,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check no Xcode`() {
+    fun `check no Xcode`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.apple.dt.Xcode\"" -> {
                     ProcessResult(0, "")
                 }
@@ -55,9 +56,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check Xcode custom installation`() {
+    fun `check Xcode custom installation`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.apple.dt.Xcode\"" -> {
                     ProcessResult(0, "")
                 }
@@ -73,7 +74,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
 
-            override fun findAppsPathsInDirectory(
+            override suspend fun findAppsPathsInDirectory(
                 prefix: String,
                 directory: String,
                 recursively: Boolean
@@ -104,9 +105,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check multiple Xcode installations`() {
+    fun `check multiple Xcode installations`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.apple.dt.Xcode\"" -> {
                     ProcessResult(0, "/Applications/Xcode.app\n/Applications/XcodeBeta.app")
                 }
@@ -159,9 +160,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check Xcode requires the license`() {
+    fun `check Xcode requires the license`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "xcrun cc" -> {
                     ProcessResult(0, "Xcode requires the license")
                 }
@@ -193,10 +194,10 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check external Command line tools`() {
+    fun `check external Command line tools`() = runTest {
         val cltPath = "/Library/Developer/CommandLineTools"
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "xcode-select -p" -> {
                     ProcessResult(0, cltPath)
                 }
@@ -229,9 +230,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check misconfigured Command line tools`() {
+    fun `check misconfigured Command line tools`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "xcode-select -p" -> {
                     ProcessResult(-1, null)
                 }
@@ -263,9 +264,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check Xcode requires first launch`() {
+    fun `check Xcode requires first launch`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "xcodebuild -checkFirstLaunchStatus" -> {
                     ProcessResult(-1, null)
                 }
@@ -297,9 +298,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check Xcode custom JAVA_HOME`() {
+    fun `check Xcode custom JAVA_HOME`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> {
                     ProcessResult(0, "\"JAVA_HOME\"=/custom/path;")
                 }
@@ -327,9 +328,9 @@ class XcodeDiagnosticTest {
     }
 
     @Test
-    fun `check Xcode system JAVA_HOME info`() {
+    fun `check Xcode system JAVA_HOME info`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "defaults read com.apple.dt.Xcode IDEApplicationwideBuildSettings" -> {
                     ProcessResult(-1, null)
                 }

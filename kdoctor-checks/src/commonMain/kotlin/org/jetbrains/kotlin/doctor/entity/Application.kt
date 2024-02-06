@@ -18,7 +18,7 @@ class AppManager(
     private val app: Application
 ) {
 
-    fun getPlugin(name: String): Plugin? {
+    suspend fun getPlugin(name: String): Plugin? {
         system.logger.d("getPlugin($name)")
         val plistPath = "${app.location}/Contents/Info.plist"
         if (!system.fileExists(plistPath)) return null
@@ -43,7 +43,7 @@ class AppManager(
         return plugin
     }
 
-    private fun findPlugin(pluginsDir: String, pluginName: String, disabledPlugins: String): Plugin? {
+    private suspend fun findPlugin(pluginsDir: String, pluginName: String, disabledPlugins: String): Plugin? {
         system.logger.d("findPlugin($pluginName)")
         val jars = system.find("$pluginsDir/$pluginName/lib", "*.jar") ?: return null
         val pluginXml = jars.firstNotNullOfOrNull { system.readArchivedFile(it, "META-INF/plugin.xml") } ?: return null
@@ -68,7 +68,7 @@ class AppManager(
         return Plugin(pluginName, id, Version(version), isEnabled)
     }
 
-    fun getEmbeddedJavaVersion(): Version? =
+    suspend fun getEmbeddedJavaVersion(): Version? =
         listOf(
             "jre/Contents/Home",
             "jbr/Contents/Home",

@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.doctor.entity.*
 class JavaDiagnostic(private val system: System) : Diagnostic() {
     override val title = "Java"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         var javaLocation = system.execute("which", "java").output
@@ -32,7 +32,7 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
         result.addEnvironment(EnvironmentPiece.Jdk(java.version))
 
         val javaHomeHint = """
-            Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME
+            Consider adding the following to ${system.shell.await()?.profile ?: "your shell profile"} for setting JAVA_HOME
             export JAVA_HOME=${javaLocation.removeSuffix("/bin/java")}
         """.trimIndent()
 

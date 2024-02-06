@@ -1,7 +1,7 @@
 package org.jetbrains.kotlin.doctor.entity
 
 abstract class NativeMacosSystemBase : MacosSystem() {
-    override fun retrieveUrl(url: String): String {
+    override suspend fun retrieveUrl(url: String): String {
         val curlResult = execute("curl", "--location", "--silent", "--fail", url)
         if (curlResult.code != 0) {
             error("curl error code = ${curlResult.code}")
@@ -9,7 +9,7 @@ abstract class NativeMacosSystemBase : MacosSystem() {
         return curlResult.output.orEmpty()
     }
 
-    override fun downloadUrl(url: String, targetPath: String) {
+    override suspend fun downloadUrl(url: String, targetPath: String) {
         val curlResult = execute(
             "curl",
             "--location", //for redirects
@@ -24,12 +24,12 @@ abstract class NativeMacosSystemBase : MacosSystem() {
         }
     }
 
-    override fun find(path: String, nameFilter: String): List<String>? =
+    override suspend fun find(path: String, nameFilter: String): List<String>? =
         execute("find", path, "-name", "\"$nameFilter\"").output?.split("\n")
 
-    override fun list(path: String) = execute("ls", path).output?.trim()
-    override fun pwd() = execute("pwd").output?.trim().orEmpty()
-    override fun parseCert(certString: String): Map<String, String> {
+    override suspend fun list(path: String) = execute("ls", path).output?.trim()
+    override suspend fun pwd() = execute("pwd").output?.trim().orEmpty()
+    override suspend fun parseCert(certString: String): Map<String, String> {
         val file = writeTempFile(certString)
         val subject = execute(
             "openssl",
@@ -46,7 +46,7 @@ abstract class NativeMacosSystemBase : MacosSystem() {
         return info
     }
 
-    override fun createTempDir(): String = execute("mktemp", "-d").output?.trim().orEmpty()
-    override fun rm(path: String): Boolean = execute("rm", path).code == 0
-    override fun mv(from: String, to: String): Boolean = execute("mv", from, to).code == 0
+    override suspend fun createTempDir(): String = execute("mktemp", "-d").output?.trim().orEmpty()
+    override suspend fun rm(path: String): Boolean = execute("rm", path).code == 0
+    override suspend fun mv(from: String, to: String): Boolean = execute("mv", from, to).code == 0
 }

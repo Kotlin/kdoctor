@@ -1,13 +1,14 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.*
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AndroidStudioDiagnosticTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = AndroidStudioDiagnostic(system, true).diagnose()
 
@@ -34,9 +35,9 @@ class AndroidStudioDiagnosticTest {
     }
 
     @Test
-    fun `check no Android Studio`() {
+    fun `check no Android Studio`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.google.android.studio*\"" -> {
                     ProcessResult(0, "")
                 }
@@ -57,9 +58,9 @@ class AndroidStudioDiagnosticTest {
     }
 
     @Test
-    fun `check disabled Kotlin plugin`() {
+    fun `check disabled Kotlin plugin`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun readFile(path: String): String? = when (path) {
+            override suspend fun readFile(path: String): String? = when (path) {
                 "/Users/my/Library/Application Support/Google/data/Directory/Name/disabled_plugins.txt" -> "org.jetbrains.kotlin"
                 else -> super.readFile(path)
             }
@@ -90,9 +91,9 @@ class AndroidStudioDiagnosticTest {
     }
 
     @Test
-    fun `check no KMM plugin`() {
+    fun `check no KMM plugin`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "find $homeDir/Library/Application Support/Google/data/Directory/Name/plugins/kmm/lib -name \"*.jar\"" -> {
                     ProcessResult(0, "")
                 }
@@ -125,9 +126,9 @@ class AndroidStudioDiagnosticTest {
     }
 
     @Test
-    fun `check multiple Android Studio installations`() {
+    fun `check multiple Android Studio installations`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/mdfind kMDItemCFBundleIdentifier=\"com.google.android.studio*\"" -> {
                     val origin = super.executeCmd(cmd).output
                     ProcessResult(

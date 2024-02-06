@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.doctor.entity.*
 class AndroidStudioDiagnostic(private val system: System, private val checkForPlugins: Boolean) : Diagnostic() {
     override val title = "Android Studio"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         val paths = mutableSetOf<String>()
@@ -121,7 +121,7 @@ class AndroidStudioDiagnostic(private val system: System, private val checkForPl
         return result.build()
     }
 
-    private fun findAndroidStudio(path: String): Application? {
+    private suspend fun findAndroidStudio(path: String): Application? {
         system.logger.d("findAndroidStudio($path)")
         val plist = system.parsePlist("$path/Contents/Info.plist") ?: return null
         val version = plist["CFBundleVersion"]?.toString()?.trim('"') ?: return null

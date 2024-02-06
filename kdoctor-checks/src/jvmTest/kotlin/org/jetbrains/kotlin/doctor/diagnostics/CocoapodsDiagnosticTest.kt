@@ -1,14 +1,16 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.entity.*
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CocoapodsDiagnosticTest {
     private val recommendation = "CocoaPods configuration is not required, but highly recommended for full-fledged development"
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
         val diagnose = CocoapodsDiagnostic(system).diagnose()
 
@@ -33,9 +35,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check no Ruby`() {
+    fun `check no Ruby`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "ruby -v" -> {
                     ProcessResult(-1, null)
                 }
@@ -58,9 +60,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check system Ruby info`() {
+    fun `check system Ruby info`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "which ruby" -> {
                     ProcessResult(0, "/usr/bin/ruby")
                 }
@@ -95,10 +97,10 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check system Ruby on M1`() {
+    fun `check system Ruby on M1`() = runTest {
         val system = object : BaseTestSystem() {
-            override val cpuInfo: String? = "Apple M1_test"
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override val cpuInfo = CompletableDeferred("Apple M1_test")
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "which ruby" -> {
                     ProcessResult(0, "/usr/bin/ruby")
                 }
@@ -137,10 +139,10 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check custom Ruby on M1`() {
+    fun `check custom Ruby on M1`() = runTest {
         val system = object : BaseTestSystem() {
-            override val cpuInfo: String? = "Apple M1_test"
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override val cpuInfo = CompletableDeferred("Apple M1_test")
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "which ruby" -> {
                     ProcessResult(0, "/custom/ruby")
                 }
@@ -171,9 +173,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check no Ruby Gems`() {
+    fun `check no Ruby Gems`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "gem -v" -> {
                     ProcessResult(-1, null)
                 }
@@ -199,9 +201,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check no Cocoapods`() {
+    fun `check no Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "pod --version" -> {
                     ProcessResult(-1, null)
                 }
@@ -230,9 +232,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check not linked Cocoapods`() {
+    fun `check not linked Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "pod --version" -> {
                     ProcessResult(-1, null)
                 }
@@ -265,9 +267,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check wrong Locale with old Cocoapods`() {
+    fun `check wrong Locale with old Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "pod --version" -> {
                     ProcessResult(0, "1.10.2")
                 }
@@ -293,7 +295,7 @@ class CocoapodsDiagnosticTest {
             )
             addWarning(
                 "CocoaPods requires your terminal to be using UTF-8 encoding.",
-                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "Consider adding the following to ${system.shell.await()?.profile ?: "shell profile"}",
                 "export LANG=en_US.UTF-8",
                 "export LC_ALL=en_US.UTF-8"
             )
@@ -308,9 +310,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check wrong Locale with new Cocoapods`() {
+    fun `check wrong Locale with new Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/locale" -> {
                     ProcessResult(0, "LC_ALL=\"WTF\"")
                 }
@@ -333,7 +335,7 @@ class CocoapodsDiagnosticTest {
             )
             addFailure(
                 "CocoaPods requires your terminal to be using UTF-8 encoding.",
-                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "Consider adding the following to ${system.shell.await()?.profile ?: "shell profile"}",
                 "export LANG=en_US.UTF-8",
                 "export LC_ALL=en_US.UTF-8"
             )
@@ -349,9 +351,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check wrong LANG environment with new Cocoapods`() {
+    fun `check wrong LANG environment with new Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/locale" -> {
                     ProcessResult(0, "LC_ALL=\"en_US.UTF-8\"")
                 }
@@ -374,7 +376,7 @@ class CocoapodsDiagnosticTest {
             )
             addFailure(
                 "CocoaPods requires your terminal to be using UTF-8 encoding.",
-                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "Consider adding the following to ${system.shell.await()?.profile ?: "shell profile"}",
                 "export LANG=en_US.UTF-8"
             )
             addEnvironment(
@@ -389,9 +391,9 @@ class CocoapodsDiagnosticTest {
     }
 
     @Test
-    fun `check wrong LC_ALL environment with new Cocoapods`() {
+    fun `check wrong LC_ALL environment with new Cocoapods`() = runTest {
         val system = object : BaseTestSystem() {
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "/usr/bin/locale" -> {
                     ProcessResult(0, "LANG=\"en_US.UTF-8\"\nLC_ALL=\"WAT\"")
                 }
@@ -414,7 +416,7 @@ class CocoapodsDiagnosticTest {
             )
             addFailure(
                 "CocoaPods requires your terminal to be using UTF-8 encoding.",
-                "Consider adding the following to ${system.shell?.profile ?: "shell profile"}",
+                "Consider adding the following to ${system.shell.await()?.profile ?: "shell profile"}",
                 "export LC_ALL=en_US.UTF-8"
             )
             addEnvironment(

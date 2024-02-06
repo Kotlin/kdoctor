@@ -9,7 +9,7 @@ class TemplateProjectDiagnostic(
 ) : Diagnostic() {
     override val title = "Synthetic generated project"
 
-    override fun diagnose(): Diagnosis {
+    override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         val dir = system.createTempDir()

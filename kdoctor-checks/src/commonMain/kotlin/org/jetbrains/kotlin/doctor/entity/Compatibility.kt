@@ -63,7 +63,7 @@ data class Compatibility(
     @SerialName("problems") val problems: List<CompatibilityProblem>
 ) {
     companion object {
-        fun download(system: System) = try {
+        suspend fun download(system: System) = try {
             system.logger.d("Compatibility.download: $COMPATIBILITY_JSON")
             from(system, system.retrieveUrl(COMPATIBILITY_JSON))
         } catch (e: Exception) {

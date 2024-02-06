@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import kotlinx.coroutines.Deferred
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -26,41 +27,41 @@ interface System {
     val logger: KdoctorLogger
 
     val currentOS: OS
-    val osVersion: Version?
-    val cpuInfo: String?
+    val osVersion: Deferred<Version?>
+    val cpuInfo: Deferred<String?>
     val homeDir: String
-    val shell: Shell?
+    val shell: Deferred<Shell?>
 
-    fun getEnvVar(name: String): String?
-    fun execute(command: String, vararg args: String): ProcessResult
+    suspend fun getEnvVar(name: String): String?
+    suspend fun execute(command: String, vararg args: String): ProcessResult
 
-    fun retrieveUrl(url: String): String
-    fun downloadUrl(url: String, targetPath: String)
-    fun find(path: String, nameFilter: String): List<String>?
-    fun list(path: String): String?
-    fun pwd(): String
-    fun parseCert(certString: String): Map<String, String>
+    suspend fun retrieveUrl(url: String): String
+    suspend fun downloadUrl(url: String, targetPath: String)
+    suspend fun find(path: String, nameFilter: String): List<String>?
+    suspend fun list(path: String): String?
+    suspend fun pwd(): String
+    suspend fun parseCert(certString: String): Map<String, String>
 
-    fun fileExists(path: String): Boolean
-    fun readFile(path: String): String?
-    fun writeTempFile(content: String): String
-    fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
-    fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
+    suspend fun fileExists(path: String): Boolean
+    suspend fun readFile(path: String): String?
+    suspend fun writeTempFile(content: String): String
+    suspend fun readArchivedFile(pathToArchive: String, pathToFile: String): String?
+    suspend fun findAppsPathsInDirectory(prefix: String, directory: String, recursively: Boolean = false): List<String>
 
-    fun createTempDir(): String
-    fun rm(path: String): Boolean
-    fun mv(from: String, to: String): Boolean
+    suspend fun createTempDir(): String
+    suspend fun rm(path: String): Boolean
+    suspend fun mv(from: String, to: String): Boolean
 }
 
-fun System.isUsingRosetta() =
+suspend fun System.isUsingRosetta() =
     execute("sysctl", "sysctl.proc_translated").output
         ?.substringAfter("sysctl.proc_translated: ")
         ?.toIntOrNull() == 1
 
-fun System.isUsingM1() =
-    cpuInfo?.contains("Apple") == true
+suspend fun System.isUsingM1() =
+    cpuInfo.await()?.contains("Apple") == true
 
-fun System.parsePlist(path: String): Map<String, Any>? {
+suspend fun System.parsePlist(path: String): Map<String, Any>? {
     if (!fileExists(path)) return null
     return try {
         execute("/usr/bin/plutil", "-convert", "json", "-o", "-", path).output
@@ -70,7 +71,7 @@ fun System.parsePlist(path: String): Map<String, Any>? {
     }
 }
 
-fun System.spotlightFindAppPaths(appId: String): List<String> =
+suspend fun System.spotlightFindAppPaths(appId: String): List<String> =
     execute("/usr/bin/mdfind", "kMDItemCFBundleIdentifier=\"$appId\"").output
         ?.split("\n")
         ?.filter { it.isNotBlank() }

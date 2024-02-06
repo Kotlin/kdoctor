@@ -1,15 +1,16 @@
 package org.jetbrains.kotlin.doctor
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.kotlin.doctor.diagnostics.BaseTestSystem
 import org.jetbrains.kotlin.doctor.entity.ProcessResult
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class DevelopmentTeamsTest {
 
     @Test
-    fun `check success`() {
+    fun `check success`() = runTest {
         val testCert = """
             -----BEGIN CERTIFICATE-----
             xxx
@@ -19,7 +20,7 @@ class DevelopmentTeamsTest {
 
         val system = object : BaseTestSystem() {
 
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "security find-certificate -c Apple Development -p -a" -> {
                     ProcessResult(0, testCert)
                 }
@@ -44,7 +45,7 @@ class DevelopmentTeamsTest {
     }
 
     @Test
-    fun `check two certificates success`() {
+    fun `check two certificates success`() = runTest {
         val testCert1 = """
             -----BEGIN CERTIFICATE-----
             yyy
@@ -62,13 +63,13 @@ class DevelopmentTeamsTest {
         val f2 = "tmp2.file"
 
         val system = object : BaseTestSystem() {
-            override fun writeTempFile(content: String): String = when (content.trim()) {
+            override suspend fun writeTempFile(content: String): String = when (content.trim()) {
                 testCert1 -> f1
                 testCert2 -> f2
                 else -> super.writeTempFile(content)
             }
 
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "security find-certificate -c Apple Development -p -a" -> {
                     ProcessResult(0, "$testCert1\n$testCert2")
                 }
@@ -104,10 +105,10 @@ class DevelopmentTeamsTest {
     }
 
     @Test
-    fun `check wrong find-certificate output`() {
+    fun `check wrong find-certificate output`() = runTest {
         val system = object : BaseTestSystem() {
 
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "security find-certificate -c Apple Development -p -a" -> {
                     ProcessResult(0, "wrong format")
                 }
@@ -126,7 +127,7 @@ class DevelopmentTeamsTest {
     }
 
     @Test
-    fun `check wrong openssl output`() {
+    fun `check wrong openssl output`() = runTest {
         val testCert = """
             -----BEGIN CERTIFICATE-----
             xxx
@@ -135,7 +136,7 @@ class DevelopmentTeamsTest {
 
         val system = object : BaseTestSystem() {
 
-            override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
+            override suspend fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "security find-certificate -c Apple Development -p -a" -> {
                     ProcessResult(0, testCert)
                 }
