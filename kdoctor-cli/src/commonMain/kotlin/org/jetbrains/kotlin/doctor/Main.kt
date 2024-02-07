@@ -4,8 +4,18 @@ import co.touchlab.kermit.*
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.kotlin.doctor.diagnostics.*
+import org.jetbrains.kotlin.doctor.entity.DiagnosisResult
 import org.jetbrains.kotlin.doctor.entity.System
+import org.jetbrains.kotlin.doctor.printer.TextPainter
 
 internal expect fun initMain(): Main
 fun main(args: Array<String>): Unit = initMain().main(args)
@@ -59,15 +69,52 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
             }
 
             else -> {
-                Doctor(system)
-                    .diagnoseKmmEnvironment(
+                if (isVerbose) {
+                    println("Environment diagnose:")
+                } else {
+                    println("Environment diagnose (to see all details, use -v option):")
+                }
+
+                val output = Channel<String>()
+                launch(Dispatchers.Default) {
+                    output.consumeEach { line -> print(line) }
+                }
+
+                val diagnoses = Doctor(system)
+                    .diagnoseEnvironment(
                         isVerbose,
                         isDebug,
-                        isExtraDiagnostics,
+                        flowOf(
+                            SystemDiagnostic(system),
+                            JavaDiagnostic(system),
+                            AndroidStudioDiagnostic(system, true),
+                            XcodeDiagnostic(system, true),
+                        ),
+                        flowOf(CocoapodsDiagnostic(system)),
+                        when {
+                            isExtraDiagnostics -> flowOf(
+                                templateProjectTag?.let { TemplateProjectDiagnostic(system, it) }
+                                    ?: TemplateProjectDiagnostic(system),
+                                GradleProjectDiagnostic(system, system.pwd())
+                            )
+
+                            else -> emptyFlow()
+                        },
                         localCompatibilityJson,
-                        templateProjectTag
-                    )
-                    .collect { line -> print(line) }
+                        output
+                    ).toList()
+
+                println("Conclusion:")
+
+                val hasFailures = diagnoses.any { it.conclusion == DiagnosisResult.Failure }
+                if (hasFailures) {
+                    val prefix = "  ${DiagnosisResult.Failure.color}${DiagnosisResult.Failure.symbol}${TextPainter.RESET} "
+                    println("${prefix}KDoctor has diagnosed one or more problems while checking your environment.")
+                    println("    Please check the output for problem description and possible solutions.")
+                } else {
+                    val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
+                    println("${prefix}Your operation system is ready for Kotlin Multiplatform Mobile Development!")
+                }
             }
         }
     }

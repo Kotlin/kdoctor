@@ -4,8 +4,10 @@ import org.jetbrains.kotlin.doctor.KDOCTOR_VERSION
 import org.jetbrains.kotlin.doctor.entity.*
 import org.jetbrains.kotlin.doctor.printer.TextPainter
 
+data class CompatibilityReport(override val conclusion: DiagnosisResult, val text: String): Conclusive
+
 class CompatibilityAnalyse(private val system: System, private val compatibility: Compatibility, private val checkKdoctorVersion: Boolean) {
-    fun check(environments: List<Set<EnvironmentPiece>>, verbose: Boolean): String {
+    fun check(environments: List<Set<EnvironmentPiece>>, verbose: Boolean): CompatibilityReport {
         val userProblems = mutableSetOf<CompatibilityProblem>()
         environments.forEach { environment ->
             val problems = compatibility.problems.filter { problem ->
@@ -50,6 +52,9 @@ class CompatibilityAnalyse(private val system: System, private val compatibility
                 }
         }
 
-        return if (result.isNotBlank()) "Recommendations:\n$result" else ""
+        return when {
+            result.isNotBlank() -> CompatibilityReport(DiagnosisResult.Warning, "Recommendations:\n$result")
+            else -> CompatibilityReport(DiagnosisResult.Success, "")
+        }
     }
 }
