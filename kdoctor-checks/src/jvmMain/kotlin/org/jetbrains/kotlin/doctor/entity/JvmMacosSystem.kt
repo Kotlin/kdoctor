@@ -1,6 +1,8 @@
 package org.jetbrains.kotlin.doctor.entity
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlin.doctor.logging.KdoctorLogger
 import java.io.IOException
@@ -22,10 +24,11 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.streams.asSequence
 
+@OptIn(DelicateCoroutinesApi::class)
 class JvmMacosSystem(
     override val logger: KdoctorLogger,
     private val envOverride: Map<String, String> = emptyMap(),
-) : MacosSystem() {
+) : MacosSystem(GlobalScope) {
     override val homeDir: String by lazy { System.getProperty("user.home") }
 
     override suspend fun getEnvVar(name: String): String? = envOverride[name] ?: System.getenv(name)

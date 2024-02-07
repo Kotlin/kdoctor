@@ -1,6 +1,10 @@
 package org.jetbrains.kotlin.doctor.entity
 
-abstract class NativeMacosSystemBase : MacosSystem() {
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+
+@OptIn(DelicateCoroutinesApi::class)
+abstract class NativeMacosSystemBase : MacosSystem(GlobalScope) {
     override suspend fun retrieveUrl(url: String): String {
         val curlResult = execute("curl", "--location", "--silent", "--fail", url)
         if (curlResult.code != 0) {
