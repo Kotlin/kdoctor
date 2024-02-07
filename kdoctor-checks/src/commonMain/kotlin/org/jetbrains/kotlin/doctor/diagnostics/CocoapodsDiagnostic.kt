@@ -24,8 +24,8 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
             }
         }
 
+        val rubyLocation = system.which("ruby")
         val rubyVersion = system.execute("ruby", "-v").output
-        val rubyLocation = system.execute("which", "ruby").output
         if (rubyLocation == null || rubyVersion == null) {
             result.addFailure(
                 "ruby not found",

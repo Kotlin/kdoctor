@@ -16,4 +16,5 @@ abstract class MacosSystem(scope: CoroutineScope) : System {
             Shell.entries.firstOrNull { it.path == shellPath }
         }
     }
+    override suspend fun which(command: String): String? = execute("which", command).output
 }

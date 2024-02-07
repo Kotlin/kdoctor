@@ -33,6 +33,7 @@ interface System {
     val shell: Deferred<Shell?>
 
     suspend fun getEnvVar(name: String): String?
+    suspend fun which(command: String): String?
     suspend fun execute(command: String, vararg args: String): ProcessResult
 
     suspend fun retrieveUrl(url: String): String
