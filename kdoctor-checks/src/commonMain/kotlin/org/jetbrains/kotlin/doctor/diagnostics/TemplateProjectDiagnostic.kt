@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.Diagnosis
 import org.jetbrains.kotlin.doctor.entity.System
+import kotlin.coroutines.cancellation.CancellationException
 
 class TemplateProjectDiagnostic(
     private val system: System,
@@ -25,6 +26,8 @@ class TemplateProjectDiagnostic(
 
         try {
             system.downloadUrl("https://github.com/Kotlin/kdoctor/archive/refs/tags/$tag.zip", zip)
+        } catch (e: CancellationException) {
+            throw e
         }
         catch (e: Exception) {
             result.addFailure("Error: impossible to download a template project", e.message.orEmpty())
