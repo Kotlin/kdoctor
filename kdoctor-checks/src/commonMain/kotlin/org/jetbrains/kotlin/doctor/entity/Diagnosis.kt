@@ -9,14 +9,18 @@ enum class DiagnosisResult(val symbol: Char, val color: String) {
     Failure('✖', TextPainter.RED)
 }
 
+interface Conclusive {
+    val conclusion: DiagnosisResult
+}
+
 data class DiagnosisEntry(val result: DiagnosisResult, val text: String)
 
 data class Diagnosis(
     val title: String,
     val entries: List<DiagnosisEntry>,
     val checkedEnvironments: List<Set<EnvironmentPiece>>, //there maybe e.g. several AS with installed plugins
-    val conclusion: DiagnosisResult
-) {
+    override val conclusion: DiagnosisResult
+): Conclusive {
 
     fun getText(verbose: Boolean) = buildString {
         val prefix = with(conclusion) {
