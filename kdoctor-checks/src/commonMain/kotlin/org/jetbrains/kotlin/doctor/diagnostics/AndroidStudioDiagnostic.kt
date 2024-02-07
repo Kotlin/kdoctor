@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
+import kotlin.coroutines.cancellation.CancellationException
 
 class AndroidStudioDiagnostic(private val system: System, private val checkForPlugins: Boolean) : Diagnostic() {
     override val title = "Android Studio"
@@ -39,6 +40,8 @@ class AndroidStudioDiagnostic(private val system: System, private val checkForPl
                     val historyJson = system.readFile(historyFile) ?: return@filter true
                     val history: ToolboxHistory = try {
                         jsonFormatter.decodeFromString(historyJson)
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
                         system.logger.e("Parse Toolbox history error: $e", e)
                         return@filter true

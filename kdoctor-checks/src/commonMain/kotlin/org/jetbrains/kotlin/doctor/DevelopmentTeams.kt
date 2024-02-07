@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.doctor
 
 import org.jetbrains.kotlin.doctor.entity.System
+import kotlin.coroutines.cancellation.CancellationException
 
 data class DevelopmentTeam(val id: String, val name: String) {
     override fun toString(): String = "$id ($name)"
@@ -19,6 +20,8 @@ class DevelopmentTeams(private val system: System) {
         return allCerts.mapNotNull {
             try {
                 getDevelopmentTeamForCert(it)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 system.logger.e("Read certificate error: $e", e)
                 null

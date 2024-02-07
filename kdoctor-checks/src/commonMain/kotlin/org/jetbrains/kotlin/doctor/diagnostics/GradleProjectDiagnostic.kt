@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
+import kotlin.coroutines.cancellation.CancellationException
 
 private const val KDOCTOR_PREFIX = "kdoctor >>> "
 
@@ -66,6 +67,8 @@ class GradleProjectDiagnostic(
 
         val tempFile = try {
             system.writeTempFile(printPluginsInitScript())
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             result.addFailure(
                 "Error: impossible to create temporary file",

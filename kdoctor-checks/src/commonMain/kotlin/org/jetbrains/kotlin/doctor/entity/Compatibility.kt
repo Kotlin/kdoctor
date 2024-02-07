@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.KDOCTOR_VERSION
+import kotlin.coroutines.cancellation.CancellationException
 
 private const val COMPATIBILITY_JSON = "https://github.com/Kotlin/kdoctor/raw/master/kdoctor/src/commonMain/resources/compatibility.json"
 
@@ -66,6 +67,8 @@ data class Compatibility(
         suspend fun download(system: System) = try {
             system.logger.d("Compatibility.download: $COMPATIBILITY_JSON")
             from(system, system.retrieveUrl(COMPATIBILITY_JSON))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             system.logger.e("Compatibility.download error ${e.message}", e)
             Compatibility(KDOCTOR_VERSION, emptyList())
@@ -74,6 +77,8 @@ data class Compatibility(
         fun from(system: System, compatibilityJson: String) = try {
             system.logger.d(compatibilityJson)
             Json.decodeFromString(compatibilityJson)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             system.logger.e("Compatibility json error ${e.message}", e)
             Compatibility(KDOCTOR_VERSION, emptyList())

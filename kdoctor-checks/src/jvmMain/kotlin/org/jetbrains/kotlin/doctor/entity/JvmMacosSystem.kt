@@ -12,6 +12,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.util.concurrent.CancellationException
 import java.util.zip.ZipInputStream
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -54,6 +55,8 @@ class JvmMacosSystem(
             if (exitCode != 0) logger.e { "Error code '$cmd' = $exitCode" }
 
             ProcessResult(exitCode, output.ifBlank { null })
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: IOException) {
             logger.d(e) { "Error executing '$cmd'" }
             ProcessResult(-1, null)
