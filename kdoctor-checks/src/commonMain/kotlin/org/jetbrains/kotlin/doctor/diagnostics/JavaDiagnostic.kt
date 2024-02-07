@@ -8,7 +8,7 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
     override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
-        var javaLocation = system.execute("which", "java").output
+        var javaLocation = system.which("java")
         val javaVersion = system.execute("java", "-version").output?.lineSequence()?.firstOrNull()
         val systemJavaHome = system.execute("/usr/libexec/java_home").output
         val javaHome = system.getEnvVar("JAVA_HOME")
