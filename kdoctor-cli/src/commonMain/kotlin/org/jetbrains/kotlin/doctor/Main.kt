@@ -113,7 +113,7 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
                     println("    Please check the output for problem description and possible solutions.")
                 } else {
                     val prefix = "  ${DiagnosisResult.Success.color}${DiagnosisResult.Success.symbol}${TextPainter.RESET} "
-                    println("${prefix}Your operation system is ready for Kotlin Multiplatform Mobile Development!")
+                    println("${prefix}Your operating system is ready for Kotlin Multiplatform Mobile Development!")
                 }
             }
         }
