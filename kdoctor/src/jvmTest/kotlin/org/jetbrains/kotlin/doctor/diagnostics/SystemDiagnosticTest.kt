@@ -12,7 +12,7 @@ internal class SystemDiagnosticTest {
         val system = object : BaseTestSystem() {}
         val diagnose = SystemDiagnostic(system).diagnose()
 
-        val expected = Diagnosis.Builder("Operation System").apply {
+        val expected = Diagnosis.Builder("Operating System").apply {
             addSuccess(
                 "Version OS: macOS 42.777",
                 "CPU: test_cpu"
@@ -38,7 +38,7 @@ internal class SystemDiagnosticTest {
         }
         val diagnose = SystemDiagnostic(system).diagnose()
 
-        val expected = Diagnosis.Builder("Operation System").apply {
+        val expected = Diagnosis.Builder("Operating System").apply {
             addSuccess(
                 "Version OS: macOS 42.777",
                 "CPU: test_cpu"
@@ -63,7 +63,7 @@ internal class SystemDiagnosticTest {
         }
         val diagnose = SystemDiagnostic(system).diagnose()
 
-        val expected = Diagnosis.Builder("Operation System").apply {
+        val expected = Diagnosis.Builder("Operating System").apply {
             addFailure(
                 "OS: Linux 42.777"
             )
@@ -79,7 +79,7 @@ internal class SystemDiagnosticTest {
         }
         val diagnose = SystemDiagnostic(system).diagnose()
 
-        val expected = Diagnosis.Builder("Operation System").apply {
+        val expected = Diagnosis.Builder("Operating System").apply {
             addFailure(
                 "OS: macOS null"
             )
