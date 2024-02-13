@@ -36,7 +36,6 @@ abstract class XcodeDiagnosticBase(protected val system: System) : Diagnostic() 
             result.addSuccess(
                 "${xcode.name} (${xcode.version})\nLocation: ${xcode.location}"
             )
-            result.addEnvironment(EnvironmentPiece.Xcode(xcode.version))
         }
 
         val xcrun = system.execute("xcrun", "cc").output
@@ -50,12 +49,15 @@ abstract class XcodeDiagnosticBase(protected val system: System) : Diagnostic() 
         if (xcodeInstallations.isNotEmpty()) {
             val tools = system.execute("xcode-select", "-p").output
             if (tools != null) {
-                if (xcodeInstallations.none { tools.startsWith(it.location!!) }) {
+                val selectedInstallation = xcodeInstallations.find { tools.startsWith(it.location!!) }
+                if (selectedInstallation == null) {
                     activeXcodeInstallationNotFound(result, tools)
                 } else {
                     if (xcodeInstallations.size > 1) {
                         result.addSuccess("Current command line tools: $tools")
                     }
+
+                    result.addEnvironment(EnvironmentPiece.Xcode(selectedInstallation.version))
 
                     val launchStatus = system.execute("xcodebuild", "-checkFirstLaunchStatus")
                     if (launchStatus.code != 0) {
@@ -66,6 +68,9 @@ abstract class XcodeDiagnosticBase(protected val system: System) : Diagnostic() 
                     }
                 }
             } else {
+                xcodeInstallations.forEach { xcode ->
+                    result.addEnvironment(EnvironmentPiece.Xcode(xcode.version))
+                }
                 noXcodeInstallationConfigured(result)
             }
         }
