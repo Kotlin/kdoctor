@@ -11,15 +11,15 @@ class CompatibilityAnalyse(private val system: System, private val compatibility
         val userProblems = mutableSetOf<CompatibilityProblem>()
         environments.forEach { environment ->
             val problems = compatibility.problems.filter { problem ->
-                system.logger.d("Analyze problem: ${problem.url}")
+                system.logger.d { "Analyze problem: ${problem.url ?: problem.text}" }
                 problem.matrix.all { app ->
-                    system.logger.d("Find app: ${app.name}")
+                    system.logger.d { "Find app: ${app.name}" }
                     val userAppVersion = environment.firstOrNull { it.name == app.name }?.version ?: return@all false
-                    system.logger.d("User app (${app.name}): ${userAppVersion.semVersion}")
+                    system.logger.d { "User app (${app.name}): ${userAppVersion.semVersion}" }
                     val beforeProblem = app.from?.let { userAppVersion < Version(it) } ?: false
                     val fixedAlready = app.fixedIn?.let { userAppVersion >= Version(it) } ?: false
                     val result = !(beforeProblem || fixedAlready)
-                    system.logger.d("App has problem: $result")
+                    system.logger.d { "App has problem: $result" }
                     return@all result
                 }
             }
@@ -47,7 +47,7 @@ class CompatibilityAnalyse(private val system: System, private val compatibility
                             appendLine("    $s")
                         }
                     }
-                    appendLine("    More details: ${problem.url}")
+                    problem.url?.let { appendLine("    More details: $it") }
                     appendLine()
                 }
         }

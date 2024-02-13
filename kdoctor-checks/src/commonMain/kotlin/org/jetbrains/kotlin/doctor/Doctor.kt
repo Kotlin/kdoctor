@@ -16,18 +16,10 @@ class Doctor(private val system: System) {
         diagnostics: Flow<Diagnostic>,
         supplementalDiagnostics: Flow<Diagnostic>,
         extraDiagnostics: Flow<Diagnostic>,
-        localCompatibilityJson: String?,
+        compatibility: Deferred<Compatibility>,
         output: SendChannel<String>
     ): Flow<Conclusive> = channelFlow {
         try {
-            val compatibility = async {
-                if (localCompatibilityJson == null) {
-                    Compatibility.download(system)
-                } else {
-                    Compatibility.from(system, system.readFile(localCompatibilityJson).orEmpty())
-                }
-            }
-
             fun CoroutineScope.showDiagnosticProgress(title: String) = launch {
                 var progressIndex = 0
                 while (isActive) {
