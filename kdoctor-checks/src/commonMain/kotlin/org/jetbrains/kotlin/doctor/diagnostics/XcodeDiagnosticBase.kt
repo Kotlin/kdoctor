@@ -2,10 +2,10 @@ package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
 
-class XcodeDiagnostic(private val system: System, private val checkCliTools: Boolean) : Diagnostic() {
-    override val title = "Xcode"
+abstract class XcodeDiagnosticBase(protected val system: System) : Diagnostic() {
+    final override val title = "Xcode"
 
-    override suspend fun diagnose(): Diagnosis {
+    final override suspend fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
         val paths = mutableSetOf<String>()
@@ -22,7 +22,12 @@ class XcodeDiagnostic(private val system: System, private val checkCliTools: Boo
         }
 
         val xcodeInstallations = paths.mapNotNull { findXcode(it) }
+        diagnoseInstallations(xcodeInstallations, result)
 
+        return result.build()
+    }
+
+    protected open suspend fun diagnoseInstallations(xcodeInstallations: List<Application>, result: Diagnosis.Builder) {
         if (xcodeInstallations.count() > 1) {
             result.addInfo("Multiple Xcode installations found")
         }
@@ -42,15 +47,11 @@ class XcodeDiagnostic(private val system: System, private val checkCliTools: Boo
             )
         }
 
-        if (checkCliTools && xcodeInstallations.isNotEmpty()) {
+        if (xcodeInstallations.isNotEmpty()) {
             val tools = system.execute("xcode-select", "-p").output
             if (tools != null) {
                 if (xcodeInstallations.none { tools.startsWith(it.location!!) }) {
-                    result.addFailure(
-                        "Current command line tools: $tools",
-                        "You have to select command line tools bundled to Xcode",
-                        "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
-                    )
+                    activeXcodeInstallationNotFound(result, tools)
                 } else {
                     if (xcodeInstallations.size > 1) {
                         result.addSuccess("Current command line tools: $tools")
@@ -65,29 +66,24 @@ class XcodeDiagnostic(private val system: System, private val checkCliTools: Boo
                     }
                 }
             } else {
-                result.addFailure(
-                    "Command line tools are not configured",
-                    "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
-                )
-            }
-
-            val xcodeJavaHome =
-                system.execute("defaults", "read", "com.apple.dt.Xcode", "IDEApplicationwideBuildSettings").output
-                    ?.lines()
-                    ?.lastOrNull { it.contains("\"JAVA_HOME\"") }
-                    ?.split("=")
-                    ?.lastOrNull()
-                    ?.trim(' ', '"', ';')
-                    ?: system.execute("/usr/libexec/java_home").output
-            if (xcodeJavaHome != null) {
-                result.addInfo(
-                    "Xcode JAVA_HOME: $xcodeJavaHome",
-                    "Xcode JAVA_HOME can be configured in Xcode -> Settings -> Locations -> Custom Paths"
-                )
+                noXcodeInstallationConfigured(result)
             }
         }
+    }
 
-        return result.build()
+    protected open fun activeXcodeInstallationNotFound(result: Diagnosis.Builder, activeInstallation: String?) {
+        result.addFailure(
+            "Current command line tools: $activeInstallation",
+            "You have to select command line tools bundled to Xcode",
+            "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
+        )
+    }
+
+    protected open fun noXcodeInstallationConfigured(result: Diagnosis.Builder) {
+        result.addFailure(
+            "Command line tools are not configured",
+            "Command line tools can be configured in Xcode -> Settings -> Locations -> Locations"
+        )
     }
 
     private suspend fun findXcode(path: String): Application? {

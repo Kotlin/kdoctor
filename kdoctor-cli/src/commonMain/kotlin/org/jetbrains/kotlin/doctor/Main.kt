@@ -88,7 +88,7 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
                             SystemDiagnostic(system),
                             JavaDiagnostic(system),
                             AndroidStudioDiagnostic(system, true),
-                            XcodeDiagnostic(system, true),
+                            XcodeDiagnosticStandlone(system),
                         ),
                         flowOf(CocoapodsDiagnostic(system)),
                         when {

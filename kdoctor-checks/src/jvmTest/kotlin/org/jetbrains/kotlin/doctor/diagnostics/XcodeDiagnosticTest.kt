@@ -13,7 +13,7 @@ class XcodeDiagnosticTest {
     @Test
     fun `check success`() = runTest {
         val system = object : BaseTestSystem() {}
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -43,7 +43,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addFailure(
@@ -85,7 +85,7 @@ class XcodeDiagnosticTest {
                 return super.findAppsPathsInDirectory(prefix, directory, recursively)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -127,7 +127,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addInfo(
@@ -170,7 +170,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -205,7 +205,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -240,7 +240,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -274,7 +274,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -308,7 +308,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
@@ -338,7 +338,7 @@ class XcodeDiagnosticTest {
                 else -> super.executeCmd(cmd)
             }
         }
-        val diagnose = XcodeDiagnostic(system, true).diagnose()
+        val diagnose = XcodeDiagnosticStandlone(system).diagnose()
 
         val expected = Diagnosis.Builder("Xcode").apply {
             addSuccess(
