@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.emptyFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.doctor.diagnostics.*
+import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.DiagnosisResult
 import org.jetbrains.kotlin.doctor.entity.System
 import org.jetbrains.kotlin.doctor.printer.TextPainter
@@ -75,6 +77,12 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
                     println("Environment diagnose (to see all details, use -v option):")
                 }
 
+                val compatibility = async {
+                    localCompatibilityJson?.let {
+                        Compatibility.from(system, system.readFile(it).orEmpty())
+                    } ?: Compatibility.download(system)
+                }
+
                 val output = Channel<String>()
                 launch(Dispatchers.Default) {
                     output.consumeEach { line -> print(line) }
@@ -100,7 +108,7 @@ internal class Main(val system: System) : CliktCommand(name = "kdoctor") {
 
                             else -> emptyFlow()
                         },
-                        localCompatibilityJson,
+                        compatibility,
                         output
                     ).toList()
 

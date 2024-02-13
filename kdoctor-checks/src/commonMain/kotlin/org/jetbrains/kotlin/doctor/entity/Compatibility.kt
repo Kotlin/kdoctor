@@ -52,7 +52,7 @@ data class EnvironmentRange(
 
 @Serializable
 data class CompatibilityProblem(
-    @SerialName("url") val url: String,
+    @SerialName("url") val url: String?,
     @SerialName("text") val text: String,
     @SerialName("isCritical") val isCritical: Boolean = false,
     @SerialName("matrix") val matrix: Set<EnvironmentRange>
