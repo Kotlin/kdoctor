@@ -81,6 +81,21 @@
           "fixedIn": "1.9.10"
         }
       ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KT-65542",
+      "isCritical": true,
+      "text": "Xcode 15.3+ is supported only since Kotlin 1.9.23",
+      "matrix": [
+        {
+          "name": "Xcode",
+          "from": "15.3"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "fixedIn": "1.9.23"
+        }
+      ]
     }
   ]
 }
