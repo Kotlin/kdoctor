@@ -17,7 +17,7 @@ class AndroidStudioDiagnosticTest {
                 "Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app",
                 "Bundled Java: openjdk version \"11.0.16\" 2022-07-19 LTS",
                 "Kotlin Plugin: 1.7.20",
-                "Kotlin Multiplatform Mobile Plugin: 0.5.0"
+                "Kotlin Multiplatform Plugin: 0.5.0"
             )
             addInfo(
                 "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
@@ -72,7 +72,7 @@ class AndroidStudioDiagnosticTest {
                 "Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app",
                 "Bundled Java: openjdk version \"11.0.16\" 2022-07-19 LTS",
                 "Kotlin Plugin: 1.7.20",
-                "Kotlin Multiplatform Mobile Plugin: 0.5.0",
+                "Kotlin Multiplatform Plugin: 0.5.0",
                 "Kotlin plugin is disabled. Enable Kotlin in Android Studio settings."
             )
             addInfo(
@@ -90,7 +90,7 @@ class AndroidStudioDiagnosticTest {
     }
 
     @Test
-    fun `check no KMM plugin`() {
+    fun `check no KMP plugin`() {
         val system = object : BaseTestSystem() {
             override fun executeCmd(cmd: String): ProcessResult = when (cmd) {
                 "find $homeDir/Library/Application Support/Google/data/Directory/Name/plugins/kmm/lib -name \"*.jar\"" -> {
@@ -108,8 +108,8 @@ class AndroidStudioDiagnosticTest {
                 "Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app",
                 "Bundled Java: openjdk version \"11.0.16\" 2022-07-19 LTS",
                 "Kotlin Plugin: 1.7.20",
-                "Kotlin Multiplatform Mobile Plugin: not installed",
-                "Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile"
+                "Kotlin Multiplatform Plugin: not installed",
+                "Install Kotlin Multiplatform plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile"
             )
             addInfo(
                 "Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.",
@@ -176,7 +176,7 @@ class AndroidStudioDiagnosticTest {
                 "Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4345.14.2221.9252092/Android Studio Preview.app",
                 "Bundled Java: openjdk version \"11.0.16\" 2022-07-19 LTS",
                 "Kotlin Plugin: not installed",
-                "Kotlin Multiplatform Mobile Plugin: 0.5.0",
+                "Kotlin Multiplatform Plugin: 0.5.0",
                 "Install Kotlin plugin - https://plugins.jetbrains.com/plugin/6954-kotlin"
             )
             addEnvironment(
@@ -188,7 +188,7 @@ class AndroidStudioDiagnosticTest {
                 "Location: /Users/my/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-1/213.7172.25.2113.9123335/Android Studio.app",
                 "Bundled Java: not found",
                 "Kotlin Plugin: 1.7.20",
-                "Kotlin Multiplatform Mobile Plugin: 0.5.0"
+                "Kotlin Multiplatform Plugin: 0.5.0"
             )
             addEnvironment(
                 EnvironmentPiece.AndroidStudio(Version("AI-213.7172.25.2113.9123335")),

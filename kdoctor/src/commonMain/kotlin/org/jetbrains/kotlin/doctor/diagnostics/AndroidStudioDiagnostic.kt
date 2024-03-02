@@ -1,7 +1,6 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 import co.touchlab.kermit.Logger
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.*
 
@@ -64,7 +63,8 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
         studioInstallations.forEach { app ->
             val androidStudio = AppManager(system, app)
             val kotlinPlugin = androidStudio.getPlugin(AppManager.KOTLIN_PLUGIN)
-            val kmmPlugin = androidStudio.getPlugin(AppManager.KMM_PLUGIN)
+            // TODO: This is why we should not rename "kmm" to "kmp"
+            val kmmPlugin = androidStudio.getPlugin(AppManager.KMP_PLUGIN)
             val embeddedJavaVersion = androidStudio.getEmbeddedJavaVersion()
 
             val message = """
@@ -72,7 +72,7 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
                 Location: ${app.location}
                 Bundled Java: ${embeddedJavaVersion ?: "not found"}
                 Kotlin Plugin: ${kotlinPlugin?.version ?: "not installed"}
-                Kotlin Multiplatform Mobile Plugin: ${kmmPlugin?.version ?: "not installed"}
+                Kotlin Multiplatform Plugin: ${kmmPlugin?.version ?: "not installed"}
             """.trimIndent()
             result.addEnvironment(*buildSet {
                 add(EnvironmentPiece.AndroidStudio(app.version))
@@ -97,14 +97,14 @@ class AndroidStudioDiagnostic(private val system: System) : Diagnostic() {
             if (kmmPlugin == null) {
                 result.addWarning(
                     message,
-                    "Install Kotlin Multiplatform Mobile plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile"
+                    "Install Kotlin Multiplatform plugin - https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile"
                 )
                 return@forEach
             }
             if (!kmmPlugin.isEnabled) {
                 result.addWarning(
                     message,
-                    "Kotlin Multiplatform Mobile plugin is disabled. Enable Kotlin Multiplatform Mobile in Android Studio settings."
+                    "Kotlin Multiplatform plugin is disabled. Enable Kotlin Multiplatform in Android Studio settings."
                 )
                 return@forEach
             }

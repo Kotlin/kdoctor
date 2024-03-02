@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Homebrew](https://badgen.net/homebrew/v/kdoctor)](https://formulae.brew.sh/formula/kdoctor)
 
-KDoctor is a command-line tool that helps to set up the environment for [Kotlin Multiplatform Mobile](https://kotlinlang.org/lp/mobile/) app development.
+KDoctor is a command-line tool that helps to set up the environment for [Kotlin Multiplatform](https://kotlinlang.org/lp/mobile/) app development.
 
 ![](https://github.com/Kotlin/kdoctor/raw/master/img/screen_1.jpg)
 
@@ -14,7 +14,7 @@ If something is missed or not configured, KDoctor highlights the problem and sug
 KDoctor runs the following diagnostics:
 * System - checks an operating system version
 * JDK - checks that JDK installation and JAVA_HOME setting
-* Android Studio - checks Android Studio installation, Kotlin and Kotlin Multiplatform Mobile plugins 
+* Android Studio - checks Android Studio installation, Kotlin and Kotlin Multiplatform plugins 
 * Xcode - checks Xcode installation and setup
 * CocoaPods - checks ruby environment and cocoapods gem installation
 
@@ -57,13 +57,13 @@ Call KDoctor in the console and wait till it completes the diagnostics
 
 ```
 kdoctor
-Diagnosing Kotlin Multiplatform Mobile environment...
+Diagnosing Kotlin Multiplatform environment...
 ```
 
-Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for Kotlin Multiplatform Mobile development:
+Once KDoctor finishes the diagnostics, it yields a report.  If no problems are found your system is ready for Kotlin Multiplatform development:
 
 ```
-Your system is ready for Kotlin Multiplatform Mobile Development!
+Your system is ready for Kotlin Multiplatform Development!
 ```
 
 If KDoctor notifies that there are problems, please review the report:
@@ -116,12 +116,12 @@ Environment diagnose:
     Location: /Users/me/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/222.4459.24.2221.9445173/Android Studio Preview.app
     Bundled Java: openjdk 17.0.4.1 2022-08-12
     Kotlin Plugin: 222-1.8.0-release-AS3739.54
-    Kotlin Multiplatform Mobile Plugin: 1.0.0-SNAPSHOT
+    Kotlin Multiplatform Plugin: 1.0.0-SNAPSHOT
   ➤ Android Studio (AI-221.6008.13.2211.9477386)
     Location: /Users/me/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-2/221.6008.13.2211.9477386/Android Studio.app
     Bundled Java: openjdk 11.0.15 2022-04-19
     Kotlin Plugin: 221-1.7.21-release-for-android-studio-AS5591.52
-    Kotlin Multiplatform Mobile Plugin: 0.5.2(221)-3
+    Kotlin Multiplatform Plugin: 0.5.2(221)-3
   i Note that, by default, Android Studio uses bundled JDK for Gradle tasks execution.
     Gradle JDK can be configured in Android Studio Preferences under Build, Execution, Deployment -> Build Tools -> Gradle section
 
@@ -140,7 +140,7 @@ Recommendations:
   ➤ IDE doesn't suggest running all tests in file if it contains more than one class
     More details: https://youtrack.jetbrains.com/issue/KTIJ-22078
 Conclusion:
-  ✓ Your system is ready for Kotlin Multiplatform Mobile Development!
+  ✓ Your system is ready for Kotlin Multiplatform Development!
 ```
 
 ## Issue Tracker
