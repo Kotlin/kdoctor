@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.doctor.diagnostics
 
 import org.jetbrains.kotlin.doctor.entity.*
+import org.jetbrains.kotlin.doctor.entity.OS.*
 
 class JavaDiagnostic(private val system: System) : Diagnostic() {
     override val title = "Java"
@@ -8,9 +9,20 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)
 
-        var javaLocation = system.execute("which", "java").output
-        val javaVersion = system.execute("java", "-version").output?.lineSequence()?.firstOrNull()
-        val systemJavaHome = system.execute("/usr/libexec/java_home").output
+        var javaLocation = when(system.currentOS) {
+            Linux, MacOS -> system.execute("which", "java").output
+//            Windows -> system.execute("(gcm java).Path").output
+            Windows -> "${system.getEnvVar("java.home")}\\"
+            UNKNOWN -> throw UnsupportedOperationException()
+        }
+        println("\n Value is $javaLocation")
+        val javaVersion = system.execute("java", "--version").output?.lineSequence()?.firstOrNull()
+
+        val systemJavaHome = when(system.currentOS) {
+            Linux, MacOS -> system.execute("/usr/libexec/java_home").output
+            Windows -> system.execute("\$Env:JAVA_HOME").output
+            UNKNOWN -> throw UnsupportedOperationException()
+        }
         val javaHome = system.getEnvVar("JAVA_HOME")
         if (javaLocation == "/usr/bin/java") {
             javaLocation = when {
@@ -31,10 +43,15 @@ class JavaDiagnostic(private val system: System) : Diagnostic() {
         result.addSuccess("${java.name} (${java.version})\nLocation: ${java.location}")
         result.addEnvironment(EnvironmentPiece.Jdk(java.version))
 
-        val javaHomeHint = """
+        val javaHomeHint = when(system.currentOS) {
+            Linux, MacOS -> """
             Consider adding the following to ${system.shell?.profile ?: "your shell profile"} for setting JAVA_HOME
             export JAVA_HOME=${javaLocation.removeSuffix("/bin/java")}
         """.trimIndent()
+            Windows -> "Consider adding the `$javaLocation` to your system environment variables, search for 'env' " +
+                    "in the Windows search bar. Click on the environment variables and add it in the System variables."
+            UNKNOWN -> "Consider adding the `$javaLocation` to your environment variable."
+        }
 
         if (javaHome.isNullOrBlank()) {
             result.addInfo("JAVA_HOME is not set", javaHomeHint)

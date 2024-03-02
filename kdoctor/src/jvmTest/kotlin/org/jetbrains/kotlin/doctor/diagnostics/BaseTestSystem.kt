@@ -9,6 +9,8 @@ open class BaseTestSystem : System {
     override val cpuInfo: String? = "test_cpu"
     override val homeDir: String = "/Users/my"
     override val shell: Shell? = Shell.Zsh
+    override val hasXcodeSupport: Boolean
+        get() = false
 
     open val testProjectPath: String = "./test/my_project"
     open val testTempFile: String get() = "$testProjectPath/temp.file"
@@ -30,7 +32,7 @@ open class BaseTestSystem : System {
             "which java" -> {
                 "$homeDir/.sdkman/candidates/java/current/bin/java"
             }
-            "java -version" -> {
+            "java --version" -> {
                 """
                     openjdk version "11.0.16" 2022-07-19 LTS
                     OpenJDK Runtime Environment Corretto-11.0.16.8.1 (build 11.0.16+8-LTS)

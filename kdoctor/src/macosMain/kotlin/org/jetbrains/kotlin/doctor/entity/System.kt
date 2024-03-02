@@ -22,9 +22,11 @@ class MacosSystem : System {
     }
     override val shell: Shell? by lazy {
         getEnvVar("SHELL")?.let { shellPath ->
-            Shell.values().firstOrNull { it.path == shellPath }
+            Shell.entries.firstOrNull { it.path == shellPath }
         }
     }
+    override val hasXcodeSupport: Boolean
+        get() = true
 
     override fun getEnvVar(name: String): String? = getenv(name)?.toKString()
 
