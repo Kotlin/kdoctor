@@ -82,8 +82,8 @@ class CocoapodsDiagnostic(private val system: System) : Diagnostic() {
                 )
             } else {
                 result.addFailure(
-                    "cocoapods not found",
-                    "Get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
+                    "cocoapods not found or installed incorrectly",
+                    "Run 'pod --version' and check output or get cocoapods from https://guides.cocoapods.org/using/getting-started.html#installation"
                 )
             }
             return result.buildWithRecommendation()
