@@ -96,6 +96,22 @@
           "fixedIn": "1.9.23"
         }
       ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KT-70700",
+      "isCritical": true,
+      "text": "Can't import or build project with Gradle 8.10.\nUpdate Gradle to 8.10.2+ or Kotlin to 2.0.21+",
+      "matrix": [
+        {
+          "name": "Gradle",
+          "from": "8.10",
+          "fixedIn": "8.10.2"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "fixedIn": "2.0.21"
+        }
+      ]
     }
   ]
 }

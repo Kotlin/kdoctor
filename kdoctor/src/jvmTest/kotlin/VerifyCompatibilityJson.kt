@@ -1,4 +1,3 @@
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.doctor.entity.Compatibility
 import org.jetbrains.kotlin.doctor.entity.EnvironmentPiece
@@ -40,6 +39,8 @@ class VerifyCompatibilityJson {
             error("Invalid semantic versions: $invalidVersions")
         }
 
-        println(compatibility.problems.joinToString("\n") { it.url })
+        println(compatibility.problems.joinToString("\n") { problem ->
+            "${problem.url} - ${problem.matrix.joinToString { "${it.name} [${it.from ?: "-∞"}, ${it.fixedIn ?: "∞"})" }}: ${problem.text}"
+        })
     }
 }
