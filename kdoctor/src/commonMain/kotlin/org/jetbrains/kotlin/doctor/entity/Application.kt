@@ -86,6 +86,7 @@ class AppManager(
 
     companion object {
         const val KOTLIN_PLUGIN = "Kotlin"
-        const val KMM_PLUGIN = "kmm"
+        // TODO: Should not be renamed yet
+        const val KMP_PLUGIN = "kmm"
     }
 }
