@@ -98,6 +98,36 @@
       ]
     },
     {
+      "url": "https://youtrack.jetbrains.com/issue/KT-69093",
+      "isCritical": true,
+      "text": "Xcode 16.0+ is supported only since Kotlin 2.0.21",
+      "matrix": [
+        {
+          "name": "Xcode",
+          "from": "16.0"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "fixedIn": "2.0.21"
+        }
+      ]
+    },
+    {
+      "url": "https://youtrack.jetbrains.com/issue/KT-75781",
+      "isCritical": true,
+      "text": "Xcode 16.3+ is supported only since Kotlin 2.1.21",
+      "matrix": [
+        {
+          "name": "Xcode",
+          "from": "16.3"
+        },
+        {
+          "name": "GradlePlugin(org.jetbrains.kotlin.multiplatform)",
+          "fixedIn": "2.1.21"
+        }
+      ]
+    },
+    {
       "url": "https://youtrack.jetbrains.com/issue/KT-70700",
       "isCritical": true,
       "text": "Can't import or build project with Gradle 8.10.\nUpdate Gradle to 8.10.2+ or Kotlin to 2.0.21+",
