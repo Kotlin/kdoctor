@@ -3,7 +3,7 @@ package org.jetbrains.kotlin.doctor.diagnostics
 import org.jetbrains.kotlin.doctor.entity.*
 
 class SystemDiagnostic(private val system: System) : Diagnostic() {
-    override val title = "Operation System"
+    override val title = "Operating System"
 
     override fun diagnose(): Diagnosis {
         val result = Diagnosis.Builder(title)

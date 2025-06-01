@@ -101,7 +101,7 @@ Options:
 ```
 kdoctor -v
 Environment diagnose:
-[✓] Operation System
+[✓] Operating System
   ➤ Version OS: macOS 13.1
     CPU: Apple M1 Max
 
